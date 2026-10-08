@@ -42,6 +42,9 @@ namespace Terraprint.Common.Systems
 
 		public override void PostUpdateEverything()
 		{
+			// Enquanto segue o mouse nao ha o que comparar (tudo aparece como "falta").
+			if (ProjectionSystem.State == ProjectionSystem.ProjectionState.Moving)
+				return;
 			if (!ProjectionSystem.HasProjection) {
 				if (Total != 0 || TileStatus.Length != 0)
 					Reset();

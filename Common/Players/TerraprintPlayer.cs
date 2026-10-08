@@ -14,9 +14,17 @@ namespace Terraprint.Common.Players
 		/// <summary>Alguma ferramenta do Terraprint esta capturando o mouse no mundo.</summary>
 		public static bool ToolActive => SelectionSystem.Active || Moving;
 
+		private static bool _waitForRelease;
+
+		/// <summary>
+		/// Ignora o clique atual ate o botao ser solto. Evita que o clique no botao do menu
+		/// (ex.: Carregar) ja fixe o blueprint ou marque um canto no mesmo quadro.
+		/// </summary>
+		public static void SwallowClick() => _waitForRelease = true;
+
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
-			if (Main.drawingPlayerChat || PlayerInput.WritingText)
+			if (Main.drawingPlayerChat || PlayerInput.WritingText || UISystem.Typing)
 				return;
 
 			if (KeybindSystem.ToggleMenu.JustPressed)
@@ -34,6 +42,12 @@ namespace Terraprint.Common.Players
 				if (KeybindSystem.NudgeDown.JustPressed) ProjectionSystem.Nudge(0, 1);
 				if (KeybindSystem.NudgeLeft.JustPressed) ProjectionSystem.Nudge(-1, 0);
 				if (KeybindSystem.NudgeRight.JustPressed) ProjectionSystem.Nudge(1, 0);
+			}
+
+			if (_waitForRelease) {
+				if (!Main.mouseLeft)
+					_waitForRelease = false;
+				return;
 			}
 
 			if (!ToolActive)

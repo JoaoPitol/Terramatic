@@ -16,13 +16,14 @@ namespace Terraprint.Common.Systems
 
 		public static bool MenuOpen => _interface?.CurrentState != null;
 		public static bool MouseOverMenu => MenuOpen && _menu.IsMouseOverPanel;
+		public static bool Typing => MenuOpen && _menu.IsTyping;
 		public static TerraprintMenu Menu => _menu;
 
 		public override void Load()
 		{
 			_interface = new UserInterface();
+			// SetState ativa (e monta) o menu na primeira abertura, quando os textos ja estao carregados.
 			_menu = new TerraprintMenu();
-			_menu.Activate();
 		}
 
 		public override void Unload()

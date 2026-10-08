@@ -28,6 +28,7 @@ namespace Terraprint.Common.Systems
 		public static void Begin()
 		{
 			ProjectionSystem.CancelMoving();
+			Players.TerraprintPlayer.SwallowClick();
 			Active = true;
 			CornerA = null;
 			CornerB = null;

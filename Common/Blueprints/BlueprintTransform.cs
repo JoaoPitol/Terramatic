@@ -1,3 +1,4 @@
+using Terraria;
 using Terraria.ObjectData;
 
 namespace Terraprint.Common.Blueprints
@@ -97,7 +98,8 @@ namespace Terraprint.Common.Blueprints
 						ref BlueprintCell t = ref d[s.Width - 1 - x, y];
 						CopyTile(c, ref t);
 						t.Slope = MirrorSlope(c.Slope);
-						t.FrameX = Reframe;
+						if (Main.tileSolid[c.TileType])
+							t.FrameX = Reframe;
 					}
 				}
 			}
@@ -121,7 +123,8 @@ namespace Terraprint.Common.Blueprints
 					CopyTile(c, ref t);
 					t.Slope = RotateSlopeCW(c.Slope);
 					t.HalfBlock = false;
-					t.FrameX = Reframe;
+					if (Main.tileSolid[c.TileType])
+						t.FrameX = Reframe;
 				}
 			}
 			return d;

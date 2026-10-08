@@ -21,6 +21,7 @@ namespace Terraprint.Common.Systems
 		private static int _builtRevision = -1;
 		private static int _builtVersion = -1;
 		private static int _builtConfig = -1;
+		private static ProjectionSystem.ProjectionState _builtState;
 
 		public override void Unload()
 		{
@@ -76,13 +77,13 @@ namespace Terraprint.Common.Systems
 		private static void EnsureTexture(TerraprintConfig cfg)
 		{
 			var bp = ProjectionSystem.Current;
-			if (_texture != null && _builtRevision == ProgressTracker.Revision && _builtVersion == ProjectionSystem.Version && _builtConfig == TerraprintConfig.ChangeCount
+			if (_texture != null && _builtRevision == ProgressTracker.Revision && _builtState == ProjectionSystem.State && _builtVersion == ProjectionSystem.Version && _builtConfig == TerraprintConfig.ChangeCount
 				&& _texture.Width == bp.Width && _texture.Height == bp.Height)
 				return;
 
 			var tiles = ProgressTracker.TileStatus;
 			var walls = ProgressTracker.WallStatus;
-			bool haveStatus = tiles.Length == bp.Cells.Length;
+			bool haveStatus = tiles.Length == bp.Cells.Length && ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
 			var data = new Color[bp.Cells.Length];
 			for (int i = 0; i < data.Length; i++) {
 				ref BlueprintCell c = ref bp.Cells[i];
@@ -99,6 +100,7 @@ namespace Terraprint.Common.Systems
 			_builtRevision = ProgressTracker.Revision;
 			_builtVersion = ProjectionSystem.Version;
 			_builtConfig = TerraprintConfig.ChangeCount;
+			_builtState = ProjectionSystem.State;
 		}
 
 		/// <summary>Bloco tem prioridade sobre parede; paredes aparecem mais apagadas.</summary>

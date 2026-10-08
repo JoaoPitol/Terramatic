@@ -46,6 +46,7 @@ namespace Terraprint.Common.Systems
 			Rebuild();
 			State = ProjectionState.Moving;
 			SelectionSystem.Cancel();
+			Players.TerraprintPlayer.SwallowClick();
 			Lang.Info(Lang.UI("PlacingStart", bp.Name), Color.LightSkyBlue);
 			if (bp.UnknownTypes > 0)
 				Main.NewText(Lang.UI("UnknownTypes", bp.UnknownTypes), Color.Orange);
@@ -96,6 +97,7 @@ namespace Terraprint.Common.Systems
 				return;
 			_originBeforeMove = State == ProjectionState.Fixed ? Origin : null;
 			State = ProjectionState.Moving;
+			Players.TerraprintPlayer.SwallowClick();
 			Lang.Info(Lang.UI("MovingStart"), Color.LightSkyBlue);
 		}
 

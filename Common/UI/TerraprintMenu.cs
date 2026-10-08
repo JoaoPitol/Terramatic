@@ -215,6 +215,7 @@ namespace Terraprint.Common.UI
 		}
 
 		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);
+		public bool IsTyping => _nameBox != null && _nameBox.Focused;
 
 		private void SaveSelection()
 		{
