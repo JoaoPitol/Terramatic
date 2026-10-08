@@ -19,6 +19,7 @@ Mods: {
 					Ghost: "Fantasma no mundo"
 					Map: "Mapa e minimapa"
 					Colors: "Cores"
+					General: "Geral"
 				}
 
 				CaptureLiquids: {
@@ -116,6 +117,27 @@ Mods: {
 					Tooltip: "Blocos já certos (quando destacados)."
 				}
 
+				ShowChatMessages: {
+					Label: "Mensagens no chat"
+					Tooltip: "Mostra dicas e confirmações no chat. Avisos e erros sempre aparecem."
+				}
+
+				CloseMenuOnLoad: {
+					Label: "Fechar menu ao carregar"
+					Tooltip: "Fecha o menu depois de clicar em Carregar, para você já posicionar o blueprint."
+				}
+
+				PlacementAnchor: {
+					Label: "Ponto do mouse"
+					Tooltip: "Qual ponto do blueprint segue o mouse enquanto você move."
+				}
+
+			}
+
+			Anchor: {
+				BottomCenter.Label: "Centro da base"
+				Center.Label: "Centro"
+				TopLeft.Label: "Canto superior esquerdo"
 			}
 		}
 
@@ -159,6 +181,16 @@ Mods: {
 			RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
 			Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
 			Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
+			Options: "Opções"
+			ToggleGhost: "Fantasma: {0}"
+			ToggleMap: "Mapa: {0}"
+			ToggleCorrect: "Certos: {0}"
+			On: "lig."
+			Off: "desl."
+			Delete: "Excluir"
+			DeleteConfirm: "Certeza?"
+			Deleted: "[Terraprint] {0} excluído."
+			DeleteError: "[Terraprint] Não foi possível excluir: {0}"
 		}
 	}
 }

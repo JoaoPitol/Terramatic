@@ -45,3 +45,16 @@ Regras de transformação (o padrão combinado):
    dourado e, passando o mouse por cima, o progresso.
 5. Teste uma construção com rampas, meio-blocos e móveis (portas, mesas, cadeiras, tochas)
    para ver se o desenho bate com o original.
+
+## Passo 4: opções e acabamento
+
+1. No menu, a linha de botões **Fantasma / Mapa / Certos** liga e desliga na hora
+   (fica salvo, igual às opções). **Opções** abre a tela completa de configurações.
+2. Na tela de opções, confira as seções Geral, Captura, Fantasma no mundo, Mapa e Cores.
+   Mude a opacidade e as cores e veja o fantasma e o mapa mudarem.
+3. **Ponto do mouse**: troque entre Centro da base, Centro e Canto superior esquerdo e carregue
+   um blueprint para ver qual ponto segue o mouse.
+4. **Mensagens no chat** desligado: as dicas somem, mas avisos e erros continuam.
+5. **Excluir** na lista pede confirmação ("Certeza?") e só apaga no segundo clique.
+6. Em Configurações > Controles, as teclas do Terraprint aparecem com nome:
+   abrir menu (K), girar (.), espelhar (,), mover com as setas.

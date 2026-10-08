@@ -19,6 +19,7 @@ Mods: {
 					Ghost: "Ghost in the world"
 					Map: "Map and minimap"
 					Colors: "Colors"
+					General: "General"
 				}
 
 				CaptureLiquids: {
@@ -116,6 +117,27 @@ Mods: {
 					Tooltip: "Blocks already correct (when highlighted)."
 				}
 
+				ShowChatMessages: {
+					Label: "Chat messages"
+					Tooltip: "Shows tips and confirmations in the chat. Warnings and errors always show."
+				}
+
+				CloseMenuOnLoad: {
+					Label: "Close menu when loading"
+					Tooltip: "Closes the menu after clicking Load so you can place the blueprint right away."
+				}
+
+				PlacementAnchor: {
+					Label: "Mouse anchor"
+					Tooltip: "Which point of the blueprint follows the mouse while moving it."
+				}
+
+			}
+
+			Anchor: {
+				BottomCenter.Label: "Bottom center"
+				Center.Label: "Center"
+				TopLeft.Label: "Top left"
 			}
 		}
 
@@ -159,6 +181,16 @@ Mods: {
 			RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
 			Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
 			Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
+			Options: "Options"
+			ToggleGhost: "Ghost: {0}"
+			ToggleMap: "Map: {0}"
+			ToggleCorrect: "Correct: {0}"
+			On: "on"
+			Off: "off"
+			Delete: "Delete"
+			DeleteConfirm: "Sure?"
+			Deleted: "[Terraprint] Deleted {0}."
+			DeleteError: "[Terraprint] Could not delete: {0}"
 		}
 	}
 }

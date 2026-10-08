@@ -36,6 +36,7 @@ namespace Terraprint.Common.Systems
 
 		private static int _timer;
 		private static int _seenVersion = -1;
+		private static int _seenConfig = -1;
 
 		public static float Percent => Total == 0 ? 1f : Correct / (float)Total;
 
@@ -46,9 +47,10 @@ namespace Terraprint.Common.Systems
 					Reset();
 				return;
 			}
-			if (++_timer >= RefreshTicks || _seenVersion != ProjectionSystem.Version) {
+			if (++_timer >= RefreshTicks || _seenVersion != ProjectionSystem.Version || _seenConfig != TerraprintConfig.ChangeCount) {
 				_timer = 0;
 				_seenVersion = ProjectionSystem.Version;
+				_seenConfig = TerraprintConfig.ChangeCount;
 				Recalculate();
 			}
 		}

@@ -12,6 +12,19 @@ namespace Terraprint.Common.Configs
 
 		public static TerraprintConfig Instance => ModContent.GetInstance<TerraprintConfig>();
 
+		public enum Anchor { BottomCenter, Center, TopLeft }
+
+		[Header("General")]
+		[DefaultValue(true)]
+		public bool ShowChatMessages;
+
+		[DefaultValue(true)]
+		public bool CloseMenuOnLoad;
+
+		[DefaultValue(Anchor.BottomCenter)]
+		[DrawTicks]
+		public Anchor PlacementAnchor;
+
 		[Header("Capture")]
 		[DefaultValue(true)]
 		public bool CaptureLiquids;
@@ -77,5 +90,18 @@ namespace Terraprint.Common.Configs
 
 		[DefaultValue(typeof(Color), "90, 255, 120, 255")]
 		public Color ColorCorrect;
+
+		/// <summary>Contador que muda sempre que alguma opcao e salva (o fantasma e o mapa se redesenham).</summary>
+		public static int ChangeCount { get; private set; }
+
+		public override void OnChanged() => ChangeCount++;
+
+		/// <summary>Altera uma opcao pelo menu do mod e grava no arquivo de configuracao.</summary>
+		public static void Set(System.Action<TerraprintConfig> change)
+		{
+			var pending = (TerraprintConfig)ConfigManager.GeneratePopulatedClone(Instance);
+			change(pending);
+			Instance.SaveChanges(pending, silent: true);
+		}
 	}
 }

@@ -20,6 +20,7 @@ namespace Terraprint.Common.Systems
 		private static Texture2D _texture;
 		private static int _builtRevision = -1;
 		private static int _builtVersion = -1;
+		private static int _builtConfig = -1;
 
 		public override void Unload()
 		{
@@ -75,7 +76,7 @@ namespace Terraprint.Common.Systems
 		private static void EnsureTexture(TerraprintConfig cfg)
 		{
 			var bp = ProjectionSystem.Current;
-			if (_texture != null && _builtRevision == ProgressTracker.Revision && _builtVersion == ProjectionSystem.Version
+			if (_texture != null && _builtRevision == ProgressTracker.Revision && _builtVersion == ProjectionSystem.Version && _builtConfig == TerraprintConfig.ChangeCount
 				&& _texture.Width == bp.Width && _texture.Height == bp.Height)
 				return;
 
@@ -97,6 +98,7 @@ namespace Terraprint.Common.Systems
 			_texture.SetData(data);
 			_builtRevision = ProgressTracker.Revision;
 			_builtVersion = ProjectionSystem.Version;
+			_builtConfig = TerraprintConfig.ChangeCount;
 		}
 
 		/// <summary>Bloco tem prioridade sobre parede; paredes aparecem mais apagadas.</summary>

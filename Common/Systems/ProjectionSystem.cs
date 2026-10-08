@@ -46,7 +46,7 @@ namespace Terraprint.Common.Systems
 			Rebuild();
 			State = ProjectionState.Moving;
 			SelectionSystem.Cancel();
-			Main.NewText(Lang.UI("PlacingStart", bp.Name), Color.LightSkyBlue);
+			Lang.Info(Lang.UI("PlacingStart", bp.Name), Color.LightSkyBlue);
 			if (bp.UnknownTypes > 0)
 				Main.NewText(Lang.UI("UnknownTypes", bp.UnknownTypes), Color.Orange);
 		}
@@ -96,7 +96,7 @@ namespace Terraprint.Common.Systems
 				return;
 			_originBeforeMove = State == ProjectionState.Fixed ? Origin : null;
 			State = ProjectionState.Moving;
-			Main.NewText(Lang.UI("MovingStart"), Color.LightSkyBlue);
+			Lang.Info(Lang.UI("MovingStart"), Color.LightSkyBlue);
 		}
 
 		/// <summary>Botao direito enquanto move: volta para onde estava, ou descarta se nunca foi fixado.</summary>
@@ -112,7 +112,7 @@ namespace Terraprint.Common.Systems
 			else
 				Clear();
 			_originBeforeMove = null;
-			Main.NewText(Lang.UI("Cancelled"));
+			Lang.Info(Lang.UI("Cancelled"));
 		}
 
 		public static void Nudge(int dx, int dy)
@@ -123,11 +123,15 @@ namespace Terraprint.Common.Systems
 			Version++;
 		}
 
-		/// <summary>Posicao do fantasma quando ele segue o mouse: o mouse fica no centro da base.</summary>
+		/// <summary>Posicao do fantasma quando ele segue o mouse (ponto de ancoragem escolhido nas opcoes).</summary>
 		public static Point OriginAtMouse()
 		{
 			Point m = Main.MouseWorld.ToTileCoordinates();
-			return new Point(m.X - Current.Width / 2, m.Y - Current.Height + 1);
+			return Configs.TerraprintConfig.Instance.PlacementAnchor switch {
+				Configs.TerraprintConfig.Anchor.Center => new Point(m.X - Current.Width / 2, m.Y - Current.Height / 2),
+				Configs.TerraprintConfig.Anchor.TopLeft => m,
+				_ => new Point(m.X - Current.Width / 2, m.Y - Current.Height + 1),
+			};
 		}
 
 		public static void Fix()
@@ -137,7 +141,7 @@ namespace Terraprint.Common.Systems
 			Origin = OriginAtMouse();
 			State = ProjectionState.Fixed;
 			Version++;
-			Main.NewText(Lang.UI("Fixed", Origin.X, Origin.Y), Color.LightGreen);
+			Lang.Info(Lang.UI("Fixed", Origin.X, Origin.Y), Color.LightGreen);
 		}
 
 		public override void PostUpdateEverything()

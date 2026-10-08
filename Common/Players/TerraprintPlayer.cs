@@ -44,7 +44,7 @@ namespace Terraprint.Common.Players
 			if (Main.mouseRight && Main.mouseRightRelease) {
 				if (SelectionSystem.Active) {
 					SelectionSystem.Cancel();
-					Main.NewText(Lang.UI("Cancelled"));
+					Lang.Info(Lang.UI("Cancelled"));
 				}
 				else
 					ProjectionSystem.CancelMoving();

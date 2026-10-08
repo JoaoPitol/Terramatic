@@ -31,7 +31,7 @@ namespace Terraprint.Common.Systems
 			Active = true;
 			CornerA = null;
 			CornerB = null;
-			Main.NewText(Lang.UI("SelectStart"), Color.LightSkyBlue);
+			Lang.Info(Lang.UI("SelectStart"), Color.LightSkyBlue);
 		}
 
 		public static void Cancel()
@@ -49,7 +49,7 @@ namespace Terraprint.Common.Systems
 
 			if (!CornerA.HasValue) {
 				CornerA = tile;
-				Main.NewText(Lang.UI("SelectSecond"), Color.LightSkyBlue);
+				Lang.Info(Lang.UI("SelectSecond"), Color.LightSkyBlue);
 				return;
 			}
 
@@ -62,7 +62,7 @@ namespace Terraprint.Common.Systems
 
 			CornerB = tile;
 			Active = false;
-			Main.NewText(Lang.UI("SelectDone", r.Width, r.Height), Color.LightGreen);
+			Lang.Info(Lang.UI("SelectDone", r.Width, r.Height), Color.LightGreen);
 		}
 
 		public static Blueprint CaptureSelection(string name)

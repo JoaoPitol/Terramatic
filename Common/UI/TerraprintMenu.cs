@@ -6,6 +6,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraprint.Common.Blueprints;
+using Terraprint.Common.Configs;
 using Terraprint.Common.Systems;
 
 namespace Terraprint.Common.UI
@@ -23,12 +24,14 @@ namespace Terraprint.Common.UI
 		private UIList _fileList;
 		private UIText _projectionInfo;
 		private UIButton[] _projectionButtons;
+		private UIButton _toggleGhost, _toggleMap, _toggleCorrect;
 
 		public override void OnInitialize()
 		{
 			_panel = new UIDragPanel();
 			_panel.Width.Set(PanelWidth, 0f);
-			_panel.Height.Set(640f, 0f);
+			_panel.Height.Set(System.Math.Min(700f, Main.screenHeight - 140f), 0f);
+			_panel.MinHeight.Set(560f, 0f);
 			_panel.Left.Set(Main.screenWidth / 2f - PanelWidth / 2f, 0f);
 			_panel.Top.Set(120f, 0f);
 			_panel.SetPadding(Pad);
@@ -99,6 +102,20 @@ namespace Terraprint.Common.UI
 			y += 40f;
 
 			_projectionButtons = new[] { rotate, flip, move, remove, left, up, down, right };
+
+			// --- Opcoes rapidas (todas as opcoes ficam no botao Opcoes) ---
+			_toggleGhost = new UIButton("", () => TerraprintConfig.Set(c => c.ShowGhost = !c.ShowGhost), 0.8f);
+			_toggleMap = new UIButton("", () => TerraprintConfig.Set(c => {
+				bool on = !(c.ShowOnMinimap || c.ShowOnFullscreenMap);
+				c.ShowOnMinimap = c.ShowOnFullscreenMap = on;
+			}), 0.8f);
+			_toggleCorrect = new UIButton("", () => TerraprintConfig.Set(c => c.ShowCorrect = !c.ShowCorrect), 0.8f);
+			var options = new UIButton(Lang.UI("Options"), () => TerraprintConfig.Instance.Open(), 0.8f);
+			Place(_toggleGhost, y, 0f, 0.25f, -6f);
+			Place(_toggleMap, y, 0.25f, 0.25f, -6f, leftOffset: 2f);
+			Place(_toggleCorrect, y, 0.5f, 0.25f, -6f, leftOffset: 4f);
+			Place(options, y, 0.75f, 0.25f, -6f, leftOffset: 6f);
+			y += 40f;
 
 			// --- Blueprints salvos ---
 			y = AddHeader(Lang.UI("FilesHeader"), y);
@@ -174,7 +191,14 @@ namespace Terraprint.Common.UI
 			foreach (var b in _projectionButtons)
 				b.Enabled = has;
 			_projectionInfo.SetText(ProjectionInfoText());
+
+			var cfg = TerraprintConfig.Instance;
+			_toggleGhost.SetText(Lang.UI("ToggleGhost", OnOff(cfg.ShowGhost)));
+			_toggleMap.SetText(Lang.UI("ToggleMap", OnOff(cfg.ShowOnMinimap || cfg.ShowOnFullscreenMap)));
+			_toggleCorrect.SetText(Lang.UI("ToggleCorrect", OnOff(cfg.ShowCorrect)));
 		}
+
+		private static string OnOff(bool on) => on ? Lang.UI("On") : Lang.UI("Off");
 
 		/// <summary>Texto do estado da projecao e, quando fixada, o progresso da construcao.</summary>
 		protected virtual string ProjectionInfoText()
@@ -199,7 +223,7 @@ namespace Terraprint.Common.UI
 			try {
 				var bp = SelectionSystem.CaptureSelection(_nameBox.Text);
 				string path = BlueprintIO.Save(bp);
-				Main.NewText(Lang.UI("Saved", Path.GetFileName(path), bp.Width, bp.Height), Color.LightGreen);
+				Lang.Info(Lang.UI("Saved", Path.GetFileName(path), bp.Width, bp.Height), Color.LightGreen);
 				_nameBox.Text = "";
 				SelectionSystem.Cancel();
 				RefreshFiles();
@@ -237,7 +261,10 @@ namespace Terraprint.Common.UI
 			Height.Set(40f, 0f);
 			SetPadding(6f);
 
-			var name = new UIText(Path.GetFileNameWithoutExtension(path), 0.9f);
+			string display = Path.GetFileNameWithoutExtension(path);
+			if (display.Length > 22)
+				display = display.Substring(0, 21) + "…";
+			var name = new UIText(display, 0.9f);
 			name.VAlign = 0.5f;
 			Append(name);
 
@@ -247,6 +274,41 @@ namespace Terraprint.Common.UI
 			load.Left.Set(-90f, 1f);
 			load.VAlign = 0.5f;
 			Append(load);
+
+			_delete = new UIButton(Lang.UI("Delete"), DeleteFile, 0.8f);
+			_delete.Width.Set(80f, 0f);
+			_delete.Height.Set(28f, 0f);
+			_delete.Left.Set(-176f, 1f);
+			_delete.VAlign = 0.5f;
+			Append(_delete);
+		}
+
+		private readonly UIButton _delete;
+		private int _confirmTimer;
+
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			if (_confirmTimer > 0 && --_confirmTimer == 0)
+				_delete.SetText(Lang.UI("Delete"));
+		}
+
+		/// <summary>Primeiro clique pede confirmacao; o segundo (em ate 3 s) apaga o arquivo.</summary>
+		private void DeleteFile()
+		{
+			if (_confirmTimer == 0) {
+				_confirmTimer = 180;
+				_delete.SetText(Lang.UI("DeleteConfirm"));
+				return;
+			}
+			try {
+				File.Delete(FilePath);
+				Lang.Info(Lang.UI("Deleted", Path.GetFileName(FilePath)));
+			}
+			catch (Exception e) {
+				Main.NewText(Lang.UI("DeleteError", e.Message), Color.OrangeRed);
+			}
+			UISystem.Menu?.RefreshFiles();
 		}
 
 		private void LoadFile()
@@ -254,6 +316,8 @@ namespace Terraprint.Common.UI
 			try {
 				var bp = BlueprintIO.Load(FilePath);
 				ProjectionSystem.Load(bp);
+				if (TerraprintConfig.Instance.CloseMenuOnLoad)
+					UISystem.CloseMenu();
 			}
 			catch (Exception e) {
 				Main.NewText(Lang.UI("LoadError", Path.GetFileName(FilePath), e.Message), Color.OrangeRed);
