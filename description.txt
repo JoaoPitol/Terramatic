@@ -1,0 +1,5 @@
+Terraprint: salve construcoes como blueprints, projete um "fantasma" delas no mundo e no mapa, e construa seguindo o molde.
+
+- Selecione uma area e salve como arquivo .tprint
+- Importe um blueprint, gire, espelhe e mova antes de fixar
+- Veja o que falta, o que esta errado e o que ja esta certo

@@ -1,0 +1,56 @@
+Mods: {
+	Terraprint: {
+		Keybinds: {
+			ToggleMenu.DisplayName: "Abrir menu do Terraprint"
+		}
+
+		Configs: {
+			TerraprintConfig: {
+				DisplayName: "Opções do Terraprint"
+
+				Headers: {
+					Capture: "Captura (ao salvar)"
+				}
+
+				CaptureLiquids: {
+					Label: "Salvar líquidos"
+					Tooltip: "Água, lava, mel e shimmer são salvos no blueprint."
+				}
+
+				CapturePaint: {
+					Label: "Salvar tinta"
+					Tooltip: "Tinta de blocos e paredes é salva no blueprint."
+				}
+
+				MaxBlueprintSize: {
+					Label: "Tamanho máximo da área"
+					Tooltip: "Maior largura ou altura, em blocos, que pode ser selecionada."
+				}
+
+			}
+		}
+
+		UI: {
+			Title: "Terraprint"
+			SaveHeader: "Salvar construção"
+			NameHint: "Nome do blueprint (clique para digitar)"
+			SelectArea: "Selecionar área"
+			Save: "Salvar"
+			FilesHeader: "Blueprints salvos"
+			Refresh: "Atualizar"
+			OpenFolder: "Abrir pasta"
+			NoFiles: "Nenhum blueprint ainda. Selecione uma área e salve."
+			InfoFirstCorner: "Clique no primeiro canto no mundo (botão direito cancela)."
+			InfoSecondCorner: "Clique no canto oposto."
+			InfoSelection: "Área selecionada: {0} x {1} blocos"
+			InfoNoSelection: "Nenhuma área selecionada."
+			SelectStart: "[Terraprint] Clique no primeiro canto da área. Botão direito cancela."
+			SelectSecond: "[Terraprint] Agora clique no canto oposto."
+			SelectTooBig: "[Terraprint] Área grande demais ({0} x {1}). O limite é {2} por lado (mude nas opções)."
+			SelectDone: "[Terraprint] Área selecionada: {0} x {1}. Dê um nome e clique em Salvar."
+			Cancelled: "[Terraprint] Cancelado."
+			Saved: "[Terraprint] Salvo {0} ({1} x {2})."
+			SaveError: "[Terraprint] Não foi possível salvar: {0}"
+		}
+	}
+}

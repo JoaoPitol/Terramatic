@@ -1,0 +1,6 @@
+displayName = Terraprint
+author = Joao
+version = 0.1
+hideCode = false
+hideResources = false
+includeSource = true
