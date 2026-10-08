@@ -27,6 +27,7 @@ namespace Terraprint.Common.Systems
 
 		public static void Begin()
 		{
+			ProjectionSystem.CancelMoving();
 			Active = true;
 			CornerA = null;
 			CornerB = null;

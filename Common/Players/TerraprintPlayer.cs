@@ -9,27 +9,55 @@ namespace Terraprint.Common.Players
 	/// <summary>Le teclas e cliques do jogador local e repassa para as ferramentas do mod.</summary>
 	public class TerraprintPlayer : ModPlayer
 	{
+		private static bool Moving => ProjectionSystem.State == ProjectionSystem.ProjectionState.Moving;
+
 		/// <summary>Alguma ferramenta do Terraprint esta capturando o mouse no mundo.</summary>
-		public static bool ToolActive => SelectionSystem.Active;
+		public static bool ToolActive => SelectionSystem.Active || Moving;
 
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
+			if (Main.drawingPlayerChat || PlayerInput.WritingText)
+				return;
+
 			if (KeybindSystem.ToggleMenu.JustPressed)
 				UISystem.ToggleMenu();
 
-			if (!ToolActive || Main.drawingPlayerChat || PlayerInput.WritingText)
+			if (ProjectionSystem.HasProjection && (Moving || UISystem.MenuOpen)) {
+				if (KeybindSystem.Rotate.JustPressed)
+					ProjectionSystem.Rotate();
+				if (KeybindSystem.Flip.JustPressed)
+					ProjectionSystem.Flip();
+			}
+
+			if (ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed && UISystem.MenuOpen) {
+				if (KeybindSystem.NudgeUp.JustPressed) ProjectionSystem.Nudge(0, -1);
+				if (KeybindSystem.NudgeDown.JustPressed) ProjectionSystem.Nudge(0, 1);
+				if (KeybindSystem.NudgeLeft.JustPressed) ProjectionSystem.Nudge(-1, 0);
+				if (KeybindSystem.NudgeRight.JustPressed) ProjectionSystem.Nudge(1, 0);
+			}
+
+			if (!ToolActive)
 				return;
 
 			bool overUI = Player.mouseInterface || UISystem.MouseOverMenu;
 
 			if (Main.mouseRight && Main.mouseRightRelease) {
-				SelectionSystem.Cancel();
-				Main.NewText(Lang.UI("Cancelled"));
+				if (SelectionSystem.Active) {
+					SelectionSystem.Cancel();
+					Main.NewText(Lang.UI("Cancelled"));
+				}
+				else
+					ProjectionSystem.CancelMoving();
 				return;
 			}
 
-			if (!overUI && Main.mouseLeft && Main.mouseLeftRelease)
+			if (overUI || !(Main.mouseLeft && Main.mouseLeftRelease))
+				return;
+
+			if (SelectionSystem.Active)
 				SelectionSystem.Click(Main.MouseWorld.ToTileCoordinates());
+			else if (Moving)
+				ProjectionSystem.Fix();
 		}
 
 		// Enquanto uma ferramenta usa o mouse, nao deixa o item da mao ser usado (minerar, atacar...).

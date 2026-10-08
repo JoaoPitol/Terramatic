@@ -2,6 +2,12 @@ Mods: {
 	Terraprint: {
 		Keybinds: {
 			ToggleMenu.DisplayName: "Open Terraprint menu"
+			Rotate.DisplayName: "Rotate blueprint"
+			Flip.DisplayName: "Mirror blueprint"
+			NudgeUp.DisplayName: "Move blueprint up (menu open)"
+			NudgeDown.DisplayName: "Move blueprint down (menu open)"
+			NudgeLeft.DisplayName: "Move blueprint left (menu open)"
+			NudgeRight.DisplayName: "Move blueprint right (menu open)"
 		}
 
 		Configs: {
@@ -51,6 +57,24 @@ Mods: {
 			Cancelled: "[Terraprint] Cancelled."
 			Saved: "[Terraprint] Saved {0} ({1} x {2})."
 			SaveError: "[Terraprint] Could not save: {0}"
+			ProjectionHeader: "Projection"
+			NoProjection: "No blueprint loaded. Click Load on a saved one below."
+			ProjectionLine: "{0} ({1} x {2}), rotation {3}° {4}"
+			Mirrored: "(mirrored)"
+			StateMoving: "Following the mouse: left click to place, right click to cancel."
+			StateFixed: "Placed. Use the arrows to adjust or Move to reposition."
+			Rotate: "Rotate"
+			Flip: "Mirror"
+			Move: "Move"
+			Remove: "Remove"
+			NudgeHint: "Moves 1 tile (arrow keys too)"
+			Load: "Load"
+			LoadError: "[Terraprint] Could not load {0}: {1}"
+			PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
+			MovingStart: "[Terraprint] Move the mouse and left click to place. Right click returns to where it was."
+			UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
+			RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
+			Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
 		}
 	}
 }

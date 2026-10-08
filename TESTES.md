@@ -14,3 +14,21 @@ vá em **Workshop > Develop Mods**, encontre **Terraprint** e clique em **Build 
    O chat confirma e o arquivo aparece na lista **Blueprints salvos**.
 4. **Abrir pasta** abre `Documents/My Games/Terraria/tModLoader/Terraprint`, onde ficam os `.tprint`.
 5. Salvar duas vezes com o mesmo nome cria `nome (2).tprint` em vez de sobrescrever.
+
+## Passo 2: importar e posicionar
+
+1. No menu, clique em **Carregar** em um blueprint salvo. Um contorno dourado com as células
+   em azul segue o mouse (o mouse fica no centro da base da construção).
+2. Enquanto ele segue o mouse: **.** (ponto) gira 90°, **,** (vírgula) espelha. Os botões
+   **Girar** e **Espelhar** fazem o mesmo.
+3. Clique esquerdo fixa. Com o menu aberto, as setas do teclado (ou os botões `< ^ v >`) movem 1 bloco.
+4. **Mover** volta a seguir o mouse; botão direito durante o movimento volta para onde estava.
+   **Remover** apaga a projeção.
+5. Saia e entre de novo no mundo: a projeção fixada continua no mesmo lugar.
+6. Para importar um arquivo de outra pessoa, coloque o `.tprint` na pasta (botão **Abrir pasta**)
+   e clique em **Atualizar**.
+
+Regras de transformação (o padrão combinado):
+- Blocos, paredes e rampas giram e espelham. Meio-blocos viram blocos inteiros ao girar.
+- Móveis e objetos maiores que 1 bloco só espelham (o objeto troca de lado, mas o sprite
+  continua virado para o mesmo lado). Ao girar, eles somem do fantasma e o chat avisa quantos.

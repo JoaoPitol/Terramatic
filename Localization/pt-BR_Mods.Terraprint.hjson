@@ -2,6 +2,12 @@ Mods: {
 	Terraprint: {
 		Keybinds: {
 			ToggleMenu.DisplayName: "Abrir menu do Terraprint"
+			Rotate.DisplayName: "Girar blueprint"
+			Flip.DisplayName: "Espelhar blueprint"
+			NudgeUp.DisplayName: "Mover blueprint para cima (menu aberto)"
+			NudgeDown.DisplayName: "Mover blueprint para baixo (menu aberto)"
+			NudgeLeft.DisplayName: "Mover blueprint para a esquerda (menu aberto)"
+			NudgeRight.DisplayName: "Mover blueprint para a direita (menu aberto)"
 		}
 
 		Configs: {
@@ -51,6 +57,24 @@ Mods: {
 			Cancelled: "[Terraprint] Cancelado."
 			Saved: "[Terraprint] Salvo {0} ({1} x {2})."
 			SaveError: "[Terraprint] Não foi possível salvar: {0}"
+			ProjectionHeader: "Projeção"
+			NoProjection: "Nenhum blueprint carregado. Clique em Carregar em um dos salvos abaixo."
+			ProjectionLine: "{0} ({1} x {2}), rotação {3}° {4}"
+			Mirrored: "(espelhado)"
+			StateMoving: "Seguindo o mouse: clique esquerdo para fixar, direito para cancelar."
+			StateFixed: "Fixado. Use as setas para ajustar ou Mover para reposicionar."
+			Rotate: "Girar"
+			Flip: "Espelhar"
+			Move: "Mover"
+			Remove: "Remover"
+			NudgeHint: "Move 1 bloco (setas também)"
+			Load: "Carregar"
+			LoadError: "[Terraprint] Não foi possível carregar {0}: {1}"
+			PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
+			MovingStart: "[Terraprint] Mova o mouse e clique esquerdo para fixar. Botão direito volta para onde estava."
+			UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
+			RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
+			Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
 		}
 	}
 }
