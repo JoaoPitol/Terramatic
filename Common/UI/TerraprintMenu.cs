@@ -176,7 +176,7 @@ namespace Terraprint.Common.UI
 			_projectionInfo.SetText(ProjectionInfoText());
 		}
 
-		/// <summary>Texto do estado da projecao (o passo 3 acrescenta o progresso).</summary>
+		/// <summary>Texto do estado da projecao e, quando fixada, o progresso da construcao.</summary>
 		protected virtual string ProjectionInfoText()
 		{
 			if (!ProjectionSystem.HasProjection)
@@ -184,7 +184,10 @@ namespace Terraprint.Common.UI
 			var bp = ProjectionSystem.Current;
 			string state = ProjectionSystem.State == ProjectionSystem.ProjectionState.Moving ? Lang.UI("StateMoving") : Lang.UI("StateFixed");
 			string flip = ProjectionSystem.FlippedX ? Lang.UI("Mirrored") : "";
-			return Lang.UI("ProjectionLine", bp.Name, bp.Width, bp.Height, ProjectionSystem.Rotation * 90, flip) + "\n" + state;
+			string line = Lang.UI("ProjectionLine", bp.Name, bp.Width, bp.Height, ProjectionSystem.Rotation * 90, flip);
+			if (ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed)
+				return line + "\n" + GhostSystem.ProgressText();
+			return line + "\n" + state;
 		}
 
 		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);

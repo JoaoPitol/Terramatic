@@ -16,6 +16,9 @@ Mods: {
 
 				Headers: {
 					Capture: "Captura (ao salvar)"
+					Ghost: "Fantasma no mundo"
+					Map: "Mapa e minimapa"
+					Colors: "Cores"
 				}
 
 				CaptureLiquids: {
@@ -31,6 +34,86 @@ Mods: {
 				MaxBlueprintSize: {
 					Label: "Tamanho máximo da área"
 					Tooltip: "Maior largura ou altura, em blocos, que pode ser selecionada."
+				}
+
+				ShowGhost: {
+					Label: "Mostrar fantasma"
+					Tooltip: "Desenha o blueprint carregado por cima do mundo."
+				}
+
+				GhostOpacity: {
+					Label: "Opacidade do fantasma"
+					Tooltip: "Quão visíveis ficam os blocos do fantasma."
+				}
+
+				ShowWalls: {
+					Label: "Mostrar paredes"
+					Tooltip: "Também desenha as paredes do blueprint."
+				}
+
+				ShowLiquids: {
+					Label: "Mostrar líquidos"
+					Tooltip: "Desenha os líquidos salvos (não contam no progresso)."
+				}
+
+				ShowCorrect: {
+					Label: "Destacar blocos certos"
+					Tooltip: "Desenha em verde os blocos já colocados certo. Desligado: eles somem do fantasma."
+				}
+
+				MarkObstructions: {
+					Label: "Marcar blocos a remover"
+					Tooltip: "Mostra um X vermelho em blocos sólidos onde o blueprint pede espaço vazio."
+				}
+
+				CheckSlopes: {
+					Label: "Conferir rampas e meio-blocos"
+					Tooltip: "Um bloco com rampa ou meio-bloco diferente conta como errado."
+				}
+
+				CheckPaint: {
+					Label: "Conferir tinta"
+					Tooltip: "Bloco ou parede com tinta diferente conta como errado."
+				}
+
+				ShowOutline: {
+					Label: "Mostrar contorno"
+					Tooltip: "Desenha um retângulo dourado em volta do blueprint."
+				}
+
+				ShowProgress: {
+					Label: "Mostrar progresso na tela"
+					Tooltip: "Mostra quantos blocos já estão prontos no topo da tela."
+				}
+
+				ShowOnMinimap: {
+					Label: "Mostrar no minimapa"
+					Tooltip: "Vale também para o mapa sobreposto."
+				}
+
+				ShowOnFullscreenMap: {
+					Label: "Mostrar no mapa grande"
+					Tooltip: "Passe o mouse em cima para ver o progresso."
+				}
+
+				MapOpacity: {
+					Label: "Opacidade no mapa"
+					Tooltip: "Quão visível o blueprint fica nos mapas."
+				}
+
+				ColorMissing: {
+					Label: "Cor do que falta"
+					Tooltip: "Blocos que ainda faltam colocar."
+				}
+
+				ColorWrong: {
+					Label: "Cor do errado"
+					Tooltip: "Blocos diferentes ou que precisam ser removidos."
+				}
+
+				ColorCorrect: {
+					Label: "Cor do certo"
+					Tooltip: "Blocos já certos (quando destacados)."
 				}
 
 			}
@@ -75,6 +158,7 @@ Mods: {
 			UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
 			RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
 			Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
+			Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
 		}
 	}
 }

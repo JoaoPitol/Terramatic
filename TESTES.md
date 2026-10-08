@@ -32,3 +32,16 @@ Regras de transformação (o padrão combinado):
 - Blocos, paredes e rampas giram e espelham. Meio-blocos viram blocos inteiros ao girar.
 - Móveis e objetos maiores que 1 bloco só espelham (o objeto troca de lado, mas o sprite
   continua virado para o mesmo lado). Ao girar, eles somem do fantasma e o chat avisa quantos.
+
+## Passo 3: fantasma no mundo e no mapa
+
+1. Fixe um blueprint em um lugar vazio. Os blocos aparecem com a textura real, em azul
+   translúcido (falta colocar). Paredes aparecem mais apagadas por trás.
+2. Coloque um bloco certo: ele some do fantasma (ou fica verde com "Destacar blocos certos").
+   Coloque um bloco diferente: fica vermelho. Bloco sólido onde deveria ser vazio: X vermelho.
+3. No topo da tela aparece `nome: certos/total (%), faltam X, errados Y`. O mesmo texto
+   aparece no menu, na seção Projeção. Ele atualiza sozinho a cada 1/4 de segundo.
+4. Minimapa e mapa sobreposto mostram a área colorida. No mapa grande (M), há contorno
+   dourado e, passando o mouse por cima, o progresso.
+5. Teste uma construção com rampas, meio-blocos e móveis (portas, mesas, cadeiras, tochas)
+   para ver se o desenho bate com o original.

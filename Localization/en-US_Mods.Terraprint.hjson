@@ -16,6 +16,9 @@ Mods: {
 
 				Headers: {
 					Capture: "Capture (saving)"
+					Ghost: "Ghost in the world"
+					Map: "Map and minimap"
+					Colors: "Colors"
 				}
 
 				CaptureLiquids: {
@@ -31,6 +34,86 @@ Mods: {
 				MaxBlueprintSize: {
 					Label: "Max area size"
 					Tooltip: "Largest width or height, in tiles, that can be selected."
+				}
+
+				ShowGhost: {
+					Label: "Show ghost"
+					Tooltip: "Draws the loaded blueprint over the world."
+				}
+
+				GhostOpacity: {
+					Label: "Ghost opacity"
+					Tooltip: "How visible the ghost blocks are."
+				}
+
+				ShowWalls: {
+					Label: "Show walls"
+					Tooltip: "Also draws and counts the blueprint walls."
+				}
+
+				ShowLiquids: {
+					Label: "Show liquids"
+					Tooltip: "Draws the saved liquids (they don't count toward progress)."
+				}
+
+				ShowCorrect: {
+					Label: "Highlight correct blocks"
+					Tooltip: "Draws blocks already placed correctly in green. Off: they just disappear from the ghost."
+				}
+
+				MarkObstructions: {
+					Label: "Mark blocks to remove"
+					Tooltip: "Shows a red X on solid blocks where the blueprint expects empty space."
+				}
+
+				CheckSlopes: {
+					Label: "Check slopes and half blocks"
+					Tooltip: "A block with the wrong slope or half-block shape counts as wrong."
+				}
+
+				CheckPaint: {
+					Label: "Check paint"
+					Tooltip: "A block or wall with different paint counts as wrong."
+				}
+
+				ShowOutline: {
+					Label: "Show outline"
+					Tooltip: "Draws a golden rectangle around the blueprint."
+				}
+
+				ShowProgress: {
+					Label: "Show progress on screen"
+					Tooltip: "Shows how many blocks are done at the top of the screen."
+				}
+
+				ShowOnMinimap: {
+					Label: "Show on minimap"
+					Tooltip: "Also applies to the overlay map."
+				}
+
+				ShowOnFullscreenMap: {
+					Label: "Show on fullscreen map"
+					Tooltip: "Hover it to see the progress."
+				}
+
+				MapOpacity: {
+					Label: "Map opacity"
+					Tooltip: "How visible the blueprint is on the maps."
+				}
+
+				ColorMissing: {
+					Label: "Missing color"
+					Tooltip: "Blocks still to be placed."
+				}
+
+				ColorWrong: {
+					Label: "Wrong color"
+					Tooltip: "Different blocks or blocks to remove."
+				}
+
+				ColorCorrect: {
+					Label: "Correct color"
+					Tooltip: "Blocks already correct (when highlighted)."
 				}
 
 			}
@@ -75,6 +158,7 @@ Mods: {
 			UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
 			RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
 			Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
+			Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
 		}
 	}
 }
