@@ -14,7 +14,7 @@ namespace Terraprint.Common.UI
 	/// <summary>Menu principal do Terraprint (abre com a tecla do mod, padrao K).</summary>
 	public class TerraprintMenu : UIState
 	{
-		private const float PanelWidth = 440f;
+		private const float PanelWidth = 520f;
 		private const float Pad = 10f;
 
 		private UIDragPanel _panel;
@@ -66,6 +66,8 @@ namespace Terraprint.Common.UI
 
 			_selectionInfo = new UIText("", 0.85f);
 			_selectionInfo.Top.Set(y, 0f);
+			_selectionInfo.Width.Set(0f, 1f);
+			_selectionInfo.IsWrapped = true;
 			_panel.Append(_selectionInfo);
 			y += 26f;
 
@@ -74,6 +76,8 @@ namespace Terraprint.Common.UI
 
 			_projectionInfo = new UIText("", 0.85f);
 			_projectionInfo.Top.Set(y, 0f);
+			_projectionInfo.Width.Set(0f, 1f);
+			_projectionInfo.IsWrapped = true;
 			_panel.Append(_projectionInfo);
 			y += 46f;
 
@@ -193,9 +197,9 @@ namespace Terraprint.Common.UI
 			_projectionInfo.SetText(ProjectionInfoText());
 
 			var cfg = TerraprintConfig.Instance;
-			_toggleGhost.SetText(Lang.UI("ToggleGhost", OnOff(cfg.ShowGhost)));
-			_toggleMap.SetText(Lang.UI("ToggleMap", OnOff(cfg.ShowOnMinimap || cfg.ShowOnFullscreenMap)));
-			_toggleCorrect.SetText(Lang.UI("ToggleCorrect", OnOff(cfg.ShowCorrect)));
+			_toggleGhost.SetLabel(Lang.UI("ToggleGhost", OnOff(cfg.ShowGhost)));
+			_toggleMap.SetLabel(Lang.UI("ToggleMap", OnOff(cfg.ShowOnMinimap || cfg.ShowOnFullscreenMap)));
+			_toggleCorrect.SetLabel(Lang.UI("ToggleCorrect", OnOff(cfg.ShowCorrect)));
 		}
 
 		private static string OnOff(bool on) => on ? Lang.UI("On") : Lang.UI("Off");
@@ -263,8 +267,8 @@ namespace Terraprint.Common.UI
 			SetPadding(6f);
 
 			string display = Path.GetFileNameWithoutExtension(path);
-			if (display.Length > 22)
-				display = display.Substring(0, 21) + "…";
+			if (display.Length > 24)
+				display = display.Substring(0, 23) + "…";
 			var name = new UIText(display, 0.9f);
 			name.VAlign = 0.5f;
 			Append(name);
@@ -279,7 +283,7 @@ namespace Terraprint.Common.UI
 			_delete = new UIButton(Lang.UI("Delete"), DeleteFile, 0.8f);
 			_delete.Width.Set(80f, 0f);
 			_delete.Height.Set(28f, 0f);
-			_delete.Left.Set(-176f, 1f);
+			_delete.Left.Set(-178f, 1f);
 			_delete.VAlign = 0.5f;
 			Append(_delete);
 		}
@@ -291,7 +295,7 @@ namespace Terraprint.Common.UI
 		{
 			base.Update(gameTime);
 			if (_confirmTimer > 0 && --_confirmTimer == 0)
-				_delete.SetText(Lang.UI("Delete"));
+				_delete.SetLabel(Lang.UI("Delete"));
 		}
 
 		/// <summary>Primeiro clique pede confirmacao; o segundo (em ate 3 s) apaga o arquivo.</summary>
@@ -299,7 +303,7 @@ namespace Terraprint.Common.UI
 		{
 			if (_confirmTimer == 0) {
 				_confirmTimer = 180;
-				_delete.SetText(Lang.UI("DeleteConfirm"));
+				_delete.SetLabel(Lang.UI("DeleteConfirm"));
 				return;
 			}
 			try {

@@ -75,16 +75,54 @@ namespace Terraprint.Common.UI
 		}
 	}
 
-	/// <summary>Botao de texto com destaque ao passar o mouse e estado desabilitado.</summary>
+	/// <summary>Botao de texto com destaque ao passar o mouse e estado desabilitado. O texto encolhe para caber no botao.</summary>
 	public class UIButton : UITextPanel<string>
 	{
 		public bool Enabled = true;
 		private readonly System.Action _onClick;
+		private readonly float _baseScale;
+		private string _label;
+		private bool _fitting;
 
 		public UIButton(string text, System.Action onClick, float textScale = 0.9f) : base(text, textScale)
 		{
 			_onClick = onClick;
+			_baseScale = textScale;
+			_label = text;
 			SetPadding(6);
+			MinWidth.Set(0f, 0f);
+		}
+
+		/// <summary>Troca o texto (sem custo se for igual ao atual).</summary>
+		public void SetLabel(string text)
+		{
+			if (text == _label)
+				return;
+			_label = text;
+			Fit();
+		}
+
+		public override void Recalculate()
+		{
+			base.Recalculate();
+			Fit();
+		}
+
+		// UITextPanel aumenta MinWidth para caber o texto, o que fazia os botoes invadirem os vizinhos.
+		// Aqui o botao mantem a largura do layout e o texto diminui ate caber.
+		private void Fit()
+		{
+			if (_fitting)
+				return;
+			_fitting = true;
+			float available = GetInnerDimensions().Width;
+			float needed = FontAssets.MouseText.Value.MeasureString(_label).X * _baseScale;
+			float scale = available > 0f && needed > available ? _baseScale * available / needed : _baseScale;
+			SetText(_label, scale, false);
+			MinWidth.Set(0f, 0f);
+			MinHeight.Set(0f, 0f);
+			base.Recalculate();
+			_fitting = false;
 		}
 
 		public override void LeftClick(UIMouseEvent evt)

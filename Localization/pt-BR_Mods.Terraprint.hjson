@@ -1,196 +1,192 @@
-Mods: {
-	Terraprint: {
-		Keybinds: {
-			ToggleMenu.DisplayName: "Abrir menu do Terraprint"
-			Rotate.DisplayName: "Girar blueprint"
-			Flip.DisplayName: "Espelhar blueprint"
-			NudgeUp.DisplayName: "Mover blueprint para cima (menu aberto)"
-			NudgeDown.DisplayName: "Mover blueprint para baixo (menu aberto)"
-			NudgeLeft.DisplayName: "Mover blueprint para a esquerda (menu aberto)"
-			NudgeRight.DisplayName: "Mover blueprint para a direita (menu aberto)"
+Keybinds: {
+	ToggleMenu.DisplayName: "Abrir menu do Terraprint"
+	Rotate.DisplayName: "Girar blueprint"
+	Flip.DisplayName: "Espelhar blueprint"
+	NudgeUp.DisplayName: "Mover blueprint para cima (menu aberto)"
+	NudgeDown.DisplayName: "Mover blueprint para baixo (menu aberto)"
+	NudgeLeft.DisplayName: "Mover blueprint para a esquerda (menu aberto)"
+	NudgeRight.DisplayName: "Mover blueprint para a direita (menu aberto)"
+}
+
+Configs: {
+	TerraprintConfig: {
+		DisplayName: "Opções do Terraprint"
+
+		Headers: {
+			Capture: "Captura (ao salvar)"
+			Ghost: "Fantasma no mundo"
+			Map: "Mapa e minimapa"
+			Colors: "Cores"
+			General: "Geral"
 		}
 
-		Configs: {
-			TerraprintConfig: {
-				DisplayName: "Opções do Terraprint"
-
-				Headers: {
-					Capture: "Captura (ao salvar)"
-					Ghost: "Fantasma no mundo"
-					Map: "Mapa e minimapa"
-					Colors: "Cores"
-					General: "Geral"
-				}
-
-				CaptureLiquids: {
-					Label: "Salvar líquidos"
-					Tooltip: "Água, lava, mel e shimmer são salvos no blueprint."
-				}
-
-				CapturePaint: {
-					Label: "Salvar tinta"
-					Tooltip: "Tinta de blocos e paredes é salva no blueprint."
-				}
-
-				MaxBlueprintSize: {
-					Label: "Tamanho máximo da área"
-					Tooltip: "Maior largura ou altura, em blocos, que pode ser selecionada."
-				}
-
-				ShowGhost: {
-					Label: "Mostrar fantasma"
-					Tooltip: "Desenha o blueprint carregado por cima do mundo."
-				}
-
-				GhostOpacity: {
-					Label: "Opacidade do fantasma"
-					Tooltip: "Quão visíveis ficam os blocos do fantasma."
-				}
-
-				ShowWalls: {
-					Label: "Mostrar paredes"
-					Tooltip: "Também desenha as paredes do blueprint."
-				}
-
-				ShowLiquids: {
-					Label: "Mostrar líquidos"
-					Tooltip: "Desenha os líquidos salvos (não contam no progresso)."
-				}
-
-				ShowCorrect: {
-					Label: "Destacar blocos certos"
-					Tooltip: "Desenha em verde os blocos já colocados certo. Desligado: eles somem do fantasma."
-				}
-
-				MarkObstructions: {
-					Label: "Marcar blocos a remover"
-					Tooltip: "Mostra um X vermelho em blocos sólidos onde o blueprint pede espaço vazio."
-				}
-
-				CheckSlopes: {
-					Label: "Conferir rampas e meio-blocos"
-					Tooltip: "Um bloco com rampa ou meio-bloco diferente conta como errado."
-				}
-
-				CheckPaint: {
-					Label: "Conferir tinta"
-					Tooltip: "Bloco ou parede com tinta diferente conta como errado."
-				}
-
-				ShowOutline: {
-					Label: "Mostrar contorno"
-					Tooltip: "Desenha um retângulo dourado em volta do blueprint."
-				}
-
-				ShowProgress: {
-					Label: "Mostrar progresso na tela"
-					Tooltip: "Mostra quantos blocos já estão prontos no topo da tela."
-				}
-
-				ShowOnMinimap: {
-					Label: "Mostrar no minimapa"
-					Tooltip: "Vale também para o mapa sobreposto."
-				}
-
-				ShowOnFullscreenMap: {
-					Label: "Mostrar no mapa grande"
-					Tooltip: "Passe o mouse em cima para ver o progresso."
-				}
-
-				MapOpacity: {
-					Label: "Opacidade no mapa"
-					Tooltip: "Quão visível o blueprint fica nos mapas."
-				}
-
-				ColorMissing: {
-					Label: "Cor do que falta"
-					Tooltip: "Blocos que ainda faltam colocar."
-				}
-
-				ColorWrong: {
-					Label: "Cor do errado"
-					Tooltip: "Blocos diferentes ou que precisam ser removidos."
-				}
-
-				ColorCorrect: {
-					Label: "Cor do certo"
-					Tooltip: "Blocos já certos (quando destacados)."
-				}
-
-				ShowChatMessages: {
-					Label: "Mensagens no chat"
-					Tooltip: "Mostra dicas e confirmações no chat. Avisos e erros sempre aparecem."
-				}
-
-				CloseMenuOnLoad: {
-					Label: "Fechar menu ao carregar"
-					Tooltip: "Fecha o menu depois de clicar em Carregar, para você já posicionar o blueprint."
-				}
-
-				PlacementAnchor: {
-					Label: "Ponto do mouse"
-					Tooltip: "Qual ponto do blueprint segue o mouse enquanto você move."
-				}
-
-			}
-
-			Anchor: {
-				BottomCenter.Label: "Centro da base"
-				Center.Label: "Centro"
-				TopLeft.Label: "Canto superior esquerdo"
-			}
+		CaptureLiquids: {
+			Label: "Salvar líquidos"
+			Tooltip: "Água, lava, mel e shimmer são salvos no blueprint."
 		}
 
-		UI: {
-			Title: "Terraprint"
-			SaveHeader: "Salvar construção"
-			NameHint: "Nome do blueprint (clique para digitar)"
-			SelectArea: "Selecionar área"
-			Save: "Salvar"
-			FilesHeader: "Blueprints salvos"
-			Refresh: "Atualizar"
-			OpenFolder: "Abrir pasta"
-			NoFiles: "Nenhum blueprint ainda. Selecione uma área e salve."
-			InfoFirstCorner: "Clique no primeiro canto no mundo (botão direito cancela)."
-			InfoSecondCorner: "Clique no canto oposto."
-			InfoSelection: "Área selecionada: {0} x {1} blocos"
-			InfoNoSelection: "Nenhuma área selecionada."
-			SelectStart: "[Terraprint] Clique no primeiro canto da área. Botão direito cancela."
-			SelectSecond: "[Terraprint] Agora clique no canto oposto."
-			SelectTooBig: "[Terraprint] Área grande demais ({0} x {1}). O limite é {2} por lado (mude nas opções)."
-			SelectDone: "[Terraprint] Área selecionada: {0} x {1}. Dê um nome e clique em Salvar."
-			Cancelled: "[Terraprint] Cancelado."
-			Saved: "[Terraprint] Salvo {0} ({1} x {2})."
-			SaveError: "[Terraprint] Não foi possível salvar: {0}"
-			ProjectionHeader: "Projeção"
-			NoProjection: "Nenhum blueprint carregado. Clique em Carregar em um dos salvos abaixo."
-			ProjectionLine: "{0} ({1} x {2}), rotação {3}° {4}"
-			Mirrored: "(espelhado)"
-			StateMoving: "Seguindo o mouse: clique esquerdo para fixar, direito para cancelar."
-			StateFixed: "Fixado. Use as setas para ajustar ou Mover para reposicionar."
-			Rotate: "Girar"
-			Flip: "Espelhar"
-			Move: "Mover"
-			Remove: "Remover"
-			NudgeHint: "Move 1 bloco (setas também)"
-			Load: "Carregar"
-			LoadError: "[Terraprint] Não foi possível carregar {0}: {1}"
-			PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
-			MovingStart: "[Terraprint] Mova o mouse e clique esquerdo para fixar. Botão direito volta para onde estava."
-			UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
-			RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
-			Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
-			Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
-			Options: "Opções"
-			ToggleGhost: "Fantasma: {0}"
-			ToggleMap: "Mapa: {0}"
-			ToggleCorrect: "Certos: {0}"
-			On: "lig."
-			Off: "desl."
-			Delete: "Excluir"
-			DeleteConfirm: "Certeza?"
-			Deleted: "[Terraprint] {0} excluído."
-			DeleteError: "[Terraprint] Não foi possível excluir: {0}"
+		CapturePaint: {
+			Label: "Salvar tinta"
+			Tooltip: "Tinta de blocos e paredes é salva no blueprint."
 		}
+
+		MaxBlueprintSize: {
+			Label: "Tamanho máximo da área"
+			Tooltip: "Maior largura ou altura, em blocos, que pode ser selecionada."
+		}
+
+		ShowGhost: {
+			Label: "Mostrar fantasma"
+			Tooltip: "Desenha o blueprint carregado por cima do mundo."
+		}
+
+		GhostOpacity: {
+			Label: "Opacidade do fantasma"
+			Tooltip: "Quão visíveis ficam os blocos do fantasma."
+		}
+
+		ShowWalls: {
+			Label: "Mostrar paredes"
+			Tooltip: "Também desenha as paredes do blueprint."
+		}
+
+		ShowLiquids: {
+			Label: "Mostrar líquidos"
+			Tooltip: "Desenha os líquidos salvos (não contam no progresso)."
+		}
+
+		ShowCorrect: {
+			Label: "Destacar blocos certos"
+			Tooltip: "Desenha em verde os blocos já colocados certo. Desligado: eles somem do fantasma."
+		}
+
+		MarkObstructions: {
+			Label: "Marcar blocos a remover"
+			Tooltip: "Mostra um X vermelho em blocos sólidos onde o blueprint pede espaço vazio."
+		}
+
+		CheckSlopes: {
+			Label: "Conferir rampas e meio-blocos"
+			Tooltip: "Um bloco com rampa ou meio-bloco diferente conta como errado."
+		}
+
+		CheckPaint: {
+			Label: "Conferir tinta"
+			Tooltip: "Bloco ou parede com tinta diferente conta como errado."
+		}
+
+		ShowOutline: {
+			Label: "Mostrar contorno"
+			Tooltip: "Desenha um retângulo dourado em volta do blueprint."
+		}
+
+		ShowProgress: {
+			Label: "Mostrar progresso na tela"
+			Tooltip: "Mostra quantos blocos já estão prontos no topo da tela."
+		}
+
+		ShowOnMinimap: {
+			Label: "Mostrar no minimapa"
+			Tooltip: "Vale também para o mapa sobreposto."
+		}
+
+		ShowOnFullscreenMap: {
+			Label: "Mostrar no mapa grande"
+			Tooltip: "Passe o mouse em cima para ver o progresso."
+		}
+
+		MapOpacity: {
+			Label: "Opacidade no mapa"
+			Tooltip: "Quão visível o blueprint fica nos mapas."
+		}
+
+		ColorMissing: {
+			Label: "Cor do que falta"
+			Tooltip: "Blocos que ainda faltam colocar."
+		}
+
+		ColorWrong: {
+			Label: "Cor do errado"
+			Tooltip: "Blocos diferentes ou que precisam ser removidos."
+		}
+
+		ColorCorrect: {
+			Label: "Cor do certo"
+			Tooltip: "Blocos já certos (quando destacados)."
+		}
+
+		ShowChatMessages: {
+			Label: "Mensagens no chat"
+			Tooltip: "Mostra dicas e confirmações no chat. Avisos e erros sempre aparecem."
+		}
+
+		CloseMenuOnLoad: {
+			Label: "Fechar menu ao carregar"
+			Tooltip: "Fecha o menu depois de clicar em Carregar, para você já posicionar o blueprint."
+		}
+
+		PlacementAnchor: {
+			Label: "Ponto do mouse"
+			Tooltip: "Qual ponto do blueprint segue o mouse enquanto você move."
+		}
+
 	}
+
+	Anchor: {
+		BottomCenter.Label: "Centro da base"
+		Center.Label: "Centro"
+		TopLeft.Label: "Canto superior esquerdo"
+	}
+}
+
+UI: {
+	Title: "Terraprint"
+	SaveHeader: "Salvar construção"
+	NameHint: "Nome do blueprint (clique para digitar)"
+	SelectArea: "Selecionar área"
+	Save: "Salvar"
+	FilesHeader: "Blueprints salvos"
+	Refresh: "Atualizar"
+	OpenFolder: "Abrir pasta"
+	NoFiles: "Nenhum blueprint ainda. Selecione uma área e salve."
+	InfoFirstCorner: "Clique no primeiro canto no mundo (botão direito cancela)."
+	InfoSecondCorner: "Clique no canto oposto."
+	InfoSelection: "Área selecionada: {0} x {1} blocos"
+	InfoNoSelection: "Nenhuma área selecionada."
+	SelectStart: "[Terraprint] Clique no primeiro canto da área. Botão direito cancela."
+	SelectSecond: "[Terraprint] Agora clique no canto oposto."
+	SelectTooBig: "[Terraprint] Área grande demais ({0} x {1}). O limite é {2} por lado (mude nas opções)."
+	SelectDone: "[Terraprint] Área selecionada: {0} x {1}. Dê um nome e clique em Salvar."
+	Cancelled: "[Terraprint] Cancelado."
+	Saved: "[Terraprint] Salvo {0} ({1} x {2})."
+	SaveError: "[Terraprint] Não foi possível salvar: {0}"
+	ProjectionHeader: "Projeção"
+	NoProjection: "Nenhum blueprint carregado. Clique em Carregar em um dos salvos abaixo."
+	ProjectionLine: "{0} ({1} x {2}), rotação {3}° {4}"
+	Mirrored: "(espelhado)"
+	StateMoving: "Seguindo o mouse: clique esquerdo para fixar, direito para cancelar."
+	StateFixed: "Fixado. Use as setas para ajustar ou Mover para reposicionar."
+	Rotate: "Girar"
+	Flip: "Espelhar"
+	Move: "Mover"
+	Remove: "Remover"
+	NudgeHint: "Move 1 bloco (setas também)"
+	Load: "Carregar"
+	LoadError: "[Terraprint] Não foi possível carregar {0}: {1}"
+	PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
+	MovingStart: "[Terraprint] Mova o mouse e clique esquerdo para fixar. Botão direito volta para onde estava."
+	UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
+	RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
+	Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
+	Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
+	Options: "Opções"
+	ToggleGhost: "Fantasma: {0}"
+	ToggleMap: "Mapa: {0}"
+	ToggleCorrect: "Certos: {0}"
+	On: "lig."
+	Off: "desl."
+	Delete: "Excluir"
+	DeleteConfirm: "Certeza?"
+	Deleted: "[Terraprint] {0} excluído."
+	DeleteError: "[Terraprint] Não foi possível excluir: {0}"
 }

@@ -1,196 +1,192 @@
-Mods: {
-	Terraprint: {
-		Keybinds: {
-			ToggleMenu.DisplayName: "Open Terraprint menu"
-			Rotate.DisplayName: "Rotate blueprint"
-			Flip.DisplayName: "Mirror blueprint"
-			NudgeUp.DisplayName: "Move blueprint up (menu open)"
-			NudgeDown.DisplayName: "Move blueprint down (menu open)"
-			NudgeLeft.DisplayName: "Move blueprint left (menu open)"
-			NudgeRight.DisplayName: "Move blueprint right (menu open)"
+Keybinds: {
+	ToggleMenu.DisplayName: "Open Terraprint menu"
+	Rotate.DisplayName: "Rotate blueprint"
+	Flip.DisplayName: "Mirror blueprint"
+	NudgeUp.DisplayName: "Move blueprint up (menu open)"
+	NudgeDown.DisplayName: "Move blueprint down (menu open)"
+	NudgeLeft.DisplayName: "Move blueprint left (menu open)"
+	NudgeRight.DisplayName: "Move blueprint right (menu open)"
+}
+
+Configs: {
+	TerraprintConfig: {
+		DisplayName: "Terraprint Options"
+
+		Headers: {
+			Capture: "Capture (saving)"
+			Ghost: "Ghost in the world"
+			Map: "Map and minimap"
+			Colors: "Colors"
+			General: "General"
 		}
 
-		Configs: {
-			TerraprintConfig: {
-				DisplayName: "Terraprint Options"
-
-				Headers: {
-					Capture: "Capture (saving)"
-					Ghost: "Ghost in the world"
-					Map: "Map and minimap"
-					Colors: "Colors"
-					General: "General"
-				}
-
-				CaptureLiquids: {
-					Label: "Save liquids"
-					Tooltip: "Water, lava, honey and shimmer are saved in the blueprint."
-				}
-
-				CapturePaint: {
-					Label: "Save paint"
-					Tooltip: "Block and wall paint are saved in the blueprint."
-				}
-
-				MaxBlueprintSize: {
-					Label: "Max area size"
-					Tooltip: "Largest width or height, in tiles, that can be selected."
-				}
-
-				ShowGhost: {
-					Label: "Show ghost"
-					Tooltip: "Draws the loaded blueprint over the world."
-				}
-
-				GhostOpacity: {
-					Label: "Ghost opacity"
-					Tooltip: "How visible the ghost blocks are."
-				}
-
-				ShowWalls: {
-					Label: "Show walls"
-					Tooltip: "Also draws and counts the blueprint walls."
-				}
-
-				ShowLiquids: {
-					Label: "Show liquids"
-					Tooltip: "Draws the saved liquids (they don't count toward progress)."
-				}
-
-				ShowCorrect: {
-					Label: "Highlight correct blocks"
-					Tooltip: "Draws blocks already placed correctly in green. Off: they just disappear from the ghost."
-				}
-
-				MarkObstructions: {
-					Label: "Mark blocks to remove"
-					Tooltip: "Shows a red X on solid blocks where the blueprint expects empty space."
-				}
-
-				CheckSlopes: {
-					Label: "Check slopes and half blocks"
-					Tooltip: "A block with the wrong slope or half-block shape counts as wrong."
-				}
-
-				CheckPaint: {
-					Label: "Check paint"
-					Tooltip: "A block or wall with different paint counts as wrong."
-				}
-
-				ShowOutline: {
-					Label: "Show outline"
-					Tooltip: "Draws a golden rectangle around the blueprint."
-				}
-
-				ShowProgress: {
-					Label: "Show progress on screen"
-					Tooltip: "Shows how many blocks are done at the top of the screen."
-				}
-
-				ShowOnMinimap: {
-					Label: "Show on minimap"
-					Tooltip: "Also applies to the overlay map."
-				}
-
-				ShowOnFullscreenMap: {
-					Label: "Show on fullscreen map"
-					Tooltip: "Hover it to see the progress."
-				}
-
-				MapOpacity: {
-					Label: "Map opacity"
-					Tooltip: "How visible the blueprint is on the maps."
-				}
-
-				ColorMissing: {
-					Label: "Missing color"
-					Tooltip: "Blocks still to be placed."
-				}
-
-				ColorWrong: {
-					Label: "Wrong color"
-					Tooltip: "Different blocks or blocks to remove."
-				}
-
-				ColorCorrect: {
-					Label: "Correct color"
-					Tooltip: "Blocks already correct (when highlighted)."
-				}
-
-				ShowChatMessages: {
-					Label: "Chat messages"
-					Tooltip: "Shows tips and confirmations in the chat. Warnings and errors always show."
-				}
-
-				CloseMenuOnLoad: {
-					Label: "Close menu when loading"
-					Tooltip: "Closes the menu after clicking Load so you can place the blueprint right away."
-				}
-
-				PlacementAnchor: {
-					Label: "Mouse anchor"
-					Tooltip: "Which point of the blueprint follows the mouse while moving it."
-				}
-
-			}
-
-			Anchor: {
-				BottomCenter.Label: "Bottom center"
-				Center.Label: "Center"
-				TopLeft.Label: "Top left"
-			}
+		CaptureLiquids: {
+			Label: "Save liquids"
+			Tooltip: "Water, lava, honey and shimmer are saved in the blueprint."
 		}
 
-		UI: {
-			Title: "Terraprint"
-			SaveHeader: "Save a build"
-			NameHint: "Blueprint name (click to type)"
-			SelectArea: "Select area"
-			Save: "Save"
-			FilesHeader: "Saved blueprints"
-			Refresh: "Refresh"
-			OpenFolder: "Open folder"
-			NoFiles: "No blueprints yet. Select an area and save one."
-			InfoFirstCorner: "Click the first corner in the world (right click cancels)."
-			InfoSecondCorner: "Click the opposite corner."
-			InfoSelection: "Selected area: {0} x {1} tiles"
-			InfoNoSelection: "No area selected."
-			SelectStart: "[Terraprint] Click the first corner of the area. Right click cancels."
-			SelectSecond: "[Terraprint] Now click the opposite corner."
-			SelectTooBig: "[Terraprint] Area too big ({0} x {1}). The limit is {2} per side (change it in the options)."
-			SelectDone: "[Terraprint] Area selected: {0} x {1}. Give it a name and click Save."
-			Cancelled: "[Terraprint] Cancelled."
-			Saved: "[Terraprint] Saved {0} ({1} x {2})."
-			SaveError: "[Terraprint] Could not save: {0}"
-			ProjectionHeader: "Projection"
-			NoProjection: "No blueprint loaded. Click Load on a saved one below."
-			ProjectionLine: "{0} ({1} x {2}), rotation {3}° {4}"
-			Mirrored: "(mirrored)"
-			StateMoving: "Following the mouse: left click to place, right click to cancel."
-			StateFixed: "Placed. Use the arrows to adjust or Move to reposition."
-			Rotate: "Rotate"
-			Flip: "Mirror"
-			Move: "Move"
-			Remove: "Remove"
-			NudgeHint: "Moves 1 tile (arrow keys too)"
-			Load: "Load"
-			LoadError: "[Terraprint] Could not load {0}: {1}"
-			PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
-			MovingStart: "[Terraprint] Move the mouse and left click to place. Right click returns to where it was."
-			UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
-			RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
-			Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
-			Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
-			Options: "Options"
-			ToggleGhost: "Ghost: {0}"
-			ToggleMap: "Map: {0}"
-			ToggleCorrect: "Correct: {0}"
-			On: "on"
-			Off: "off"
-			Delete: "Delete"
-			DeleteConfirm: "Sure?"
-			Deleted: "[Terraprint] Deleted {0}."
-			DeleteError: "[Terraprint] Could not delete: {0}"
+		CapturePaint: {
+			Label: "Save paint"
+			Tooltip: "Block and wall paint are saved in the blueprint."
 		}
+
+		MaxBlueprintSize: {
+			Label: "Max area size"
+			Tooltip: "Largest width or height, in tiles, that can be selected."
+		}
+
+		ShowGhost: {
+			Label: "Show ghost"
+			Tooltip: "Draws the loaded blueprint over the world."
+		}
+
+		GhostOpacity: {
+			Label: "Ghost opacity"
+			Tooltip: "How visible the ghost blocks are."
+		}
+
+		ShowWalls: {
+			Label: "Show walls"
+			Tooltip: "Also draws and counts the blueprint walls."
+		}
+
+		ShowLiquids: {
+			Label: "Show liquids"
+			Tooltip: "Draws the saved liquids (they don't count toward progress)."
+		}
+
+		ShowCorrect: {
+			Label: "Highlight correct blocks"
+			Tooltip: "Draws blocks already placed correctly in green. Off: they just disappear from the ghost."
+		}
+
+		MarkObstructions: {
+			Label: "Mark blocks to remove"
+			Tooltip: "Shows a red X on solid blocks where the blueprint expects empty space."
+		}
+
+		CheckSlopes: {
+			Label: "Check slopes and half blocks"
+			Tooltip: "A block with the wrong slope or half-block shape counts as wrong."
+		}
+
+		CheckPaint: {
+			Label: "Check paint"
+			Tooltip: "A block or wall with different paint counts as wrong."
+		}
+
+		ShowOutline: {
+			Label: "Show outline"
+			Tooltip: "Draws a golden rectangle around the blueprint."
+		}
+
+		ShowProgress: {
+			Label: "Show progress on screen"
+			Tooltip: "Shows how many blocks are done at the top of the screen."
+		}
+
+		ShowOnMinimap: {
+			Label: "Show on minimap"
+			Tooltip: "Also applies to the overlay map."
+		}
+
+		ShowOnFullscreenMap: {
+			Label: "Show on fullscreen map"
+			Tooltip: "Hover it to see the progress."
+		}
+
+		MapOpacity: {
+			Label: "Map opacity"
+			Tooltip: "How visible the blueprint is on the maps."
+		}
+
+		ColorMissing: {
+			Label: "Missing color"
+			Tooltip: "Blocks still to be placed."
+		}
+
+		ColorWrong: {
+			Label: "Wrong color"
+			Tooltip: "Different blocks or blocks to remove."
+		}
+
+		ColorCorrect: {
+			Label: "Correct color"
+			Tooltip: "Blocks already correct (when highlighted)."
+		}
+
+		ShowChatMessages: {
+			Label: "Chat messages"
+			Tooltip: "Shows tips and confirmations in the chat. Warnings and errors always show."
+		}
+
+		CloseMenuOnLoad: {
+			Label: "Close menu when loading"
+			Tooltip: "Closes the menu after clicking Load so you can place the blueprint right away."
+		}
+
+		PlacementAnchor: {
+			Label: "Mouse anchor"
+			Tooltip: "Which point of the blueprint follows the mouse while moving it."
+		}
+
 	}
+
+	Anchor: {
+		BottomCenter.Label: "Bottom center"
+		Center.Label: "Center"
+		TopLeft.Label: "Top left"
+	}
+}
+
+UI: {
+	Title: "Terraprint"
+	SaveHeader: "Save a build"
+	NameHint: "Blueprint name (click to type)"
+	SelectArea: "Select area"
+	Save: "Save"
+	FilesHeader: "Saved blueprints"
+	Refresh: "Refresh"
+	OpenFolder: "Open folder"
+	NoFiles: "No blueprints yet. Select an area and save one."
+	InfoFirstCorner: "Click the first corner in the world (right click cancels)."
+	InfoSecondCorner: "Click the opposite corner."
+	InfoSelection: "Selected area: {0} x {1} tiles"
+	InfoNoSelection: "No area selected."
+	SelectStart: "[Terraprint] Click the first corner of the area. Right click cancels."
+	SelectSecond: "[Terraprint] Now click the opposite corner."
+	SelectTooBig: "[Terraprint] Area too big ({0} x {1}). The limit is {2} per side (change it in the options)."
+	SelectDone: "[Terraprint] Area selected: {0} x {1}. Give it a name and click Save."
+	Cancelled: "[Terraprint] Cancelled."
+	Saved: "[Terraprint] Saved {0} ({1} x {2})."
+	SaveError: "[Terraprint] Could not save: {0}"
+	ProjectionHeader: "Projection"
+	NoProjection: "No blueprint loaded. Click Load on a saved one below."
+	ProjectionLine: "{0} ({1} x {2}), rotation {3}° {4}"
+	Mirrored: "(mirrored)"
+	StateMoving: "Following the mouse: left click to place, right click to cancel."
+	StateFixed: "Placed. Use the arrows to adjust or Move to reposition."
+	Rotate: "Rotate"
+	Flip: "Mirror"
+	Move: "Move"
+	Remove: "Remove"
+	NudgeHint: "Moves 1 tile (arrow keys too)"
+	Load: "Load"
+	LoadError: "[Terraprint] Could not load {0}: {1}"
+	PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
+	MovingStart: "[Terraprint] Move the mouse and left click to place. Right click returns to where it was."
+	UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
+	RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
+	Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
+	Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
+	Options: "Options"
+	ToggleGhost: "Ghost: {0}"
+	ToggleMap: "Map: {0}"
+	ToggleCorrect: "Correct: {0}"
+	On: "on"
+	Off: "off"
+	Delete: "Delete"
+	DeleteConfirm: "Sure?"
+	Deleted: "[Terraprint] Deleted {0}."
+	DeleteError: "[Terraprint] Could not delete: {0}"
 }
