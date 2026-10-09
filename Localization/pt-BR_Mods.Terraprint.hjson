@@ -225,16 +225,16 @@ UI: {
 	DeleteError: "[Terraprint] Não foi possível excluir: {0}"
 	Materials: Materiais
 	MaterialsTitle: Materiais
-	MaterialsNone: "Nenhum blueprint carregado."
-	MaterialsDone: "Tudo colocado!"
-	MaterialsEnough: "Faltam colocar {0}. Você tem tudo o que precisa."
-	MaterialsLacking: "Faltam colocar {0}. Faltam {1} itens no inventário (em vermelho)."
+	MaterialsNone: Nenhum blueprint carregado.
+	MaterialsDone: Tudo colocado!
+	MaterialsEnough: Faltam colocar {0}. Você tem tudo o que precisa.
+	MaterialsLacking: Faltam colocar {0}. Faltam {1} itens no inventário (em vermelho).
 	ColNeeded: Total
 	ColRemaining: Falta
 	ColHave: Tem
 	NoItem: "{0} (sem item)"
-	AutoBuild: "Construir (segure)"
-	AutoBuilding: "Construindo..."
+	AutoBuild: Construir (segure)
+	AutoBuilding: Construindo...
 	AutoBuildNothing: "[Terraprint] Nada para colocar ao seu alcance: chegue mais perto ou faltam os itens (veja Materiais)."
 	AutoBuildNoProjection: "[Terraprint] Fixe um blueprint primeiro (carregue e clique esquerdo) para construir automaticamente."
 }

@@ -225,16 +225,16 @@ UI: {
 	DeleteError: "[Terraprint] Could not delete: {0}"
 	Materials: Materials
 	MaterialsTitle: Materials
-	MaterialsNone: "No blueprint loaded."
-	MaterialsDone: "Everything is placed!"
+	MaterialsNone: No blueprint loaded.
+	MaterialsDone: Everything is placed!
 	MaterialsEnough: "{0} still to place. You have everything you need."
 	MaterialsLacking: "{0} still to place. You are short of {1} items (in red)."
 	ColNeeded: Total
 	ColRemaining: Left
 	ColHave: Have
 	NoItem: "{0} (no item)"
-	AutoBuild: "Build (hold)"
-	AutoBuilding: "Building..."
+	AutoBuild: Build (hold)
+	AutoBuilding: Building...
 	AutoBuildNothing: "[Terraprint] Nothing to place within reach: get closer, or you are missing the items (see Materials)."
 	AutoBuildNoProjection: "[Terraprint] Place a blueprint first (load it and left click) to auto-build."
 }
