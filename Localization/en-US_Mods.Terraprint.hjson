@@ -201,4 +201,14 @@ UI: {
 	DeleteConfirm: Sure?
 	Deleted: "[Terraprint] Deleted {0}."
 	DeleteError: "[Terraprint] Could not delete: {0}"
+	Materials: Materials
+	MaterialsTitle: Materials
+	MaterialsNone: "No blueprint loaded."
+	MaterialsDone: "Everything is placed!"
+	MaterialsEnough: "{0} still to place. You have everything you need."
+	MaterialsLacking: "{0} still to place. You are short of {1} items (in red)."
+	ColNeeded: Total
+	ColRemaining: Left
+	ColHave: Have
+	NoItem: "{0} (no item)"
 }

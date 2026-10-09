@@ -58,3 +58,19 @@ Regras de transformação (o padrão combinado):
 5. **Excluir** na lista pede confirmação ("Certeza?") e só apaga no segundo clique.
 6. Em Configurações > Controles, as teclas do Terraprint aparecem com nome:
    abrir menu (K), girar (.), espelhar (,), mover com as setas.
+
+## Passo 5: lista de materiais
+
+1. Carregue e fixe um blueprint. No menu, clique em **Materiais**: abre uma segunda janela,
+   que pode ser arrastada e continua aberta mesmo fechando o menu (K). O X fecha.
+2. Cada linha mostra o ícone e o nome do item, e três números: **Total** (quanto o blueprint usa),
+   **Falta** (quanto ainda falta colocar) e **Tem** (quanto você tem no inventário, contando
+   moedas e munição).
+3. Cores: vermelho = você não tem o suficiente para o que falta; amarelo = tem o suficiente;
+   verde = já está tudo colocado. Os vermelhos ficam no topo da lista.
+4. Coloque alguns blocos certos: **Falta** diminui em até 1/4 de segundo. Pegue ou jogue fora
+   itens: **Tem** atualiza sozinho.
+5. Móveis contam 1 por objeto (uma mesa 3x2 conta 1 mesa, não 6). Paredes aparecem como
+   o item da parede.
+6. Coisas que nenhum item coloca (grama, árvores) aparecem como "(sem item)".
+7. Passe o mouse em cima de uma linha para ver a dica do item.

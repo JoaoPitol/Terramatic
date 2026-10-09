@@ -201,4 +201,14 @@ UI: {
 	DeleteConfirm: Certeza?
 	Deleted: "[Terraprint] {0} excluído."
 	DeleteError: "[Terraprint] Não foi possível excluir: {0}"
+	Materials: Materiais
+	MaterialsTitle: Materiais
+	MaterialsNone: "Nenhum blueprint carregado."
+	MaterialsDone: "Tudo colocado!"
+	MaterialsEnough: "Faltam colocar {0}. Você tem tudo o que precisa."
+	MaterialsLacking: "Faltam colocar {0}. Faltam {1} itens no inventário (em vermelho)."
+	ColNeeded: Total
+	ColRemaining: Falta
+	ColHave: Tem
+	NoItem: "{0} (sem item)"
 }

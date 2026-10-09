@@ -12,10 +12,13 @@ namespace Terraprint.Common.Systems
 	{
 		private static UserInterface _interface;
 		private static TerraprintMenu _menu;
+		private static UserInterface _materialsInterface;
+		private static MaterialsPanel _materials;
 		private static GameTime _lastTime;
 
 		public static bool MenuOpen => _interface?.CurrentState != null;
-		public static bool MouseOverMenu => MenuOpen && _menu.IsMouseOverPanel;
+		public static bool MaterialsOpen => _materialsInterface?.CurrentState != null;
+		public static bool MouseOverMenu => MenuOpen && _menu.IsMouseOverPanel || MaterialsOpen && _materials.IsMouseOverPanel;
 		public static bool Typing => MenuOpen && _menu.IsTyping;
 		public static TerraprintMenu Menu => _menu;
 
@@ -24,12 +27,16 @@ namespace Terraprint.Common.Systems
 			_interface = new UserInterface();
 			// SetState ativa (e monta) o menu na primeira abertura, quando os textos ja estao carregados.
 			_menu = new TerraprintMenu();
+			_materialsInterface = new UserInterface();
+			_materials = new MaterialsPanel();
 		}
 
 		public override void Unload()
 		{
 			_interface = null;
 			_menu = null;
+			_materialsInterface = null;
+			_materials = null;
 		}
 
 		public static void ToggleMenu()
@@ -48,11 +55,22 @@ namespace Terraprint.Common.Systems
 
 		public static void CloseMenu() => _interface?.SetState(null);
 
-		public override void OnWorldUnload() => CloseMenu();
+		/// <summary>A lista de materiais e uma janela separada: continua aberta com o menu fechado.</summary>
+		public static void ToggleMaterials() => _materialsInterface?.SetState(MaterialsOpen ? null : _materials);
+
+		public static void CloseMaterials() => _materialsInterface?.SetState(null);
+
+		public override void OnWorldUnload()
+		{
+			CloseMenu();
+			CloseMaterials();
+		}
 
 		public override void UpdateUI(GameTime gameTime)
 		{
 			_lastTime = gameTime;
+			if (MaterialsOpen)
+				_materialsInterface.Update(gameTime);
 			if (MenuOpen)
 				_interface.Update(gameTime);
 		}
@@ -63,6 +81,8 @@ namespace Terraprint.Common.Systems
 			if (index < 0)
 				return;
 			layers.Insert(index, new LegacyGameInterfaceLayer("Terraprint: Menu", () => {
+				if (MaterialsOpen)
+					_materialsInterface.Draw(Main.spriteBatch, _lastTime);
 				if (MenuOpen)
 					_interface.Draw(Main.spriteBatch, _lastTime);
 				return true;

@@ -30,8 +30,8 @@ namespace Terraprint.Common.UI
 		{
 			_panel = new UIDragPanel();
 			_panel.Width.Set(PanelWidth, 0f);
-			_panel.Height.Set(System.Math.Min(700f, Main.screenHeight - 140f), 0f);
-			_panel.MinHeight.Set(560f, 0f);
+			_panel.Height.Set(System.Math.Min(740f, Main.screenHeight - 140f), 0f);
+			_panel.MinHeight.Set(600f, 0f);
 			_panel.Left.Set(Main.screenWidth / 2f - PanelWidth / 2f, 0f);
 			_panel.Top.Set(120f, 0f);
 			_panel.SetPadding(Pad);
@@ -107,6 +107,10 @@ namespace Terraprint.Common.UI
 
 			_projectionButtons = new[] { rotate, flip, move, remove, left, up, down, right };
 
+			var materials = new UIButton(Lang.UI("Materials"), UISystem.ToggleMaterials);
+			Place(materials, y, 0f, 0.5f, -4f);
+			y += 40f;
+
 			// --- Opcoes rapidas (todas as opcoes ficam no botao Opcoes) ---
 			_toggleGhost = new UIButton("", () => TerraprintConfig.Set(c => c.ShowGhost = !c.ShowGhost), 0.8f);
 			_toggleMap = new UIButton("", () => TerraprintConfig.Set(c => {
@@ -145,6 +149,7 @@ namespace Terraprint.Common.UI
 			_fileList.Width.Set(-24f, 1f);
 			_fileList.Height.Set(0f, 1f);
 			_fileList.ListPadding = 4f;
+			_fileList.ManualSortMethod = _ => { }; // mantem a ordem da pasta (mais recente primeiro)
 			listPanel.Append(_fileList);
 
 			var scroll = new UIScrollbar();
@@ -329,7 +334,5 @@ namespace Terraprint.Common.UI
 				ModContent.GetInstance<Terraprint>().Logger.Error("Failed to load blueprint " + FilePath, e);
 			}
 		}
-
-		public override int CompareTo(object obj) => 0; // mantem a ordem da pasta (mais recente primeiro)
 	}
 }
