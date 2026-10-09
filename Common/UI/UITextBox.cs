@@ -148,6 +148,37 @@ namespace Terraprint.Common.UI
 		}
 	}
 
+	/// <summary>Botao que age enquanto fica pressionado (chama a acao a cada tick).</summary>
+	public class UIHoldButton : UIButton
+	{
+		private readonly System.Action _whileHeld;
+
+		public bool Held { get; private set; }
+
+		public UIHoldButton(string text, System.Action whileHeld, float textScale = 0.9f) : base(text, null, textScale)
+		{
+			_whileHeld = whileHeld;
+		}
+
+		public override void LeftMouseDown(UIMouseEvent evt)
+		{
+			base.LeftMouseDown(evt);
+			if (Enabled)
+				Held = true;
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			if (Held && (!Main.mouseLeft || !Enabled))
+				Held = false;
+			if (Held) {
+				_whileHeld?.Invoke();
+				BackgroundColor = new Color(90, 150, 90);
+			}
+		}
+	}
+
 	/// <summary>Painel que pode ser arrastado pela barra de titulo.</summary>
 	public class UIDragPanel : UIPanel
 	{

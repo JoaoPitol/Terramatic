@@ -6,6 +6,7 @@ Keybinds: {
 	NudgeDown.DisplayName: Move blueprint down (menu open)
 	NudgeLeft.DisplayName: Move blueprint left (menu open)
 	NudgeRight.DisplayName: Move blueprint right (menu open)
+	AutoBuild.DisplayName: Hold to auto-build
 }
 
 Configs: {
@@ -18,6 +19,7 @@ Configs: {
 			Map: Map and minimap
 			Colors: Colors
 			General: General
+			AutoBuild: Auto-build
 		}
 
 		CaptureLiquids: {
@@ -129,6 +131,26 @@ Configs: {
 			Label: Mouse anchor
 			Tooltip: Which point of the blueprint follows the mouse while moving it.
 		}
+
+		AutoBuildPerTick: {
+			Label: Blocks per tick
+			Tooltip: How many blocks auto-build places per tick (60 ticks = 1 second).
+		}
+
+		AutoBuildWalls: {
+			Label: Place walls
+			Tooltip: Auto-build also places the blueprint walls.
+		}
+
+		AutoBuildFurniture: {
+			Label: Place furniture
+			Tooltip: Auto-build also places furniture and other multi-tile objects.
+		}
+
+		AutoBuildSlopes: {
+			Label: Apply slopes and half blocks
+			Tooltip: Placed blocks get the same slope or half-block shape as the blueprint.
+		}
 	}
 
 	Anchor: {
@@ -211,4 +233,8 @@ UI: {
 	ColRemaining: Left
 	ColHave: Have
 	NoItem: "{0} (no item)"
+	AutoBuild: "Build (hold)"
+	AutoBuilding: "Building..."
+	AutoBuildNothing: "[Terraprint] Nothing to place within reach: get closer, or you are missing the items (see Materials)."
+	AutoBuildNoProjection: "[Terraprint] Place a blueprint first (load it and left click) to auto-build."
 }

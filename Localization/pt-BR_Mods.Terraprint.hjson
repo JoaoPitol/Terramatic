@@ -6,6 +6,7 @@ Keybinds: {
 	NudgeDown.DisplayName: Mover blueprint para baixo (menu aberto)
 	NudgeLeft.DisplayName: Mover blueprint para a esquerda (menu aberto)
 	NudgeRight.DisplayName: Mover blueprint para a direita (menu aberto)
+	AutoBuild.DisplayName: Segurar para construir automaticamente
 }
 
 Configs: {
@@ -18,6 +19,7 @@ Configs: {
 			Map: Mapa e minimapa
 			Colors: Cores
 			General: Geral
+			AutoBuild: Construção automática
 		}
 
 		CaptureLiquids: {
@@ -129,6 +131,26 @@ Configs: {
 			Label: Ponto do mouse
 			Tooltip: Qual ponto do blueprint segue o mouse enquanto você move.
 		}
+
+		AutoBuildPerTick: {
+			Label: Blocos por tick
+			Tooltip: Quantos blocos a construção automática coloca por tick (60 ticks = 1 segundo).
+		}
+
+		AutoBuildWalls: {
+			Label: Colocar paredes
+			Tooltip: A construção automática também coloca as paredes do blueprint.
+		}
+
+		AutoBuildFurniture: {
+			Label: Colocar móveis
+			Tooltip: A construção automática também coloca móveis e outros objetos de vários blocos.
+		}
+
+		AutoBuildSlopes: {
+			Label: Aplicar rampas e meio-blocos
+			Tooltip: Os blocos colocados ficam com a mesma rampa ou meio-bloco do blueprint.
+		}
 	}
 
 	Anchor: {
@@ -211,4 +233,8 @@ UI: {
 	ColRemaining: Falta
 	ColHave: Tem
 	NoItem: "{0} (sem item)"
+	AutoBuild: "Construir (segure)"
+	AutoBuilding: "Construindo..."
+	AutoBuildNothing: "[Terraprint] Nada para colocar ao seu alcance: chegue mais perto ou faltam os itens (veja Materiais)."
+	AutoBuildNoProjection: "[Terraprint] Fixe um blueprint primeiro (carregue e clique esquerdo) para construir automaticamente."
 }

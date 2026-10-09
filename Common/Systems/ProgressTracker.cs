@@ -60,6 +60,9 @@ namespace Terraprint.Common.Systems
 
 		public override void ClearWorld() => Reset();
 
+		/// <summary>Recalcula em poucos ticks (usado depois da construcao automatica colocar blocos).</summary>
+		public static void RequestRefresh() => _timer = System.Math.Max(_timer, RefreshTicks - 4);
+
 		private static void Reset()
 		{
 			TileStatus = System.Array.Empty<CellStatus>();

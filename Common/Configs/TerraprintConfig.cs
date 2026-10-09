@@ -69,6 +69,21 @@ namespace Terraprint.Common.Configs
 		[DefaultValue(true)]
 		public bool ShowProgress;
 
+		[Header("AutoBuild")]
+		[Range(1, 10)]
+		[DefaultValue(2)]
+		[Slider]
+		public int AutoBuildPerTick;
+
+		[DefaultValue(true)]
+		public bool AutoBuildWalls;
+
+		[DefaultValue(true)]
+		public bool AutoBuildFurniture;
+
+		[DefaultValue(true)]
+		public bool AutoBuildSlopes;
+
 		[Header("Map")]
 		[DefaultValue(true)]
 		public bool ShowOnMinimap;

@@ -25,6 +25,7 @@ namespace Terraprint.Common.UI
 		private UIText _projectionInfo;
 		private UIButton[] _projectionButtons;
 		private UIButton _toggleGhost, _toggleMap, _toggleCorrect;
+		private UIHoldButton _buildButton;
 
 		public override void OnInitialize()
 		{
@@ -109,6 +110,8 @@ namespace Terraprint.Common.UI
 
 			var materials = new UIButton(Lang.UI("Materials"), UISystem.ToggleMaterials);
 			Place(materials, y, 0f, 0.5f, -4f);
+			_buildButton = new UIHoldButton(Lang.UI("AutoBuild"), AutoBuildSystem.RequestHold);
+			Place(_buildButton, y, 0.5f, 0.5f, -4f, leftOffset: 4f);
 			y += 40f;
 
 			// --- Opcoes rapidas (todas as opcoes ficam no botao Opcoes) ---
@@ -200,6 +203,8 @@ namespace Terraprint.Common.UI
 			foreach (var b in _projectionButtons)
 				b.Enabled = has;
 			_projectionInfo.SetText(ProjectionInfoText());
+			_buildButton.Enabled = ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
+			_buildButton.SetLabel(Lang.UI(_buildButton.Held && _buildButton.Enabled ? "AutoBuilding" : "AutoBuild"));
 
 			var cfg = TerraprintConfig.Instance;
 			_toggleGhost.SetLabel(Lang.UI("ToggleGhost", OnOff(cfg.ShowGhost)));

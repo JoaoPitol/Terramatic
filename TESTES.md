@@ -74,3 +74,20 @@ Regras de transformação (o padrão combinado):
    o item da parede.
 6. Coisas que nenhum item coloca (grama, árvores) aparecem como "(sem item)".
 7. Passe o mouse em cima de uma linha para ver a dica do item.
+
+## Passo 6: construir automaticamente (segurar)
+
+1. Fixe um blueprint, tenha os materiais no inventário e fique perto dele.
+2. No menu, **segure** o botão **Construir (segure)** (fica verde e mostra "Construindo...").
+   Os blocos ao seu alcance vão aparecendo aos poucos, os itens saem do inventário e a lista
+   de materiais atualiza. Soltar o botão para na hora.
+3. A tecla **P** faz o mesmo sem abrir o menu (troque em Configurações > Controles).
+4. Ordem: primeiro blocos sólidos, depois paredes, depois móveis e decoração; sempre do mais
+   perto para o mais longe. Ande ao longo da construção segurando para cobrir tudo.
+5. Posições já ocupadas (por qualquer bloco, certo ou errado) são puladas. Materiais que você
+   não tem são pulados. Se nada for colocado, ao soltar aparece um aviso no chat.
+6. Rampas e meio-blocos saem iguais ao blueprint. Móveis saem virados para o mesmo lado.
+   Baús, placas e afins funcionam normalmente depois de colocados.
+7. Você nunca fica preso: blocos sólidos em cima do personagem são pulados até você sair dali.
+8. Nas opções, seção **Construção automática**: blocos por tick (1 a 10, padrão 2), e ligar/desligar
+   paredes, móveis e rampas.

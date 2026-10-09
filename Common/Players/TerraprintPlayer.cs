@@ -44,6 +44,9 @@ namespace Terraprint.Common.Players
 				if (KeybindSystem.NudgeRight.JustPressed) ProjectionSystem.Nudge(1, 0);
 			}
 
+			if (KeybindSystem.AutoBuild.Current)
+				AutoBuildSystem.RequestHold();
+
 			if (_waitForRelease) {
 				if (!Main.mouseLeft)
 					_waitForRelease = false;

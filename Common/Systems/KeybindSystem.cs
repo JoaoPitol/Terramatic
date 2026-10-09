@@ -11,6 +11,7 @@ namespace Terraprint.Common.Systems
 		public static ModKeybind NudgeDown { get; private set; }
 		public static ModKeybind NudgeLeft { get; private set; }
 		public static ModKeybind NudgeRight { get; private set; }
+		public static ModKeybind AutoBuild { get; private set; }
 
 		public override void Load()
 		{
@@ -23,11 +24,13 @@ namespace Terraprint.Common.Systems
 			NudgeDown = KeybindLoader.RegisterKeybind(Mod, "NudgeDown", "Down");
 			NudgeLeft = KeybindLoader.RegisterKeybind(Mod, "NudgeLeft", "Left");
 			NudgeRight = KeybindLoader.RegisterKeybind(Mod, "NudgeRight", "Right");
+			// Segurar para construir automaticamente (o mesmo que segurar o botao Construir do menu).
+			AutoBuild = KeybindLoader.RegisterKeybind(Mod, "AutoBuild", "P");
 		}
 
 		public override void Unload()
 		{
-			ToggleMenu = Rotate = Flip = NudgeUp = NudgeDown = NudgeLeft = NudgeRight = null;
+			ToggleMenu = Rotate = Flip = NudgeUp = NudgeDown = NudgeLeft = NudgeRight = AutoBuild = null;
 		}
 	}
 }
