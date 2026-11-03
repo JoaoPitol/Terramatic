@@ -94,7 +94,7 @@ namespace Terraprint.Common.UI
 			if (!Bare)
 				TerraprintStyle.DrawSlot(spriteBatch, r, IsActive() || Held, IsMouseHovering, enabled, Tint());
 
-			Color iconColor = !enabled ? Color.White * 0.35f : Bare && !IsMouseHovering ? new Color(210, 220, 235) : Color.White;
+			Color iconColor = Color.White * TerraprintStyle.IconAlpha(IsActive() || Held, IsMouseHovering, enabled);
 			Vector2 center = r.Center.ToVector2();
 			if (_item != null) {
 				ItemSlot.DrawItemIcon(_item, ItemSlot.Context.InventoryItem, spriteBatch, center, _item.scale, System.Math.Min(28f, r.Width - 10f), iconColor);

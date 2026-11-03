@@ -12,12 +12,12 @@ namespace Terraprint.Common.UI
 	/// <summary>Cores e desenhos comuns do visual do Terraprint (painel azul e slots iguais ao inventario do Terraria).</summary>
 	public static class TerraprintStyle
 	{
-		public static readonly Color PanelBackground = new Color(33, 70, 125) * 0.95f;
-		public static readonly Color PanelBorder = new(13, 25, 48);
+		public static readonly Color PanelBackground = new Color(38, 68, 130) * 0.9f;
+		public static readonly Color PanelBorder = Color.Black;
 		public static readonly Color Separator = new(82, 146, 217);
 		public static readonly Color Title = Color.White;
 		public static readonly Color Muted = new(170, 190, 220);
-		public static readonly Color InputBackground = new Color(18, 40, 76) * 0.95f;
+		public static readonly Color InputBackground = new Color(22, 42, 88) * 0.85f;
 
 		public const float SlotSize = 40f;
 
@@ -39,19 +39,22 @@ namespace Terraprint.Common.UI
 			panel.BorderColor = PanelBorder;
 		}
 
-		/// <summary>Fundo de slot do inventario. active = borda dourada (como o item selecionado na hotbar).</summary>
+		/// <summary>
+		/// Fundo de slot do inventario, semitransparente como no jogo.
+		/// active = slot selecionado (borda dourada), hovered = um pouco mais claro.
+		/// </summary>
 		public static void DrawSlot(SpriteBatch sb, Rectangle r, bool active, bool hovered, bool enabled, Color? tint = null)
 		{
 			Texture2D tex = active ? TextureAssets.InventoryBack14.Value : TextureAssets.InventoryBack.Value;
 			Color color = tint ?? Color.White;
+			float alpha = !enabled ? 0.4f : active ? 0.95f : hovered ? 0.9f : 0.7f;
 			if (!enabled)
-				color = new Color(110, 110, 120) * 0.8f;
-			else if (hovered)
-				color = Color.Lerp(color, Color.White, 0.35f);
-			else
-				color *= 0.9f;
-			sb.Draw(tex, r, color);
+				color = new Color(160, 160, 180);
+			sb.Draw(tex, r, color * alpha);
 		}
+
+		/// <summary>Opacidade do icone dentro de um slot: semitransparente em repouso, cheio ao passar o mouse.</summary>
+		public static float IconAlpha(bool active, bool hovered, bool enabled) => !enabled ? 0.3f : active || hovered ? 1f : 0.75f;
 
 		/// <summary>Linha horizontal fina, como a que separa as abas do conteudo na tela de crafting.</summary>
 		public static void DrawSeparator(SpriteBatch sb, float x, float y, float width)

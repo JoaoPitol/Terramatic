@@ -75,18 +75,21 @@ namespace Terraprint.Common.UI
 		}
 	}
 
-	/// <summary>Painel que pode ser arrastado pela barra de titulo.</summary>
+	/// <summary>Painel que pode ser arrastado pela faixa de cima. DragTarget permite mover uma janela inteira (painel + abas).</summary>
 	public class UIDragPanel : UIPanel
 	{
 		public float DragHeight = 30f;
+		public UIElement DragTarget;
 		private Vector2 _offset;
 		private bool _dragging;
+
+		private UIElement Target => DragTarget ?? this;
 
 		public override void LeftMouseDown(UIMouseEvent evt)
 		{
 			base.LeftMouseDown(evt);
 			if (evt.Target == this && evt.MousePosition.Y - GetDimensions().Y < DragHeight) {
-				_offset = evt.MousePosition - new Vector2(Left.Pixels, Top.Pixels);
+				_offset = evt.MousePosition - new Vector2(Target.Left.Pixels, Target.Top.Pixels);
 				_dragging = true;
 			}
 		}
@@ -103,19 +106,22 @@ namespace Terraprint.Common.UI
 			if (ContainsPoint(Main.MouseScreen))
 				Main.LocalPlayer.mouseInterface = true;
 
+			var target = Target;
 			if (_dragging) {
-				Left.Set(Main.mouseX - _offset.X, 0f);
-				Top.Set(Main.mouseY - _offset.Y, 0f);
-				Recalculate();
+				target.Left.Set(Main.mouseX - _offset.X, 0f);
+				target.Top.Set(Main.mouseY - _offset.Y, 0f);
+				target.Recalculate();
 			}
 
-			// Mantem o painel dentro da tela.
-			var parent = Parent.GetDimensions().ToRectangle();
-			var me = GetDimensions().ToRectangle();
-			if (!me.Intersects(parent) || !parent.Contains(me)) {
-				Left.Pixels = Utils.Clamp(Left.Pixels, 0, parent.Width - me.Width);
-				Top.Pixels = Utils.Clamp(Top.Pixels, 0, parent.Height - me.Height);
-				Recalculate();
+			// Mantem a janela dentro da tela.
+			if (target.Parent == null)
+				return;
+			var parent = target.Parent.GetDimensions().ToRectangle();
+			var me = target.GetDimensions().ToRectangle();
+			if (!parent.Contains(me)) {
+				target.Left.Pixels = Utils.Clamp(target.Left.Pixels, 0, System.Math.Max(0, parent.Width - me.Width));
+				target.Top.Pixels = Utils.Clamp(target.Top.Pixels, 0, System.Math.Max(0, parent.Height - me.Height));
+				target.Recalculate();
 			}
 		}
 	}

@@ -9,82 +9,18 @@ using Terraprint.Common.Systems;
 
 namespace Terraprint.Common.UI
 {
-	/// <summary>
-	/// Janela separada com os materiais da projecao, em slots como o inventario do jogo.
-	/// O numero do slot e quanto ainda falta colocar; a dica mostra total, falta e quanto voce tem.
-	/// </summary>
-	public class MaterialsPanel : UIState
+	public static class MaterialsSummary
 	{
-		private const int Columns = 8;
-		private const float Pad = 10f;
-		private const float GridTop = 62f;
-		private static readonly float PanelWidth = Columns * MaterialsGrid.Step - 4f + 2 * Pad + 22f;
-
-		private UITerraprintPanel _panel;
-		private UIText _summary;
-
-		public override void OnInitialize()
+		/// <summary>Texto de resumo da lista de materiais da projecao ativa.</summary>
+		public static string Text()
 		{
-			_panel = new UITerraprintPanel {
-				SeparatorY = GridTop - 8f,
-			};
-			_panel.Width.Set(PanelWidth, 0f);
-			_panel.Height.Set(Math.Min(GridTop + 2 * Pad + 6 * MaterialsGrid.Step, Main.screenHeight - 160f), 0f);
-			_panel.Left.Set(Math.Min(Main.screenWidth / 2f + 196f, Main.screenWidth - PanelWidth - 10f), 0f);
-			_panel.Top.Set(120f, 0f);
-			_panel.SetPadding(Pad);
-			Append(_panel);
-
-			var title = new UIText(Lang.UI("MaterialsTitle"), 0.9f);
-			title.Top.Set(2f, 0f);
-			_panel.Append(title);
-
-			var close = new UIIconButton("Close", Lang.UI("Close"), UISystem.CloseMaterials) { Bare = true };
-			close.Width.Set(26f, 0f);
-			close.Height.Set(26f, 0f);
-			close.Left.Set(-26f, 1f);
-			close.Top.Set(-2f, 0f);
-			_panel.Append(close);
-
-			_summary = new UIText("", 0.75f) {
-				TextColor = TerraprintStyle.Muted,
-				IsWrapped = true,
-				TextOriginX = 0f,
-			};
-			_summary.Top.Set(28f, 0f);
-			_summary.Width.Set(0f, 1f);
-			_panel.Append(_summary);
-
-			var grid = new MaterialsGrid();
-			grid.Top.Set(GridTop, 0f);
-			grid.Width.Set(-22f, 1f);
-			grid.Height.Set(-GridTop, 1f);
-			_panel.Append(grid);
-
-			var scroll = new UIScrollbar();
-			scroll.Top.Set(GridTop + 4f, 0f);
-			scroll.Height.Set(-GridTop - 8f, 1f);
-			scroll.Left.Set(-18f, 1f);
-			_panel.Append(scroll);
-			grid.Scrollbar = scroll;
-		}
-
-		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);
-
-		public override void Update(GameTime gameTime)
-		{
-			MaterialsTracker.Update();
-
 			if (!ProjectionSystem.HasProjection)
-				_summary.SetText(Lang.UI("MaterialsNone"));
-			else if (MaterialsTracker.TotalRemaining == 0)
-				_summary.SetText(Lang.UI("MaterialsDone"));
-			else if (MaterialsTracker.TotalLacking == 0)
-				_summary.SetText(Lang.UI("MaterialsEnough", MaterialsTracker.TotalRemaining));
-			else
-				_summary.SetText(Lang.UI("MaterialsLacking", MaterialsTracker.TotalRemaining, MaterialsTracker.TotalLacking));
-
-			base.Update(gameTime);
+				return Lang.UI("MaterialsNone");
+			if (MaterialsTracker.TotalRemaining == 0)
+				return Lang.UI("MaterialsDone");
+			if (MaterialsTracker.TotalLacking == 0)
+				return Lang.UI("MaterialsEnough", MaterialsTracker.TotalRemaining);
+			return Lang.UI("MaterialsLacking", MaterialsTracker.TotalRemaining, MaterialsTracker.TotalLacking);
 		}
 	}
 

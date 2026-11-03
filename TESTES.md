@@ -118,23 +118,24 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
    Se algum não couber (ficaria em cima de outro bloco), ele some e o chat diz quantos blocos de móveis ficaram de fora.
 5. Gire 4 vezes: tudo volta exatamente como era.
 
-## Passo 9: menu novo (estilo do Terraria)
+## Passo 9: menu no estilo do Terraria
 
-O menu e a janela de materiais agora usam o visual do inventário: painel azul, botões em forma de slot
-e dicas ao passar o mouse (os nomes dos botões aparecem só na dica). Os passos anteriores continuam
-valendo; só mudou onde cada botão fica.
+O menu usa o visual da tela de crafting: abas em forma de slot no topo da janela, painel azul com borda
+preta arredondada, slots e ícones semitransparentes (ficam cheios ao passar o mouse) e dicas com o nome
+de cada botão.
 
-1. Aperte **K**. No topo: título, o X para fechar e, abaixo, três abas: **Projeção** (casa),
-   **Salvar construção** (retângulo tracejado) e **Blueprints salvos** (pasta). A aba ativa fica com borda dourada.
-   À direita ficam **Materiais** e **Opções**. Arraste o menu pela linha do título.
-2. Sem blueprint carregado, o menu abre em **Blueprints salvos**. Cada linha tem o nome, **Carregar** (seta para baixo)
-   e **Excluir** (lixeira, fica vermelha e pede um segundo clique). Os dois botões de cima atualizam a lista
-   e abrem a pasta. Carregar um blueprint pula para a aba **Projeção**.
-3. Aba **Projeção**: o texto mostra nome, tamanho, rotação e progresso. Primeira linha: Girar, Espelhar, Mover,
-   Remover e, à direita, o martelo **Construir (segure)**, que fica dourado enquanto está pressionado.
-   Segunda linha: as quatro setas e, à direita, Fantasma, Mapa e Certos (dourado = ligado).
-4. Aba **Salvar construção**: campo **Nome:**, botão de selecionar área e o disquete para salvar
-   (apagado até ter uma área). Depois de salvar, o menu vai para a lista e o arquivo novo aparece no topo.
-5. **Materiais** abre a janela em grade: cada slot é um item, e o número é quanto ainda falta colocar.
-   Slot vermelho = falta no inventário, normal = você tem o suficiente, verde com ✓ = já colocado.
-   Passe o mouse para ver nome, total, falta e quanto você tem. A roda do mouse rola a grade.
+1. Aperte **K**. Em cima da janela ficam as abas **Projeção** (casa), **Salvar construção** (retângulo
+   tracejado), **Blueprints salvos** (pasta) e **Materiais**; na ponta direita, **Opções** (engrenagem).
+   A aba ativa fica com borda dourada e o nome dela aparece no título do painel, com o X redondo à direita.
+   Arraste a janela inteira (abas junto) pela faixa do título.
+2. **Blueprints salvos**: cada linha mostra a **prévia** da construção (com as cores do mapa), o nome, o tamanho,
+   **Excluir** (lixeira, fica vermelha e pede um segundo clique) e **Carregar** (seta para baixo).
+   Passe o mouse sobre uma linha: uma prévia grande aparece ao lado da janela. Carregar pula para **Projeção**.
+3. **Projeção**: texto com nome, tamanho, rotação e progresso. Primeira linha: Girar, Espelhar, Mover, Remover
+   e, à direita, o martelo **Construir (segure)**. Segunda linha: as quatro setas e Fantasma, Mapa e Certos
+   (dourado = ligado).
+4. **Salvar construção**: campo **Nome:**, selecionar área e o disquete para salvar. Depois de salvar, a
+   janela vai para a lista, com a prévia do arquivo novo no topo.
+5. **Materiais** agora é uma aba (não é mais uma janela separada): grade de slots, o número é quanto falta
+   colocar; vermelho = falta no inventário, verde com ✓ = já colocado. Passe o mouse para ver nome, total,
+   falta e quanto você tem. A roda do mouse rola a grade.

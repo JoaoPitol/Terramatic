@@ -5,7 +5,7 @@ Mod para tModLoader que salva construções do Terraria como blueprints e projet
 
 ## Como usar
 
-1. Aperte **K** para abrir o menu. Ele tem três abas (Projeção, Salvar construção e Blueprints salvos);
+1. Aperte **K** para abrir o menu. As abas no topo são Projeção, Salvar construção, Blueprints salvos (com prévia de cada construção) e Materiais;
    passe o mouse sobre um botão para ver o que ele faz.
 2. Na aba **Salvar construção**, selecione a área clicando em dois cantos de uma construção, dê um nome e salve.
    O arquivo vai para `Documents/My Games/Terraria/tModLoader/Terraprint/*.tprint`.
@@ -32,7 +32,7 @@ Mod para tModLoader que salva construções do Terraria como blueprints e projet
 |---|---|
 | `Common/Blueprints` | Formato do blueprint, leitura/escrita `.tprint`, girar/espelhar |
 | `Common/Systems` | Seleção, projeção, fantasma, progresso, mapa, teclas, UI |
-| `Common/UI` | Menu, janela de materiais e elementos (estilo, botões em slot, campo de texto, painel arrastável) |
+| `Common/UI` | Menu, grade de materiais, prévias dos blueprints e elementos (estilo, botões em slot, campo de texto, painel arrastável) |
 | `Assets/UI` | Ícones dos botões do menu |
 | `Common/Configs` | Opções do mod |
 | `Localization` | Textos em português (pt-BR) e inglês (en-US) |

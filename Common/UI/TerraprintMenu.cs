@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,79 +16,101 @@ using Terraprint.Common.Systems;
 namespace Terraprint.Common.UI
 {
 	/// <summary>
-	/// Menu principal do Terraprint (abre com a tecla do mod, padrao K). Segue o visual do inventario
-	/// do Terraria: painel azul, abas e botoes em forma de slot, dicas ao passar o mouse.
+	/// Janela do Terraprint (abre com a tecla do mod, padrao K), no visual da tela de crafting do Terraria:
+	/// abas em forma de slot no topo, painel azul com borda preta arredondada e slots semitransparentes.
 	/// </summary>
 	public class TerraprintMenu : UIState
 	{
-		public enum Tab { Projection, Save, Files }
+		public enum Tab { Projection, Save, Files, Materials }
 
-		private const float PanelWidth = 372f;
-		private const float PanelHeight = 330f;
+		private const float PanelWidth = 424f;
+		private const float PanelHeight = 360f;
 		private const float Pad = 10f;
+		private const float TabSize = 36f;
+		private const float TabGap = 4f;
 		private const float Step = TerraprintStyle.SlotSize + 4f;
-		private const float TabsTop = 30f;
-		private const float ContentTop = TabsTop + TerraprintStyle.SlotSize + 16f;
+		private const float HeaderHeight = 30f;
+		private const float ContentTop = HeaderHeight + 8f;
 
+		private static readonly string[] TabIcons = { "Projection", "Select", "Folder", "Materials" };
+		private static readonly string[] TabTitles = { "ProjectionHeader", "SaveHeader", "FilesHeader", "MaterialsTitle" };
+
+		private UIElement _window;
+		private UIElement _tabRow;
 		private UITerraprintPanel _panel;
-		private readonly UIElement[] _contents = new UIElement[3];
+		private UIText _title;
+		private readonly UIElement[] _contents = new UIElement[4];
 		private Tab _tab = Tab.Files;
 
 		private UITextBox _nameBox;
 		private UIText _selectionInfo;
 		private UIText _projectionInfo;
 		private UIText _filesInfo;
+		private UIText _materialsInfo;
 		private UIIconButton _buildButton;
 		private UIList _fileList;
 
+		/// <summary>Linha da lista de arquivos sob o mouse; a previa grande aparece ao lado da janela.</summary>
+		internal BlueprintFileRow HoveredRow;
+
 		public override void OnInitialize()
 		{
-			_panel = new UITerraprintPanel {
-				SeparatorY = ContentTop - 8f,
-			};
-			_panel.Width.Set(PanelWidth, 0f);
-			_panel.Height.Set(PanelHeight, 0f);
-			_panel.Left.Set(Main.screenWidth / 2f - PanelWidth / 2f, 0f);
-			_panel.Top.Set(120f, 0f);
-			_panel.SetPadding(Pad);
-			Append(_panel);
+			_window = new UIElement();
+			_window.Width.Set(PanelWidth, 0f);
+			_window.Height.Set(TabSize + TabGap + PanelHeight, 0f);
+			_window.Left.Set(Main.screenWidth / 2f - PanelWidth / 2f, 0f);
+			_window.Top.Set(100f, 0f);
+			Append(_window);
 
-			// --- Titulo e fechar ---
-			var title = new UIText(Lang.UI("Title"), 0.9f) { TextColor = TerraprintStyle.Title };
-			title.Top.Set(2f, 0f);
-			_panel.Append(title);
+			// --- Abas no topo da janela ---
+			_tabRow = new UIElement();
+			_tabRow.Width.Set(0f, 1f);
+			_tabRow.Height.Set(TabSize, 0f);
+			_window.Append(_tabRow);
+			for (int i = 0; i < TabIcons.Length; i++) {
+				var tab = (Tab)i;
+				var b = new UIIconButton(TabIcons[i], Lang.UI(TabTitles[i]), () => ShowTab(tab)) {
+					IsActive = () => _tab == tab,
+				};
+				b.Width.Set(TabSize, 0f);
+				b.Height.Set(TabSize, 0f);
+				b.Left.Set(i * (TabSize + TabGap), 0f);
+				_tabRow.Append(b);
+			}
+			var options = new UIIconButton("Options", Lang.UI("Options"), () => TerraprintConfig.Instance.Open());
+			options.Width.Set(TabSize, 0f);
+			options.Height.Set(TabSize, 0f);
+			options.Left.Set(-TabSize, 1f);
+			_tabRow.Append(options);
+
+			// --- Painel ---
+			_panel = new UITerraprintPanel {
+				SeparatorY = HeaderHeight,
+				DragTarget = _window,
+				DragHeight = HeaderHeight + Pad,
+			};
+			_panel.Top.Set(TabSize + TabGap, 0f);
+			_panel.Width.Set(0f, 1f);
+			_panel.Height.Set(PanelHeight, 0f);
+			_panel.SetPadding(Pad);
+			_window.Append(_panel);
+
+			_title = new UIText(Lang.UI(TabTitles[(int)_tab]), 0.95f);
+			_title.Top.Set(4f, 0f);
+			_panel.Append(_title);
 
 			var close = new UIIconButton("Close", Lang.UI("Close"), UISystem.CloseMenu) { Bare = true };
-			close.Width.Set(26f, 0f);
-			close.Height.Set(26f, 0f);
-			close.Left.Set(-26f, 1f);
-			close.Top.Set(-2f, 0f);
+			close.Width.Set(22f, 0f);
+			close.Height.Set(22f, 0f);
+			close.Left.Set(-22f, 1f);
+			close.Top.Set(1f, 0f);
 			_panel.Append(close);
-
-			// --- Abas (esquerda) e atalhos (direita) ---
-			AddTab(Tab.Projection, "Projection", "ProjectionHeader", 0);
-			AddTab(Tab.Save, "Select", "SaveHeader", 1);
-			AddTab(Tab.Files, "Folder", "FilesHeader", 2);
-
-			var materials = new UIIconButton("Materials", Lang.UI("Materials"), UISystem.ToggleMaterials) {
-				IsActive = () => UISystem.MaterialsOpen,
-			};
-			Put(_panel, materials, -2f * Step + 4f, TabsTop, right: true);
-			var options = new UIIconButton("Options", Lang.UI("Options"), () => TerraprintConfig.Instance.Open());
-			Put(_panel, options, -TerraprintStyle.SlotSize, TabsTop, right: true);
 
 			_contents[(int)Tab.Projection] = BuildProjectionTab();
 			_contents[(int)Tab.Save] = BuildSaveTab();
 			_contents[(int)Tab.Files] = BuildFilesTab();
+			_contents[(int)Tab.Materials] = BuildMaterialsTab();
 			_panel.Append(_contents[(int)_tab]);
-		}
-
-		private void AddTab(Tab tab, string icon, string nameKey, int index)
-		{
-			var b = new UIIconButton(icon, Lang.UI(nameKey), () => ShowTab(tab)) {
-				IsActive = () => _tab == tab,
-			};
-			Put(_panel, b, index * Step, TabsTop);
 		}
 
 		private static UIElement NewContent()
@@ -119,6 +142,14 @@ namespace Terraprint.Common.UI
 			return t;
 		}
 
+		private static UISeparator Separator(UIElement parent, float y)
+		{
+			var s = new UISeparator();
+			s.Top.Set(y, 0f);
+			parent.Append(s);
+			return s;
+		}
+
 		// ----- Aba Projecao -----
 
 		private UIElement BuildProjectionTab()
@@ -129,7 +160,7 @@ namespace Terraprint.Common.UI
 			_projectionInfo.Height.Set(58f, 0f);
 			c.Append(_projectionInfo);
 
-			float y = 62f;
+			float y = 64f;
 			Put(c, ProjectionButton("Rotate", "Rotate", ProjectionSystem.Rotate), 0f, y);
 			Put(c, ProjectionButton("Mirror", "Flip", ProjectionSystem.Flip), Step, y);
 			Put(c, ProjectionButton("Move", "Move", ProjectionSystem.StartMoving), 2 * Step, y);
@@ -138,7 +169,6 @@ namespace Terraprint.Common.UI
 			_buildButton = new UIIconButton(ItemID.IronHammer, Lang.UI("AutoBuild"), null) {
 				WhileHeld = AutoBuildSystem.RequestHold,
 				IsEnabled = () => ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed,
-				Tint = () => new Color(150, 230, 150),
 			};
 			_buildButton.Tooltip = () => Lang.UI(_buildButton.Held ? "AutoBuilding" : "AutoBuild");
 			Put(c, _buildButton, -TerraprintStyle.SlotSize, y, right: true);
@@ -212,7 +242,7 @@ namespace Terraprint.Common.UI
 			return c;
 		}
 
-		// ----- Aba Arquivos -----
+		// ----- Aba Blueprints salvos -----
 
 		private UIElement BuildFilesTab()
 		{
@@ -230,34 +260,57 @@ namespace Terraprint.Common.UI
 			_filesInfo.Top.Set(12f, 0f);
 			c.Append(_filesInfo);
 
-			float y = Step + 2f;
-			var listPanel = new UIPanel {
-				BackgroundColor = TerraprintStyle.InputBackground,
-				BorderColor = TerraprintStyle.PanelBorder,
-			};
-			listPanel.Top.Set(y, 0f);
-			listPanel.Width.Set(0f, 1f);
-			listPanel.Height.Set(-y, 1f);
-			listPanel.SetPadding(4f);
-			c.Append(listPanel);
+			Separator(c, Step + 2f);
 
+			float y = Step + 10f;
 			_fileList = new UIList();
+			_fileList.Top.Set(y, 0f);
 			_fileList.Width.Set(-22f, 1f);
-			_fileList.Height.Set(0f, 1f);
-			_fileList.ListPadding = 3f;
+			_fileList.Height.Set(-y, 1f);
+			_fileList.ListPadding = 4f;
 			_fileList.ManualSortMethod = _ => { }; // mantem a ordem da pasta (mais recente primeiro)
-			listPanel.Append(_fileList);
+			c.Append(_fileList);
 
 			var scroll = new UIScrollbar();
-			scroll.Height.Set(-8f, 1f);
-			scroll.Top.Set(4f, 0f);
+			scroll.Top.Set(y + 4f, 0f);
+			scroll.Height.Set(-y - 8f, 1f);
 			scroll.Left.Set(-18f, 1f);
-			listPanel.Append(scroll);
+			c.Append(scroll);
 			_fileList.SetScrollbar(scroll);
 			return c;
 		}
 
+		// ----- Aba Materiais -----
+
+		private UIElement BuildMaterialsTab()
+		{
+			var c = NewContent();
+
+			_materialsInfo = Label("", 0.8f, TerraprintStyle.Muted);
+			_materialsInfo.Height.Set(40f, 0f);
+			c.Append(_materialsInfo);
+
+			Separator(c, 42f);
+
+			float y = 50f;
+			var grid = new MaterialsGrid();
+			grid.Top.Set(y, 0f);
+			grid.Width.Set(-22f, 1f);
+			grid.Height.Set(-y, 1f);
+			c.Append(grid);
+
+			var scroll = new UIScrollbar();
+			scroll.Top.Set(y + 4f, 0f);
+			scroll.Height.Set(-y - 8f, 1f);
+			scroll.Left.Set(-18f, 1f);
+			c.Append(scroll);
+			grid.Scrollbar = scroll;
+			return c;
+		}
+
 		// ----- Estado -----
+
+		public Tab CurrentTab => _tab;
 
 		public void ShowTab(Tab tab)
 		{
@@ -270,6 +323,7 @@ namespace Terraprint.Common.UI
 			_contents[(int)_tab].Remove();
 			_tab = tab;
 			_panel.Append(_contents[(int)tab]);
+			_title.SetText(Lang.UI(TabTitles[(int)tab]));
 			_nameBox?.Unfocus();
 			_panel.Recalculate();
 		}
@@ -285,7 +339,11 @@ namespace Terraprint.Common.UI
 
 		public override void Update(GameTime gameTime)
 		{
+			HoveredRow = null;
 			base.Update(gameTime);
+
+			if (_tabRow.ContainsPoint(Main.MouseScreen))
+				Main.LocalPlayer.mouseInterface = true;
 
 			switch (_tab) {
 				case Tab.Projection:
@@ -301,7 +359,36 @@ namespace Terraprint.Common.UI
 					else
 						_selectionInfo.SetText(Lang.UI("InfoNoSelection"));
 					break;
+				case Tab.Materials:
+					MaterialsTracker.Update();
+					_materialsInfo.SetText(MaterialsSummary.Text());
+					break;
 			}
+		}
+
+		public override void Draw(SpriteBatch spriteBatch)
+		{
+			base.Draw(spriteBatch);
+			if (_tab == Tab.Files && HoveredRow != null)
+				DrawLargePreview(spriteBatch, HoveredRow);
+		}
+
+		/// <summary>Previa grande do blueprint sob o mouse, ao lado da janela (do lado que tiver espaco).</summary>
+		private void DrawLargePreview(SpriteBatch sb, BlueprintFileRow row)
+		{
+			var e = row.Preview;
+			if (e?.Texture == null)
+				return;
+			const int boxW = 260, boxH = 200, pad = 10;
+			var panel = _panel.GetDimensions().ToRectangle();
+			int x = panel.Right + 8;
+			if (x + boxW > Main.screenWidth / Main.UIScale)
+				x = panel.Left - 8 - boxW;
+			var box = new Rectangle(x, panel.Top, boxW, boxH + 26);
+			Utils.DrawInvBG(sb, box, TerraprintStyle.PanelBackground);
+			BlueprintPreview.Draw(sb, e, new Rectangle(box.X + pad, box.Y + pad, boxW - 2 * pad, boxH - 2 * pad));
+			string size = $"{e.Width} x {e.Height}";
+			Utils.DrawBorderString(sb, size, new Vector2(box.X + pad, box.Bottom - 28), TerraprintStyle.Muted, 0.8f);
 		}
 
 		private static string OnOff(bool on) => on ? Lang.UI("On") : Lang.UI("Off");
@@ -321,7 +408,7 @@ namespace Terraprint.Common.UI
 			return line + "\n" + GhostSystem.ProgressText();
 		}
 
-		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);
+		public bool IsMouseOverPanel => _panel != null && (_panel.ContainsPoint(Main.MouseScreen) || _tabRow.ContainsPoint(Main.MouseScreen));
 		public bool IsTyping => _nameBox != null && _nameBox.Focused;
 
 		private void SaveSelection()
@@ -353,37 +440,77 @@ namespace Terraprint.Common.UI
 				return;
 			_fileList.Clear();
 			var files = BlueprintIO.ListFiles();
+			BlueprintPreview.Retain(new HashSet<string>(files));
 			_filesInfo.SetText(files.Count == 0 ? Lang.UI("NoFiles") : Lang.UI("FilesCount", files.Count));
 			foreach (string file in files)
 				_fileList.Add(new BlueprintFileRow(file));
 		}
 	}
 
-	/// <summary>Uma linha da lista de arquivos .tprint: nome, carregar e excluir.</summary>
+	/// <summary>Linha clara e fina, como a que separa as partes da tela de crafting.</summary>
+	public class UISeparator : UIElement
+	{
+		public UISeparator()
+		{
+			Width.Set(0f, 1f);
+			Height.Set(2f, 0f);
+		}
+
+		protected override void DrawSelf(SpriteBatch spriteBatch)
+		{
+			var d = GetDimensions();
+			TerraprintStyle.DrawSeparator(spriteBatch, d.X, d.Y, d.Width);
+		}
+	}
+
+	/// <summary>Uma linha da lista de blueprints salvos: previa, nome, tamanho, carregar e excluir.</summary>
 	public class BlueprintFileRow : UIElement
 	{
-		private const float ButtonSize = 30f;
+		private const float RowHeight = 56f;
+		private const float ThumbWidth = 76f;
+		private const float ButtonSize = 34f;
 
 		public readonly string FilePath;
 		private int _confirmTimer;
+		private BlueprintPreview.Entry _preview;
+		private bool _previewLoaded;
+		private readonly UIText _size;
+
+		public BlueprintPreview.Entry Preview
+		{
+			get {
+				if (!_previewLoaded) {
+					_previewLoaded = true;
+					_preview = BlueprintPreview.Get(FilePath);
+					if (_preview != null && !_preview.Failed)
+						_size.SetText($"{_preview.Width} x {_preview.Height}");
+				}
+				return _preview;
+			}
+		}
 
 		public BlueprintFileRow(string path)
 		{
 			FilePath = path;
 			Width.Set(0f, 1f);
-			Height.Set(36f, 0f);
+			Height.Set(RowHeight, 0f);
 
 			string display = Path.GetFileNameWithoutExtension(path);
-			if (display.Length > 26)
-				display = display.Substring(0, 25) + "…";
+			if (display.Length > 20)
+				display = display.Substring(0, 19) + "…";
 			var name = new UIText(display, 0.85f);
-			name.Left.Set(8f, 0f);
-			name.VAlign = 0.5f;
+			name.Left.Set(ThumbWidth + 14f, 0f);
+			name.Top.Set(9f, 0f);
 			Append(name);
+
+			_size = new UIText("", 0.75f) { TextColor = TerraprintStyle.Muted };
+			_size.Left.Set(ThumbWidth + 14f, 0f);
+			_size.Top.Set(31f, 0f);
+			Append(_size);
 
 			var load = new UIIconButton("Load", Lang.UI("Load"), LoadFile);
 			Size(load);
-			load.Left.Set(-ButtonSize - 3f, 1f);
+			load.Left.Set(-ButtonSize - 6f, 1f);
 			Append(load);
 
 			var delete = new UIIconButton("Delete", Lang.UI("Delete"), DeleteFile) {
@@ -391,7 +518,7 @@ namespace Terraprint.Common.UI
 			};
 			delete.Tooltip = () => Lang.UI(_confirmTimer > 0 ? "DeleteConfirm" : "Delete");
 			Size(delete);
-			delete.Left.Set(-2 * ButtonSize - 6f, 1f);
+			delete.Left.Set(-2 * ButtonSize - 10f, 1f);
 			Append(delete);
 		}
 
@@ -407,13 +534,25 @@ namespace Terraprint.Common.UI
 			base.Update(gameTime);
 			if (_confirmTimer > 0)
 				_confirmTimer--;
+			if (IsMouseHovering && UISystem.Menu != null)
+				UISystem.Menu.HoveredRow = this;
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			var r = GetDimensions().ToRectangle();
-			Color c = IsMouseHovering ? new Color(63, 105, 170) * 0.8f : new Color(45, 85, 150) * 0.6f;
-			spriteBatch.Draw(TextureAssets.MagicPixel.Value, r, c);
+			// Fundo da linha: o mesmo slot do inventario, esticado e semitransparente.
+			Utils.DrawInvBG(spriteBatch, r, new Color(53, 88, 160) * (IsMouseHovering ? 0.75f : 0.5f));
+
+			var thumb = new Rectangle(r.X + 6, r.Y + 6, (int)ThumbWidth, r.Height - 12);
+			spriteBatch.Draw(TextureAssets.MagicPixel.Value, thumb, new Color(10, 20, 45) * 0.6f);
+			var e = Preview;
+			if (e != null && !e.Failed) {
+				BlueprintPreview.Draw(spriteBatch, e, new Rectangle(thumb.X + 2, thumb.Y + 2, thumb.Width - 4, thumb.Height - 4));
+			}
+			else if (e != null) {
+				Utils.DrawBorderString(spriteBatch, "?", thumb.Center.ToVector2() - new Vector2(4f, 10f), TerraprintStyle.Muted);
+			}
 		}
 
 		/// <summary>Primeiro clique pede confirmacao; o segundo (em ate 3 s) apaga o arquivo.</summary>
