@@ -4,7 +4,9 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraprint.Common.Blueprints;
@@ -14,197 +16,224 @@ using Terraprint.Common.Systems;
 namespace Terraprint.Common.UI
 {
 	/// <summary>
-	/// Janela do Terraprint (abre com a tecla do mod, padrao K), no formato de catalogo:
-	/// titulo e abas em botoes de texto no topo, lista a esquerda, previa grande a direita e acoes embaixo.
+	/// Janela do Terraprint (tecla do mod, padrao K). Barra lateral com as paginas (Biblioteca, Salvar area,
+	/// Projecao, Materiais, Opcoes) e o estado da projecao embaixo; a pagina escolhida ocupa o resto.
+	/// O editor de schematic abre numa janela propria, no lugar desta.
 	/// </summary>
 	public class TerraprintMenu : UIState
 	{
-		public enum Tab { Catalog, Save, Projection, Materials }
+		public enum Tab { Library, Save, Projection, Materials, Options }
 
-		private const float PanelWidth = 680f;
-		private const float PanelHeight = 420f;
-		private const float Pad = 12f;
-		private const float HeaderHeight = 34f;
-		private const float ContentTop = HeaderHeight + 10f;
-		private const float ButtonHeight = 32f;
+		private const float SidebarW = 178f;
+		private const float Pad = 14f;
+		private const float PageTop = 52f;
+		private const float BtnH = 32f;
 		private const float Gap = 6f;
-		private const float LeftColumn = 200f;
-		private const float RightColumn = LeftColumn + 12f;
 
-		private static readonly string[] TabLabels = { "TabCatalog", "Save", "ProjectionHeader", "Materials" };
+		private static readonly (string icon, string key)[] Pages = {
+			("Load", "PageLibrary"), ("Save", "PageSave"), ("Projection", "PageProjection"), ("Materials", "PageMaterials"), ("Options", "PageOptions"),
+		};
 
 		private UITerraprintPanel _panel;
-		private readonly UIElement[] _contents = new UIElement[4];
-		private Tab _tab = Tab.Catalog;
+		private UIElement _body;
+		private readonly UIElement[] _pages = new UIElement[5];
+		private Tab _tab = Tab.Library;
 
-		// Catalogo
-		private UIList _fileList;
-		private UIText _fileName, _fileInfo, _fileHint;
+		// Biblioteca
+		private UITextBox _search;
+		private BlueprintGrid _grid;
 		private string _selected;
 		private int _confirmDelete;
 
 		// Salvar
 		private UITextBox _nameBox;
-		private UIText _selectionInfo;
 
 		// Projecao
-		private UIText _projectionInfo, _projectionHint;
 		private UITextButton _buildButton;
 
-		// Materiais
-		private UIText _materialsInfo;
+		// Opcoes
+		private UIElement _pickerOverlay;
+		private UIPaletteBrowser _picker;
+		private Action<int> _pickerCallback;
+
+		// Editor
+		private SchematicEditor _editor;
+
+		public bool EditorOpen => _editor?.Parent != null;
 
 		public override void OnInitialize()
 		{
-			float width = Math.Min(PanelWidth, Main.screenWidth / Main.UIScale - 20f);
-			_panel = new UITerraprintPanel {
-				DragHeight = HeaderHeight + Pad,
-			};
-			_panel.Width.Set(width, 0f);
-			_panel.Height.Set(PanelHeight, 0f);
-			_panel.Left.Set(Main.screenWidth / Main.UIScale / 2f - width / 2f, 0f);
-			_panel.Top.Set(110f, 0f);
-			_panel.SetPadding(Pad);
+			float sw = Main.screenWidth / Main.UIScale, sh = Main.screenHeight / Main.UIScale;
+			float w = Math.Min(900f, sw - 40f), h = Math.Min(540f, sh - 140f);
+			_panel = new UITerraprintPanel { DragHeight = 44f };
+			_panel.Width.Set(w, 0f);
+			_panel.Height.Set(h, 0f);
+			_panel.Left.Set((sw - w) / 2f, 0f);
+			_panel.Top.Set(Math.Max(40f, (sh - h) / 2f - 30f), 0f);
+			_panel.SetPadding(0f);
 			Append(_panel);
 
-			var title = new UIText(Lang.UI("Title"), 1.15f);
-			title.Top.Set(4f, 0f);
-			_panel.Append(title);
+			BuildSidebar();
 
-			// Abas e fechar, alinhados a direita.
 			var close = new UITextButton("X", UISystem.CloseMenu) { Tooltip = () => Lang.UI("Close") };
-			Place(_panel, close, -ButtonHeight, 0f, ButtonHeight, right: true);
-			float x = -ButtonHeight - Gap;
-			var options = new UITextButton(Lang.UI("Options"), () => TerraprintConfig.Instance.Open());
-			x -= 92f;
-			Place(_panel, options, x, 0f, 92f, right: true);
-			for (int i = TabLabels.Length - 1; i >= 0; i--) {
-				var tab = (Tab)i;
-				var b = new UITextButton(Lang.UI(TabLabels[i]), () => ShowTab(tab)) {
-					IsActive = () => _tab == tab,
-				};
-				x -= 92f + Gap;
-				Place(_panel, b, x, 0f, 92f, right: true);
-			}
+			Put(_panel, close, -Pad - 30f, Pad - 2f, 30f, 30f, rightAligned: true);
 
-			_contents[(int)Tab.Catalog] = BuildCatalogTab();
-			_contents[(int)Tab.Save] = BuildSaveTab();
-			_contents[(int)Tab.Projection] = BuildProjectionTab();
-			_contents[(int)Tab.Materials] = BuildMaterialsTab();
-			_panel.Append(_contents[(int)_tab]);
+			_body = new UIElement();
+			_body.Left.Set(SidebarW + Pad, 0f);
+			_body.Top.Set(PageTop, 0f);
+			_body.Width.Set(-SidebarW - 2 * Pad, 1f);
+			_body.Height.Set(-PageTop - Pad, 1f);
+			_panel.Append(_body);
+
+			_pages[(int)Tab.Library] = BuildLibrary();
+			_pages[(int)Tab.Save] = BuildSave();
+			_pages[(int)Tab.Projection] = BuildProjection();
+			_pages[(int)Tab.Materials] = BuildMaterials();
+			_pages[(int)Tab.Options] = BuildOptions();
+			_body.Append(_pages[(int)_tab]);
+
+			_editor = new SchematicEditor(CloseEditor);
 		}
 
-		// ----- Ajudantes de layout -----
+		// ----- Ajudantes -----
 
-		private static UIElement NewContent()
+		private static T Put<T>(UIElement parent, T el, float x, float y, float w, float h, bool rightAligned = false) where T : UIElement
 		{
-			var c = new UIElement();
-			c.Top.Set(ContentTop, 0f);
-			c.Width.Set(0f, 1f);
-			c.Height.Set(-ContentTop, 1f);
-			return c;
-		}
-
-		/// <summary>Posiciona um elemento com largura fixa; right=true conta x a partir da borda direita.</summary>
-		private static T Place<T>(UIElement parent, T el, float x, float y, float width, bool right = false, float height = ButtonHeight) where T : UIElement
-		{
-			el.Left.Set(x, right ? 1f : 0f);
+			el.Left.Set(x, rightAligned ? 1f : 0f);
 			el.Top.Set(y, 0f);
-			el.Width.Set(width, 0f);
-			el.Height.Set(height, 0f);
+			el.Width.Set(w, 0f);
+			el.Height.Set(h, 0f);
 			parent.Append(el);
 			return el;
 		}
 
-		/// <summary>Botao na faixa de baixo do conteudo.</summary>
-		private static T Bottom<T>(UIElement parent, T el, float x, float width) where T : UIElement
+		private static UIElement Page()
 		{
-			el.Left.Set(x, 0f);
-			el.Top.Set(-ButtonHeight, 1f);
-			el.Width.Set(width, 0f);
-			el.Height.Set(ButtonHeight, 0f);
-			parent.Append(el);
-			return el;
+			var p = new UIElement();
+			p.Width.Set(0f, 1f);
+			p.Height.Set(0f, 1f);
+			return p;
 		}
 
-		private static UIText Label(UIElement parent, float x, float y, float scale, Color color, bool fill = true)
+		private static UIText Wrapped(UIElement parent, string text, float y, float scale, Color color)
 		{
-			var t = new UIText("", scale) {
-				TextColor = color,
-				IsWrapped = fill,
-				TextOriginX = 0f,
-			};
-			t.Left.Set(x, 0f);
+			var t = new UIText(text, scale) { IsWrapped = true, TextOriginX = 0f, TextColor = color };
 			t.Top.Set(y, 0f);
-			if (fill)
-				t.Width.Set(-x, 1f);
+			t.Width.Set(0f, 1f);
 			parent.Append(t);
 			return t;
 		}
 
-		private static UIPanel Box(UIElement parent, float x, float y, float heightFromBottom)
+		private static TerraprintConfig Cfg => TerraprintConfig.Instance;
+
+		// ----- Barra lateral -----
+
+		private void BuildSidebar()
 		{
-			var box = new UIPanel {
-				BackgroundColor = TerraprintStyle.PreviewBackground,
-				BorderColor = Color.Black * 0.6f,
-			};
-			box.Left.Set(x, 0f);
-			box.Top.Set(y, 0f);
-			box.Width.Set(-x, 1f);
-			box.Height.Set(-y - heightFromBottom, 1f);
-			box.SetPadding(6f);
-			parent.Append(box);
-			return box;
+			var side = new UIBox(TerraprintStyle.Sidebar);
+			side.Width.Set(SidebarW, 0f);
+			side.Height.Set(0f, 1f);
+			_panel.Append(side);
+
+			Put(side, new UILabel(() => Lang.UI("Title"), 1.2f, Color.White), 16f, 14f, SidebarW - 24f, 28f);
+			Put(side, new UILabel(() => Lang.UI("Subtitle"), 0.72f, TerraprintStyle.Muted), 16f, 40f, SidebarW - 24f, 18f);
+
+			float y = 72f;
+			for (int i = 0; i < Pages.Length; i++) {
+				var tab = (Tab)i;
+				string key = Pages[i].key;
+				var nav = new UINavButton(Pages[i].icon, () => Lang.UI(key), () => ShowTab(tab)) { IsActive = () => _tab == tab };
+				nav.Left.Set(8f, 0f);
+				nav.Width.Set(-16f, 1f);
+				nav.Top.Set(y, 0f);
+				side.Append(nav);
+				y += 42f;
+			}
+
+			var badge = new UIProjectionBadge();
+			badge.Left.Set(8f, 0f);
+			badge.Width.Set(-16f, 1f);
+			badge.Top.Set(-84f, 1f);
+			badge.Height.Set(76f, 0f);
+			badge.OnLeftClick += (_, _) => ShowTab(Tab.Projection);
+			side.Append(badge);
+
+			// Titulo da pagina, ao lado da barra.
+			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key), 1.05f, Color.White), SidebarW + Pad, Pad, 400f, 26f);
+			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key + "Sub"), 0.72f, TerraprintStyle.Muted), SidebarW + Pad, Pad + 24f, 560f, 18f);
 		}
 
-		// ----- Aba Blueprints (catalogo) -----
+		// ----- Biblioteca -----
 
-		private UIElement BuildCatalogTab()
+		private UIElement BuildLibrary()
 		{
-			var c = NewContent();
+			var p = Page();
+			_search = new UITextBox(Lang.UI("SearchHint"));
+			Put(p, _search, 0f, 0f, 220f, BtnH);
 
-			_fileList = new UIList();
-			_fileList.Width.Set(LeftColumn - 22f, 0f);
-			_fileList.Height.Set(-ButtonHeight - Gap, 1f);
-			_fileList.ListPadding = 4f;
-			_fileList.ManualSortMethod = _ => { }; // mantem a ordem da pasta (mais recente primeiro)
-			c.Append(_fileList);
-
-			var scroll = new UIScrollbar();
-			scroll.Left.Set(LeftColumn - 18f, 0f);
-			scroll.Top.Set(4f, 0f);
-			scroll.Height.Set(-ButtonHeight - Gap - 8f, 1f);
-			c.Append(scroll);
-			_fileList.SetScrollbar(scroll);
-
-			float half = (LeftColumn - Gap) / 2f;
-			Bottom(c, new UITextButton(Lang.UI("Refresh"), RefreshFiles), 0f, half);
-			Bottom(c, new UITextButton(Lang.UI("OpenFolder"), () => {
+			float x = 0f;
+			void Right(UITextButton b, float w)
+			{
+				x += w;
+				Put(p, b, -x, 0f, w, BtnH, rightAligned: true);
+				x += Gap;
+			}
+			Right(new UITextButton(Lang.UI("NewBlank"), NewBlank) { Tooltip = () => Lang.UI("NewBlankTip") }, 120f);
+			Right(new UITextButton(Lang.UI("OpenFolder"), () => {
 				BlueprintIO.EnsureFolder();
 				Utils.OpenFolder(BlueprintIO.Folder);
-			}), half + Gap, half);
+			}), 100f);
+			Right(new UITextButton(Lang.UI("Refresh"), RefreshFiles), 90f);
 
-			_fileName = Label(c, RightColumn, 0f, 1f, Color.White, fill: false);
-			_fileInfo = Label(c, RightColumn, 24f, 0.8f, TerraprintStyle.Muted, fill: false);
-			var box = Box(c, RightColumn, 48f, ButtonHeight + Gap + 26f);
-			box.Append(new UIPreviewImage(() => SelectedPreview));
-			_fileHint = Label(c, RightColumn, 0f, 0.8f, TerraprintStyle.Highlight);
-			_fileHint.Top.Set(-ButtonHeight - Gap - 22f, 1f);
+			_grid = new BlueprintGrid(this) { Filter = () => _search.Text };
+			_grid.Top.Set(BtnH + 10f, 0f);
+			_grid.Width.Set(-20f, 1f);
+			_grid.Height.Set(-BtnH - 10f - BtnH - 12f, 1f);
+			p.Append(_grid);
+			var scroll = new UIScrollbar();
+			scroll.Left.Set(-16f, 1f);
+			scroll.Top.Set(BtnH + 14f, 0f);
+			scroll.Height.Set(-BtnH - 18f - BtnH - 12f, 1f);
+			p.Append(scroll);
+			_grid.Scrollbar = scroll;
 
-			float w = (PanelWidth - 2 * Pad - RightColumn - 2 * Gap) / 3f;
-			Bottom(c, new UITextButton(Lang.UI("Load"), LoadSelected) {
+			// Barra de acoes do selecionado.
+			var info = new UILabel(SelectedInfo, 0.8f, TerraprintStyle.Muted);
+			info.Top.Set(-BtnH + 7f, 1f);
+			info.Width.Set(-3 * 106f - 10f, 1f);
+			info.Height.Set(24f, 0f);
+			p.Append(info);
+			float bx = 0f;
+			void Action(UITextButton b)
+			{
+				bx += 100f;
+				b.Left.Set(-bx, 1f);
+				b.Top.Set(-BtnH, 1f);
+				b.Width.Set(100f, 0f);
+				b.Height.Set(BtnH, 0f);
+				p.Append(b);
+				bx += Gap;
+			}
+			Action(new UITextButton(() => Lang.UI(_confirmDelete > 0 ? "DeleteConfirmShort" : "Delete"), DeleteSelected) {
 				IsEnabled = () => _selected != null,
-			}, RightColumn, w);
-			var delete = new UITextButton(() => Lang.UI(_confirmDelete > 0 ? "DeleteConfirm" : "Delete"), DeleteSelected) {
-				IsEnabled = () => _selected != null,
-				Tint = () => _confirmDelete > 0 ? new Color(170, 50, 50) : null,
-			};
-			Bottom(c, delete, RightColumn + w + Gap, w);
-			Bottom(c, new UITextButton(Lang.UI("NewBlueprint"), () => ShowTab(Tab.Save)), RightColumn + 2 * (w + Gap), w);
-			return c;
+				Tint = () => _confirmDelete > 0 ? TerraprintStyle.Danger : null,
+				Tooltip = () => _confirmDelete > 0 ? Lang.UI("DeleteConfirm") : null,
+			});
+			Action(new UITextButton(Lang.UI("Edit"), EditSelected) { IsEnabled = () => _selected != null, Tooltip = () => Lang.UI("EditTip") });
+			Action(new UITextButton(Lang.UI("Load"), LoadSelected) { IsEnabled = () => _selected != null, IsActive = () => _selected != null });
+			return p;
 		}
 
-		private BlueprintPreview.Entry SelectedPreview => _selected == null ? null : BlueprintPreview.Get(_selected);
+		private string SelectedInfo()
+		{
+			if (_selected == null)
+				return _grid != null && _grid.Count == 0 ? "" : Lang.UI("PickOne");
+			var e = BlueprintPreview.Get(_selected);
+			string name = Path.GetFileNameWithoutExtension(_selected);
+			if (e == null || e.Failed)
+				return name + "  ·  " + Lang.UI("PreviewError");
+			return name + "  ·  " + Lang.UI("FileInfo", e.Width, e.Height, e.Tiles);
+		}
 
 		internal string Selected => _selected;
 
@@ -220,8 +249,8 @@ namespace Terraprint.Common.UI
 				return;
 			try {
 				var bp = BlueprintIO.Load(_selected);
-				ProjectionSystem.Load(bp);
-				if (TerraprintConfig.Instance.CloseMenuOnLoad)
+				ProjectionSystem.Load(bp, _selected);
+				if (Cfg.CloseMenuOnLoad)
 					UISystem.CloseMenu();
 				else
 					ShowTab(Tab.Projection);
@@ -230,6 +259,18 @@ namespace Terraprint.Common.UI
 				Main.NewText(Lang.UI("LoadError", Path.GetFileName(_selected), e.Message), Color.OrangeRed);
 				ModContent.GetInstance<Terraprint>().Logger.Error("Failed to load blueprint " + _selected, e);
 			}
+		}
+
+		private void EditSelected()
+		{
+			if (_selected != null)
+				OpenEditor(_selected);
+		}
+
+		private void NewBlank()
+		{
+			var bp = new Blueprint(32, 20) { Name = Lang.UI("NewBlankName"), Author = Main.LocalPlayer?.name ?? "" };
+			OpenEditor(bp, null);
 		}
 
 		/// <summary>Primeiro clique pede confirmacao; o segundo (em ate 3 s) apaga o arquivo.</summary>
@@ -255,41 +296,58 @@ namespace Terraprint.Common.UI
 
 		public void RefreshFiles()
 		{
-			if (_fileList == null)
+			if (_grid == null)
 				return;
-			_fileList.Clear();
 			var files = BlueprintIO.ListFiles();
 			BlueprintPreview.Retain(new HashSet<string>(files));
 			if (_selected != null && !files.Contains(_selected))
 				_selected = null;
 			if (_selected == null && files.Count > 0)
 				_selected = files[0];
-			foreach (string file in files)
-				_fileList.Add(new CatalogRow(file));
+			_grid.SetFiles(files);
 		}
 
-		// ----- Aba Salvar -----
+		// ----- Salvar area -----
 
-		private UIElement BuildSaveTab()
+		private UIElement BuildSave()
 		{
-			var c = NewContent();
+			var p = Page();
+			float y = 0f;
 
-			var nameLabel = Label(c, 0f, 8f, 0.9f, Color.White, fill: false);
-			nameLabel.SetText(Lang.UI("NameLabel"));
-			_nameBox = new UITextBox(Lang.UI("NameHint"));
-			Place(c, _nameBox, 64f, 0f, 340f);
-
-			Place(c, new UITextButton(Lang.UI("SelectArea"), SelectionSystem.Begin) {
+			var step1 = Put(p, new UIStepCard(1, () => Lang.UI("Step1"), SelectionText), 0f, y, 0f, 74f);
+			step1.Width.Set(0f, 1f);
+			Put(step1, new UITextButton(() => Lang.UI(SelectionSystem.Active ? "Selecting" : "SelectArea"), SelectionSystem.Begin) {
 				IsActive = () => SelectionSystem.Active,
-			}, 0f, 44f, 196f);
-			Place(c, new UITextButton(Lang.UI("Save"), SaveSelection) {
-				IsEnabled = () => SelectionSystem.HasSelection,
-			}, 196f + Gap, 44f, 196f);
+			}, -190f, 21f, 176f, BtnH, rightAligned: true);
+			y += 84f;
 
-			_selectionInfo = Label(c, 0f, 90f, 0.85f, TerraprintStyle.Muted);
-			var hint = Label(c, 0f, 120f, 0.8f, TerraprintStyle.Highlight);
-			hint.SetText(Lang.UI("SaveHint"));
-			return c;
+			var step2 = Put(p, new UIStepCard(2, () => Lang.UI("Step2"), () => Lang.UI("Step2Sub")), 0f, y, 0f, 74f);
+			step2.Width.Set(0f, 1f);
+			_nameBox = new UITextBox(Lang.UI("NameHint"));
+			Put(step2, _nameBox, -290f, 21f, 276f, BtnH, rightAligned: true);
+			y += 84f;
+
+			var step3 = Put(p, new UIStepCard(3, () => Lang.UI("Step3"), () => Lang.UI("SaveHint")), 0f, y, 0f, 74f);
+			step3.Width.Set(0f, 1f);
+			Put(step3, new UITextButton(Lang.UI("Save"), SaveSelection) {
+				IsEnabled = () => SelectionSystem.HasSelection,
+				IsActive = () => SelectionSystem.HasSelection,
+			}, -190f, 21f, 176f, BtnH, rightAligned: true);
+			y += 92f;
+
+			Wrapped(p, Lang.UI("SaveFootnote"), y, 0.75f, TerraprintStyle.Muted);
+			return p;
+		}
+
+		private static string SelectionText()
+		{
+			if (SelectionSystem.Active)
+				return SelectionSystem.CornerA.HasValue ? Lang.UI("InfoSecondCorner") : Lang.UI("InfoFirstCorner");
+			if (SelectionSystem.HasSelection) {
+				var r = SelectionSystem.SelectionRect;
+				return Lang.UI("InfoSelection", r.Width, r.Height);
+			}
+			return Lang.UI("InfoNoSelection");
 		}
 
 		private void SaveSelection()
@@ -308,7 +366,7 @@ namespace Terraprint.Common.UI
 				SelectionSystem.Cancel();
 				_selected = path;
 				RefreshFiles();
-				ShowTab(Tab.Catalog);
+				ShowTab(Tab.Library);
 			}
 			catch (Exception e) {
 				Main.NewText(Lang.UI("SaveError", e.Message), Color.OrangeRed);
@@ -316,92 +374,298 @@ namespace Terraprint.Common.UI
 			}
 		}
 
-		// ----- Aba Projecao -----
+		// ----- Projecao -----
 
-		private UIElement BuildProjectionTab()
+		private UIElement BuildProjection()
 		{
-			var c = NewContent();
+			var p = Page();
+			const float right = 250f;
 
-			_projectionInfo = Label(c, 0f, 0f, 0.85f, Color.White);
-			_projectionInfo.Width.Set(LeftColumn, 0f);
+			// Previa grande com nome e progresso.
+			var card = new UIBox(TerraprintStyle.Card);
+			card.Width.Set(-right - 12f, 1f);
+			card.Height.Set(0f, 1f);
+			p.Append(card);
+			var preview = new UIBox(TerraprintStyle.PreviewBackground);
+			preview.Left.Set(10f, 0f);
+			preview.Top.Set(10f, 0f);
+			preview.Width.Set(-20f, 1f);
+			preview.Height.Set(-84f, 1f);
+			preview.SetPadding(8f);
+			card.Append(preview);
+			preview.Append(new UIPreviewImage(() => ProjectionSystem.HasProjection
+				? BlueprintPreview.ForProjection(ProjectionSystem.Current, ProjectionSystem.Version) : null));
+			var empty = new UILabel(() => ProjectionSystem.HasProjection ? "" : Lang.UI("NoProjection"), 0.8f, TerraprintStyle.Muted) { Center = true };
+			empty.Width.Set(0f, 1f);
+			empty.Top.Set(-12f, 0.5f);
+			empty.Height.Set(24f, 0f);
+			preview.Append(empty);
 
-			var cfg = () => TerraprintConfig.Instance;
-			float y = 96f;
-			Place(c, new UITextButton(() => Lang.UI("ToggleGhost", OnOff(cfg().ShowGhost)),
-				() => TerraprintConfig.Set(x => x.ShowGhost = !x.ShowGhost)) {
-				IsActive = () => cfg().ShowGhost,
-			}, 0f, y, LeftColumn);
-			Place(c, new UITextButton(() => Lang.UI("ToggleMap", OnOff(cfg().ShowOnMinimap || cfg().ShowOnFullscreenMap)),
-				() => TerraprintConfig.Set(x => {
-					bool on = !(x.ShowOnMinimap || x.ShowOnFullscreenMap);
-					x.ShowOnMinimap = x.ShowOnFullscreenMap = on;
-				})) {
-				IsActive = () => cfg().ShowOnMinimap || cfg().ShowOnFullscreenMap,
-			}, 0f, y + ButtonHeight + Gap, LeftColumn);
-			Place(c, new UITextButton(() => Lang.UI("ToggleCorrect", OnOff(cfg().ShowCorrect)),
-				() => TerraprintConfig.Set(x => x.ShowCorrect = !x.ShowCorrect)) {
-				IsActive = () => cfg().ShowCorrect,
-			}, 0f, y + 2 * (ButtonHeight + Gap), LeftColumn);
+			var line = new UILabel(ProjectionLine, 0.85f, Color.White);
+			line.Left.Set(12f, 0f);
+			line.Top.Set(-68f, 1f);
+			line.Width.Set(-24f, 1f);
+			line.Height.Set(22f, 0f);
+			card.Append(line);
+			var bar = new UIProgress();
+			bar.Left.Set(12f, 0f);
+			bar.Top.Set(-40f, 1f);
+			bar.Width.Set(-24f, 1f);
+			bar.Height.Set(28f, 0f);
+			card.Append(bar);
 
-			// Setas: movem 1 bloco (as setas do teclado tambem).
-			y += 3 * (ButtonHeight + Gap) + 8f;
-			float a = (LeftColumn - 3 * Gap) / 4f;
+			// Controles a direita.
+			var col = new UIElement();
+			col.Left.Set(-right, 1f);
+			col.Width.Set(right, 0f);
+			col.Height.Set(0f, 1f);
+			p.Append(col);
+			float y = 0f;
+			float half = (right - Gap) / 2f;
+
+			col.Append(Header(Lang.UI("GroupTransform"), y));
+			y += 22f;
+			Put(col, ProjButton("Rotate", ProjectionSystem.Rotate), 0f, y, half, BtnH);
+			Put(col, ProjButton("Flip", ProjectionSystem.Flip), half + Gap, y, half, BtnH);
+			y += BtnH + 10f;
+
+			col.Append(Header(Lang.UI("GroupPosition"), y));
+			y += 22f;
+			Put(col, ProjButton("Move", ProjectionSystem.StartMoving), 0f, y, half, BtnH);
+			// Setas (as do teclado tambem funcionam com o menu aberto).
+			float a = (half - 3 * 3f) / 4f;
 			int[] rot = { 3, 0, 2, 1 };
 			Point[] dir = { new(-1, 0), new(0, -1), new(0, 1), new(1, 0) };
 			for (int i = 0; i < 4; i++) {
 				Point d = dir[i];
-				Place(c, new UITextButton("Up", Lang.UI("NudgeHint"), () => ProjectionSystem.Nudge(d.X, d.Y), rot[i]) {
+				Put(col, new UITextButton("Up", Lang.UI("NudgeHint"), () => ProjectionSystem.Nudge(d.X, d.Y), rot[i]) {
 					IsEnabled = () => ProjectionSystem.HasProjection,
-				}, i * (a + Gap), y, a);
+				}, half + Gap + i * (a + 3f), y, a, BtnH);
 			}
+			y += BtnH + 10f;
 
-			var box = Box(c, RightColumn, 0f, ButtonHeight + Gap + 26f);
-			box.Append(new UIPreviewImage(() => ProjectionSystem.HasProjection
-				? BlueprintPreview.ForProjection(ProjectionSystem.Current, ProjectionSystem.Version) : null));
-			_projectionHint = Label(c, RightColumn, 0f, 0.8f, TerraprintStyle.Highlight);
-			_projectionHint.Top.Set(-ButtonHeight - Gap - 22f, 1f);
+			col.Append(Header(Lang.UI("GroupView"), y));
+			y += 22f;
+			Put(col, new UIToggleRow(Lang.UI("ShowGhostShort"), null, () => Cfg.ShowGhost, v => TerraprintConfig.Set(c => c.ShowGhost = v)), 0f, y, right, 32f);
+			y += 36f;
+			Put(col, new UIToggleRow(Lang.UI("ShowMapShort"), null, () => Cfg.ShowOnMinimap || Cfg.ShowOnFullscreenMap,
+				v => TerraprintConfig.Set(c => c.ShowOnMinimap = c.ShowOnFullscreenMap = v)), 0f, y, right, 32f);
+			y += 36f;
+			Put(col, new UIToggleRow(Lang.UI("ShowCorrectShort"), null, () => Cfg.ShowCorrect, v => TerraprintConfig.Set(c => c.ShowCorrect = v)), 0f, y, right, 32f);
 
-			float w = (PanelWidth - 2 * Pad - 4 * Gap) / 5f;
-			Bottom(c, ProjectionButton("Rotate", ProjectionSystem.Rotate), 0f, w);
-			Bottom(c, ProjectionButton("Flip", ProjectionSystem.Flip), w + Gap, w);
-			Bottom(c, ProjectionButton("Move", ProjectionSystem.StartMoving), 2 * (w + Gap), w);
-			Bottom(c, ProjectionButton("Remove", ProjectionSystem.Clear), 3 * (w + Gap), w);
+			// Acoes principais embaixo.
 			_buildButton = new UITextButton(() => Lang.UI(_buildButton.Held ? "AutoBuilding" : "AutoBuild"), null) {
 				WhileHeld = AutoBuildSystem.RequestHold,
 				IsEnabled = () => ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed,
+				IsActive = () => ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed,
+				Tooltip = () => Lang.UI("AutoBuildTip"),
 			};
-			Bottom(c, _buildButton, 4 * (w + Gap), w);
-			return c;
+			_buildButton.Top.Set(-2 * BtnH - Gap, 1f);
+			_buildButton.Width.Set(0f, 1f);
+			_buildButton.Height.Set(BtnH, 0f);
+			col.Append(_buildButton);
+			var edit = new UITextButton(Lang.UI("Edit"), () => {
+				if (ProjectionSystem.SourcePath != null && File.Exists(ProjectionSystem.SourcePath))
+					OpenEditor(ProjectionSystem.SourcePath);
+				else if (ProjectionSystem.Source != null)
+					OpenEditor(ProjectionSystem.Source.Clone(), null);
+			}) { IsEnabled = () => ProjectionSystem.HasProjection, Tooltip = () => Lang.UI("EditTip") };
+			Put(col, edit, 0f, 0f, half, BtnH).Top.Set(-BtnH, 1f);
+			Put(col, ProjButton("Remove", ProjectionSystem.Clear), half + Gap, 0f, half, BtnH).Top.Set(-BtnH, 1f);
+			return p;
 		}
 
-		private static UITextButton ProjectionButton(string key, Action onClick) => new(Lang.UI(key), onClick) {
+		private static UIElement Header(string text, float y)
+		{
+			var h = new UILabel(() => text, 0.78f, TerraprintStyle.Accent);
+			h.Top.Set(y, 0f);
+			h.Width.Set(0f, 1f);
+			h.Height.Set(20f, 0f);
+			return h;
+		}
+
+		private static UITextButton ProjButton(string key, Action onClick) => new(Lang.UI(key), onClick) {
 			IsEnabled = () => ProjectionSystem.HasProjection,
 		};
 
-		private static string OnOff(bool on) => on ? Lang.UI("On") : Lang.UI("Off");
-
-		// ----- Aba Materiais -----
-
-		private UIElement BuildMaterialsTab()
+		private static string ProjectionLine()
 		{
-			var c = NewContent();
-			_materialsInfo = Label(c, 0f, 0f, 0.85f, TerraprintStyle.Muted);
-			_materialsInfo.Height.Set(40f, 0f);
+			if (!ProjectionSystem.HasProjection)
+				return Lang.UI("NoProjectionShort");
+			var bp = ProjectionSystem.Current;
+			string flip = ProjectionSystem.FlippedX ? Lang.UI("Mirrored") : "";
+			return Lang.UI("ProjectionLine", bp.Name, bp.Width, bp.Height, ProjectionSystem.Rotation * 90, flip);
+		}
 
-			float y = 44f;
+		// ----- Materiais -----
+
+		private UIElement BuildMaterials()
+		{
+			var p = Page();
+			var info = new UILabel(MaterialsSummary.Text, 0.85f, Color.White);
+			info.Width.Set(0f, 1f);
+			info.Height.Set(24f, 0f);
+			p.Append(info);
+
+			var box = new UIBox(TerraprintStyle.Card);
+			box.Top.Set(32f, 0f);
+			box.Width.Set(0f, 1f);
+			box.Height.Set(-32f, 1f);
+			box.SetPadding(10f);
+			p.Append(box);
+
 			var grid = new MaterialsGrid();
-			grid.Top.Set(y, 0f);
 			grid.Width.Set(-22f, 1f);
-			grid.Height.Set(-y, 1f);
-			c.Append(grid);
-
+			grid.Height.Set(0f, 1f);
+			box.Append(grid);
 			var scroll = new UIScrollbar();
-			scroll.Top.Set(y + 4f, 0f);
-			scroll.Height.Set(-y - 8f, 1f);
 			scroll.Left.Set(-18f, 1f);
-			c.Append(scroll);
+			scroll.Top.Set(4f, 0f);
+			scroll.Height.Set(-8f, 1f);
+			box.Append(scroll);
 			grid.Scrollbar = scroll;
-			return c;
+			return p;
+		}
+
+		// ----- Opcoes -----
+
+		private UIElement BuildOptions()
+		{
+			var p = Page();
+			var list = new UIList { ListPadding = 6f, ManualSortMethod = _ => { } };
+			list.Width.Set(-22f, 1f);
+			list.Height.Set(0f, 1f);
+			p.Append(list);
+			var scroll = new UIScrollbar();
+			scroll.Left.Set(-16f, 1f);
+			scroll.Top.Set(4f, 0f);
+			scroll.Height.Set(-8f, 1f);
+			p.Append(scroll);
+			list.SetScrollbar(scroll);
+
+			static string L(string key) => Lang.UI(key);
+			static string Tip(string key) => Lang.UI(key + "Tip");
+			void Toggle(string key, Func<TerraprintConfig, bool> get, Action<TerraprintConfig, bool> set) =>
+				list.Add(new UIToggleRow(L(key), Tip(key), () => get(Cfg), v => TerraprintConfig.Set(c => set(c, v))));
+			void Slider(string key, float min, float max, float step, Func<TerraprintConfig, float> get, Action<TerraprintConfig, float> set) =>
+				list.Add(new UISliderRow(L(key), Tip(key), min, max, step, () => get(Cfg), v => TerraprintConfig.Set(c => set(c, v))));
+			void Stepper(string key, int min, int max, int step, Func<TerraprintConfig, int> get, Action<TerraprintConfig, int> set) =>
+				list.Add(new UIStepperRow(L(key), Tip(key), min, max, step, () => get(Cfg), v => TerraprintConfig.Set(c => set(c, v))));
+
+			list.Add(new UISectionHeader(L("SecBlacklists")));
+			list.Add(new UIItemListRow(L("OptTileBlacklist"), Tip("OptTileBlacklist"), () => Cfg.TileBlacklist,
+				v => TerraprintConfig.Set(c => c.TileBlacklist = v), cb => OpenPicker(false, cb)));
+			list.Add(new UIItemListRow(L("OptWallBlacklist"), Tip("OptWallBlacklist"), () => Cfg.WallBlacklist,
+				v => TerraprintConfig.Set(c => c.WallBlacklist = v), cb => OpenPicker(true, cb)));
+
+			list.Add(new UISectionHeader(L("SecRendering")));
+			Slider("OptOpacity", 0.1f, 1f, 0.05f, c => c.GhostOpacity, (c, v) => c.GhostOpacity = v);
+			Toggle("OptBlink", c => c.EnableBlinking, (c, v) => c.EnableBlinking = v);
+			Stepper("OptTileBlink", 5, 240, 5, c => c.TileBlinkDelay, (c, v) => c.TileBlinkDelay = v);
+			Stepper("OptWallBlink", 5, 240, 5, c => c.WallBlinkDelay, (c, v) => c.WallBlinkDelay = v);
+
+			list.Add(new UISectionHeader(L("SecLayers")));
+			Toggle("OptShowTiles", c => c.ShowTiles, (c, v) => c.ShowTiles = v);
+			Toggle("OptShowWalls", c => c.ShowWalls, (c, v) => c.ShowWalls = v);
+			Toggle("OptShowPaint", c => c.ShowPaint, (c, v) => c.ShowPaint = v);
+			Toggle("OptShowLiquids", c => c.ShowLiquids, (c, v) => c.ShowLiquids = v);
+
+			list.Add(new UISectionHeader(L("SecActuator")));
+			Toggle("OptShowActuated", c => c.ShowActuated, (c, v) => c.ShowActuated = v);
+			Slider("OptActuatedOpacity", 0.1f, 1f, 0.05f, c => c.ActuatedOpacity, (c, v) => c.ActuatedOpacity = v);
+			Toggle("OptActuatorMismatch", c => c.HighlightActuatorMismatch, (c, v) => c.HighlightActuatorMismatch = v);
+			Stepper("OptActuatorBorder", 1, 4, 1, c => c.ActuatorBorder, (c, v) => c.ActuatorBorder = v);
+
+			list.Add(new UISectionHeader(L("SecGhost")));
+			Toggle("OptShowCorrect", c => c.ShowCorrect, (c, v) => c.ShowCorrect = v);
+			Toggle("OptObstructions", c => c.MarkObstructions, (c, v) => c.MarkObstructions = v);
+			Toggle("OptOutline", c => c.ShowOutline, (c, v) => c.ShowOutline = v);
+			Toggle("OptProgress", c => c.ShowProgress, (c, v) => c.ShowProgress = v);
+			Toggle("OptMinimap", c => c.ShowOnMinimap, (c, v) => c.ShowOnMinimap = v);
+			Toggle("OptFullMap", c => c.ShowOnFullscreenMap, (c, v) => c.ShowOnFullscreenMap = v);
+
+			list.Add(new UISectionHeader(L("SecAutoBuild")));
+			Stepper("OptPerTick", 1, 10, 1, c => c.AutoBuildPerTick, (c, v) => c.AutoBuildPerTick = v);
+			Toggle("OptBuildWalls", c => c.AutoBuildWalls, (c, v) => c.AutoBuildWalls = v);
+			Toggle("OptBuildFurniture", c => c.AutoBuildFurniture, (c, v) => c.AutoBuildFurniture = v);
+			Toggle("OptBuildSlopes", c => c.AutoBuildSlopes, (c, v) => c.AutoBuildSlopes = v);
+
+			var all = new UITextButton(L("AllOptions"), () => Cfg.Open()) { Tooltip = () => L("AllOptionsTip") };
+			all.Width.Set(0f, 1f);
+			all.Height.Set(BtnH, 0f);
+			list.Add(all);
+
+			// Seletor de itens das listas de bloqueio (cobre a pagina enquanto aberto).
+			_pickerOverlay = new UIBox(TerraprintStyle.PanelBackground);
+			_pickerOverlay.Width.Set(0f, 1f);
+			_pickerOverlay.Height.Set(0f, 1f);
+			_pickerOverlay.SetPadding(10f);
+			var ptitle = new UILabel(() => Lang.UI("PickerTitle"), 0.9f, Color.White);
+			ptitle.Top.Set(4f, 0f);
+			ptitle.Width.Set(-120f, 1f);
+			ptitle.Height.Set(24f, 0f);
+			_pickerOverlay.Append(ptitle);
+			Put(_pickerOverlay, new UITextButton(Lang.UI("Cancel"), ClosePicker), -110f, 0f, 110f, 28f, rightAligned: true);
+			return p;
+		}
+
+		private void OpenPicker(bool walls, Action<int> onPick)
+		{
+			_picker?.Remove();
+			_pickerCallback = onPick;
+			var cats = walls ? new[] { PaletteCategory.Walls }
+				: new[] { PaletteCategory.Blocks, PaletteCategory.Furniture, PaletteCategory.Decoration, PaletteCategory.Entities };
+			_picker = new UIPaletteBrowser(cats, e => {
+				_pickerCallback?.Invoke(e.ItemType);
+				ClosePicker();
+			}, () => null);
+			_picker.Top.Set(36f, 0f);
+			_picker.Width.Set(0f, 1f);
+			_picker.Height.Set(-36f, 1f);
+			_pickerOverlay.Append(_picker);
+			_pages[(int)Tab.Options].Append(_pickerOverlay);
+			_pickerOverlay.Recalculate();
+		}
+
+		private void ClosePicker()
+		{
+			_picker?.Unfocus();
+			_pickerOverlay?.Remove();
+			_pickerCallback = null;
+		}
+
+		// ----- Editor -----
+
+		public void OpenEditor(string path)
+		{
+			try {
+				OpenEditor(BlueprintIO.Load(path), path);
+			}
+			catch (Exception e) {
+				Main.NewText(Lang.UI("LoadError", Path.GetFileName(path), e.Message), Color.OrangeRed);
+			}
+		}
+
+		public void OpenEditor(Blueprint bp, string path)
+		{
+			_nameBox?.Unfocus();
+			_search?.Unfocus();
+			ClosePicker();
+			_panel.Remove();
+			if (_editor.Parent == null)
+				Append(_editor);
+			_editor.Activate();
+			Recalculate();
+			_editor.Open(bp, path);
+		}
+
+		private void CloseEditor()
+		{
+			_editor.Remove();
+			if (_panel.Parent == null)
+				Append(_panel);
+			Recalculate();
+			RefreshFiles();
 		}
 
 		// ----- Estado -----
@@ -414,19 +678,21 @@ namespace Terraprint.Common.UI
 			}
 			if (tab == _tab)
 				return;
-			_contents[(int)_tab].Remove();
+			ClosePicker();
+			_pages[(int)_tab].Remove();
 			_tab = tab;
-			_panel.Append(_contents[(int)tab]);
+			_body.Append(_pages[(int)tab]);
 			_nameBox?.Unfocus();
-			_panel.Recalculate();
+			_search?.Unfocus();
+			_body.Recalculate();
 		}
 
 		public override void OnActivate()
 		{
 			RefreshFiles();
 			if (_tab == Tab.Projection && !ProjectionSystem.HasProjection && !SelectionSystem.Active)
-				ShowTab(Tab.Catalog);
-			else if (_tab == Tab.Catalog && ProjectionSystem.HasProjection)
+				ShowTab(Tab.Library);
+			else if (_tab == Tab.Library && ProjectionSystem.HasProjection)
 				ShowTab(Tab.Projection);
 		}
 
@@ -435,70 +701,140 @@ namespace Terraprint.Common.UI
 			base.Update(gameTime);
 			if (_confirmDelete > 0)
 				_confirmDelete--;
-
-			switch (_tab) {
-				case Tab.Catalog:
-					UpdateCatalogText();
-					break;
-				case Tab.Save:
-					if (SelectionSystem.Active)
-						_selectionInfo.SetText(SelectionSystem.CornerA.HasValue ? Lang.UI("InfoSecondCorner") : Lang.UI("InfoFirstCorner"));
-					else if (SelectionSystem.HasSelection) {
-						var r = SelectionSystem.SelectionRect;
-						_selectionInfo.SetText(Lang.UI("InfoSelection", r.Width, r.Height));
-					}
-					else
-						_selectionInfo.SetText(Lang.UI("InfoNoSelection"));
-					break;
-				case Tab.Projection:
-					UpdateProjectionText();
-					break;
-				case Tab.Materials:
-					MaterialsTracker.Update();
-					_materialsInfo.SetText(MaterialsSummary.Text());
-					break;
-			}
+			if (_tab == Tab.Materials)
+				MaterialsTracker.Update();
 		}
 
-		private void UpdateCatalogText()
+		public bool IsMouseOverPanel =>
+			_panel != null && _panel.Parent != null && _panel.ContainsPoint(Main.MouseScreen)
+			|| EditorOpen && _editor.ContainsPoint(Main.MouseScreen);
+
+		public bool IsTyping =>
+			(_nameBox?.Focused ?? false) || (_search?.Focused ?? false) || (_picker != null && _picker.Parent != null && _picker.IsTyping)
+			|| EditorOpen && _editor.IsTyping;
+	}
+
+	// ======================= Elementos usados pelo menu =======================
+
+	/// <summary>Caixa arredondada de uma cor (fundo da barra lateral, cartoes).</summary>
+	public class UIBox : UIElement
+	{
+		public Color Color;
+
+		public UIBox(Color color) => Color = color;
+
+		public override void Update(GameTime gameTime)
 		{
-			if (_selected == null) {
-				_fileName.SetText(Lang.UI("NoFiles"));
-				_fileInfo.SetText("");
-				_fileHint.SetText("");
-				return;
-			}
-			_fileName.SetText(Path.GetFileNameWithoutExtension(_selected));
-			var e = SelectedPreview;
-			if (e == null || e.Failed) {
-				_fileInfo.SetText("");
-				_fileHint.SetText(Lang.UI("PreviewError"));
-				return;
-			}
-			_fileInfo.SetText(Lang.UI("FileInfo", e.Width, e.Height, e.Tiles));
-			_fileHint.SetText(Lang.UI("LoadHint"));
+			base.Update(gameTime);
+			if (IsMouseHovering)
+				Main.LocalPlayer.mouseInterface = true;
 		}
 
-		private void UpdateProjectionText()
+		protected override void DrawSelf(SpriteBatch sb) => TerraprintStyle.RoundedBox(sb, GetDimensions().ToRectangle(), Color, Color.Black * 0.7f);
+	}
+
+	/// <summary>Texto de uma linha que muda sozinho (cortado com "..." se nao couber).</summary>
+	public class UILabel : UIElement
+	{
+		private readonly Func<string> _text;
+		private readonly float _scale;
+		public Color Color;
+		public bool Center;
+
+		public UILabel(Func<string> text, float scale, Color color)
 		{
-			if (!ProjectionSystem.HasProjection) {
-				_projectionInfo.SetText(Lang.UI("NoProjection"));
-				_projectionHint.SetText("");
-				return;
-			}
-			var bp = ProjectionSystem.Current;
-			string flip = ProjectionSystem.FlippedX ? Lang.UI("Mirrored") : "";
-			_projectionInfo.SetText(Lang.UI("ProjectionLine", bp.Name, bp.Width, bp.Height, ProjectionSystem.Rotation * 90, flip));
-			if (ProjectionSystem.State != ProjectionSystem.ProjectionState.Fixed)
-				_projectionHint.SetText(Lang.UI("StateMoving"));
-			else if (_buildButton.Held)
-				_projectionHint.SetText(Lang.UI("AutoBuilding"));
+			_text = text;
+			_scale = scale;
+			Color = color;
+			IgnoresMouseInteraction = true;
+		}
+
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var d = GetDimensions();
+			string t = TerraprintStyle.Ellipsis(_text() ?? "", _scale, d.Width);
+			if (Center)
+				TerraprintStyle.Text(sb, t, new Vector2(d.X + d.Width / 2f, d.Y), Color, _scale, 0f, 0.5f);
 			else
-				_projectionHint.SetText(GhostSystem.ProgressText());
+				TerraprintStyle.Text(sb, t, d.Position(), Color, _scale);
+		}
+	}
+
+	/// <summary>Barra de progresso da projecao (blocos certos / total), com o texto por cima.</summary>
+	public class UIProgress : UIElement
+	{
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var r = GetDimensions().ToRectangle();
+			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.InputBackground, Color.Black);
+			if (!ProjectionSystem.HasProjection)
+				return;
+			bool fixedState = ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
+			float f = fixedState ? ProgressTracker.Percent : 0f;
+			var fill = new Rectangle(r.X + 3, r.Y + 3, (int)((r.Width - 6) * f), r.Height - 6);
+			TerraprintStyle.Fill(sb, fill, (f >= 1f ? TerraprintStyle.Good : TerraprintStyle.Accent) * 0.75f);
+			string text = fixedState
+				? Lang.UI("ProgressBar", (int)(f * 100f), ProgressTracker.Correct, ProgressTracker.Total, ProgressTracker.Missing, ProgressTracker.Wrong)
+				: Lang.UI("StateMovingShort");
+			TerraprintStyle.Text(sb, text, new Vector2(r.Center.X, r.Y + r.Height / 2f - 9f), Color.White, 0.75f, r.Width - 12f, 0.5f);
+		}
+	}
+
+	/// <summary>Cartao no pe da barra lateral com o nome e o progresso da projecao ativa.</summary>
+	public class UIProjectionBadge : UIElement
+	{
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+			if (IsMouseHovering)
+				Main.LocalPlayer.mouseInterface = true;
 		}
 
-		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);
-		public bool IsTyping => _nameBox != null && _nameBox.Focused;
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var r = GetDimensions().ToRectangle();
+			TerraprintStyle.RoundedBox(sb, r, IsMouseHovering ? TerraprintStyle.CardHover : TerraprintStyle.Card, Color.Black * 0.7f);
+			TerraprintStyle.Text(sb, Lang.UI("BadgeTitle"), new Vector2(r.X + 10, r.Y + 8), TerraprintStyle.Accent, 0.7f);
+			if (!ProjectionSystem.HasProjection) {
+				TerraprintStyle.Text(sb, Lang.UI("BadgeNone"), new Vector2(r.X + 10, r.Y + 28), TerraprintStyle.Muted, 0.72f, r.Width - 20);
+				return;
+			}
+			string name = TerraprintStyle.Ellipsis(ProjectionSystem.Current.Name ?? "", 0.8f, r.Width - 20);
+			TerraprintStyle.Text(sb, name, new Vector2(r.X + 10, r.Y + 26), Color.White, 0.8f);
+			var bar = new Rectangle(r.X + 10, r.Bottom - 18, r.Width - 20, 10);
+			TerraprintStyle.Fill(sb, bar, TerraprintStyle.InputBackground);
+			bool fixedState = ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
+			float f = fixedState ? ProgressTracker.Percent : 0f;
+			TerraprintStyle.Fill(sb, new Rectangle(bar.X, bar.Y, (int)(bar.Width * f), bar.Height), f >= 1f ? TerraprintStyle.Good : TerraprintStyle.Accent);
+			string pct = fixedState ? (int)(f * 100f) + "%" : Lang.UI("BadgeMoving");
+			TerraprintStyle.Text(sb, pct, new Vector2(r.Right - 10, r.Y + 8), TerraprintStyle.Muted, 0.65f, 0f, 1f);
+		}
+	}
+
+	/// <summary>Cartao de um passo (numero, titulo e texto de apoio); os controles ficam a direita.</summary>
+	public class UIStepCard : UIElement
+	{
+		private readonly int _n;
+		private readonly Func<string> _title, _sub;
+
+		public UIStepCard(int n, Func<string> title, Func<string> sub)
+		{
+			_n = n;
+			_title = title;
+			_sub = sub;
+		}
+
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var r = GetDimensions().ToRectangle();
+			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.Card, Color.Black * 0.7f);
+			var circle = new Rectangle(r.X + 14, r.Y + r.Height / 2 - 15, 30, 30);
+			TerraprintStyle.RoundedBox(sb, circle, TerraprintStyle.ButtonActive, Color.Black);
+			TerraprintStyle.Text(sb, _n.ToString(), new Vector2(circle.Center.X, circle.Y + 5), Color.White, 0.95f, 0f, 0.5f);
+			float textW = r.Width - 60 - 300;
+			TerraprintStyle.Text(sb, _title(), new Vector2(r.X + 56, r.Y + 16), Color.White, 0.9f, textW);
+			TerraprintStyle.Text(sb, TerraprintStyle.Ellipsis(_sub() ?? "", 0.72f, textW), new Vector2(r.X + 56, r.Y + 42), TerraprintStyle.Muted, 0.72f);
+		}
 	}
 
 	/// <summary>Imagem de previa que preenche o elemento pai, centralizada e sem distorcer.</summary>
@@ -511,6 +847,7 @@ namespace Terraprint.Common.UI
 			_source = source;
 			Width.Set(0f, 1f);
 			Height.Set(0f, 1f);
+			IgnoresMouseInteraction = true;
 		}
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -519,66 +856,134 @@ namespace Terraprint.Common.UI
 		}
 	}
 
-	/// <summary>Uma linha da lista de blueprints: nome e tamanho. Clique seleciona; clique duplo carrega.</summary>
-	public class CatalogRow : UIPanel
+	/// <summary>
+	/// Grade de cartoes dos blueprints salvos: previa, nome e tamanho. Clique seleciona, clique duplo carrega.
+	/// </summary>
+	public class BlueprintGrid : UIElement
 	{
-		public readonly string FilePath;
-		private readonly UIText _size;
-		private bool _sizeSet;
+		private const float CardW = 152f, CardH = 136f, GapX = 10f, GapY = 10f;
 
-		public CatalogRow(string path)
+		private static readonly RasterizerState ClipRaster = new() { CullMode = CullMode.None, ScissorTestEnable = true };
+
+		private readonly TerraprintMenu _menu;
+		private List<string> _files = new();
+		private List<string> _shown = new();
+		private string _filter;
+		private int _hovered = -1;
+		public UIScrollbar Scrollbar;
+		public Func<string> Filter = () => "";
+
+		public BlueprintGrid(TerraprintMenu menu) => _menu = menu;
+
+		public int Count => _files.Count;
+
+		public void SetFiles(List<string> files)
 		{
-			FilePath = path;
-			Width.Set(0f, 1f);
-			Height.Set(28f, 0f);
-			SetPadding(0f);
-			BorderColor = Color.Black;
-
-			string display = Path.GetFileNameWithoutExtension(path);
-			if (display.Length > 17)
-				display = display.Substring(0, 16) + "…";
-			var name = new UIText(display, 0.8f);
-			name.Left.Set(8f, 0f);
-			name.VAlign = 0.5f;
-			Append(name);
-
-			_size = new UIText("", 0.65f) { TextColor = TerraprintStyle.Muted, TextOriginX = 1f };
-			_size.Width.Set(60f, 0f);
-			_size.Left.Set(-66f, 1f);
-			_size.VAlign = 0.5f;
-			Append(_size);
+			_files = files;
+			_filter = null;
 		}
 
-		public override void LeftClick(UIMouseEvent evt)
+		private int Columns => Math.Max(1, (int)((GetDimensions().Width + GapX) / (CardW + GapX)));
+		private const float RowH = CardH + GapY;
+
+		private Rectangle CardRect(int i)
 		{
-			base.LeftClick(evt);
-			Terraria.Audio.SoundEngine.PlaySound(Terraria.ID.SoundID.MenuTick);
-			UISystem.Menu?.Select(FilePath);
+			var d = GetDimensions();
+			int cols = Columns;
+			// Espalha as colunas para ocupar a largura toda.
+			float w = (d.Width - (cols - 1) * GapX) / cols;
+			float y = d.Y + i / cols * RowH - (Scrollbar?.ViewPosition ?? 0f);
+			return new Rectangle((int)(d.X + i % cols * (w + GapX)), (int)y, (int)w, (int)CardH);
 		}
 
-		public override void LeftDoubleClick(UIMouseEvent evt)
+		public override void ScrollWheel(UIScrollWheelEvent evt)
 		{
-			base.LeftDoubleClick(evt);
-			UISystem.Menu?.Select(FilePath);
-			UISystem.Menu?.LoadSelected();
+			base.ScrollWheel(evt);
+			if (Scrollbar != null)
+				Scrollbar.ViewPosition -= evt.ScrollWheelValue / 2f;
 		}
 
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
-			if (!_sizeSet) {
-				_sizeSet = true;
-				var e = BlueprintPreview.Get(FilePath);
-				if (e != null && !e.Failed)
-					_size.SetText($"{e.Width}x{e.Height}");
+			string f = (Filter() ?? "").Trim().ToLowerInvariant();
+			if (f != _filter) {
+				_filter = f;
+				_shown = f.Length == 0 ? new List<string>(_files)
+					: _files.FindAll(p => Path.GetFileNameWithoutExtension(p).ToLowerInvariant().Contains(f));
+			}
+			var d = GetDimensions();
+			int rows = (_shown.Count + Columns - 1) / Columns;
+			Scrollbar?.SetView(d.Height, Math.Max(d.Height, rows * RowH - GapY));
+
+			_hovered = -1;
+			if (!IsMouseHovering)
+				return;
+			Main.LocalPlayer.mouseInterface = true;
+			Terraria.GameInput.PlayerInput.LockVanillaMouseScroll("Terraprint/Library");
+			for (int i = 0; i < _shown.Count; i++) {
+				if (CardRect(i).Contains(Main.MouseScreen.ToPoint())) {
+					_hovered = i;
+					break;
+				}
 			}
 		}
 
-		protected override void DrawSelf(SpriteBatch spriteBatch)
+		public override void LeftClick(UIMouseEvent evt)
 		{
-			bool selected = UISystem.Menu?.Selected == FilePath;
-			BackgroundColor = selected ? TerraprintStyle.RowSelected : IsMouseHovering ? TerraprintStyle.RowHover : TerraprintStyle.Row;
-			base.DrawSelf(spriteBatch);
+			base.LeftClick(evt);
+			if (_hovered < 0)
+				return;
+			SoundEngine.PlaySound(SoundID.MenuTick);
+			_menu.Select(_shown[_hovered]);
+		}
+
+		public override void LeftDoubleClick(UIMouseEvent evt)
+		{
+			base.LeftDoubleClick(evt);
+			if (_hovered < 0)
+				return;
+			_menu.Select(_shown[_hovered]);
+			_menu.LoadSelected();
+		}
+
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var box = GetDimensions().ToRectangle();
+			if (_shown.Count == 0) {
+				TerraprintStyle.Text(sb, Lang.UI(_files.Count == 0 ? "NoFiles" : "NoMatches"), new Vector2(box.X + 4, box.Y + 6), TerraprintStyle.Muted, 0.8f, box.Width - 8);
+				return;
+			}
+			// Corta os cartoes que saem da area (rolagem).
+			var device = sb.GraphicsDevice;
+			Rectangle oldScissor = device.ScissorRectangle;
+			RasterizerState oldRaster = device.RasterizerState;
+			sb.End();
+			device.ScissorRectangle = Rectangle.Intersect(GetClippingRectangle(sb), oldScissor);
+			sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, ClipRaster, null, Main.UIScaleMatrix);
+
+			for (int i = 0; i < _shown.Count; i++) {
+				var r = CardRect(i);
+				if (r.Bottom < box.Y || r.Y > box.Bottom)
+					continue;
+				string path = _shown[i];
+				bool sel = _menu.Selected == path;
+				bool hover = i == _hovered;
+				TerraprintStyle.RoundedBox(sb, r, sel || hover ? TerraprintStyle.CardHover : TerraprintStyle.Card,
+					sel ? TerraprintStyle.Accent : Color.Black * 0.8f);
+				var img = new Rectangle(r.X + 8, r.Y + 8, r.Width - 16, r.Height - 52);
+				TerraprintStyle.Fill(sb, img, TerraprintStyle.PreviewBackground);
+				var e = BlueprintPreview.Get(path);
+				BlueprintPreview.Draw(sb, e, new Rectangle(img.X + 3, img.Y + 3, img.Width - 6, img.Height - 6), hover || sel ? 1f : 0.85f);
+				string name = TerraprintStyle.Ellipsis(Path.GetFileNameWithoutExtension(path), 0.8f, r.Width - 16);
+				TerraprintStyle.Text(sb, name, new Vector2(r.X + 8, r.Bottom - 40), sel ? TerraprintStyle.Accent : Color.White, 0.8f);
+				string size = e == null || e.Failed ? Lang.UI("PreviewErrorShort") : $"{e.Width} x {e.Height}";
+				TerraprintStyle.Text(sb, size, new Vector2(r.X + 8, r.Bottom - 21), TerraprintStyle.Muted, 0.68f);
+			}
+
+			sb.End();
+			device.ScissorRectangle = oldScissor;
+			sb.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.AnisotropicClamp, DepthStencilState.None, oldRaster, null, Main.UIScaleMatrix);
 		}
 	}
 }

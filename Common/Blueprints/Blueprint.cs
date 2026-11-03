@@ -61,8 +61,8 @@ namespace Terraprint.Common.Blueprints
 						c.HalfBlock = t.IsHalfBlock;
 						c.TilePaint = includePaint ? t.TileColor : (byte)0;
 						c.Inactive = t.IsActuated;
+						c.HasActuator = t.HasActuator;
 					}
-					c.HasActuator = t.HasActuator;
 					c.WallType = t.WallType;
 					c.WallPaint = includePaint && t.WallType != WallID.None ? t.WallColor : (byte)0;
 					if (includeLiquids && t.LiquidAmount > 0) {

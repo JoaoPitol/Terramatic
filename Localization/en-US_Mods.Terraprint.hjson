@@ -20,6 +20,10 @@ Configs: {
 			Colors: Colors
 			General: General
 			AutoBuild: Auto-build
+			Blacklists: Blacklists
+			Rendering: Rendering
+			Layers: Layers
+			Actuator: Actuator
 		}
 
 		CaptureLiquids: {
@@ -151,6 +155,61 @@ Configs: {
 			Label: Apply slopes and half blocks
 			Tooltip: Placed blocks get the same slope or half-block shape as the blueprint.
 		}
+
+		TileBlacklist: {
+			Label: Ignored blocks
+			Tooltip: Blocks and objects placed by these items are not shown in the ghost and do not count for progress, materials or auto build.
+		}
+
+		WallBlacklist: {
+			Label: Ignored walls
+			Tooltip: Walls placed by these items are ignored.
+		}
+
+		EnableBlinking: {
+			Label: Blink the ghost
+			Tooltip: Makes ghost blocks and walls blink.
+		}
+
+		TileBlinkDelay: {
+			Label: Block blink delay
+			Tooltip: Ticks between blinks (60 = 1 second).
+		}
+
+		WallBlinkDelay: {
+			Label: Wall blink delay
+			Tooltip: Ticks between blinks (60 = 1 second).
+		}
+
+		ShowTiles: {
+			Label: Show block layer
+			Tooltip: Draws the blueprint's blocks and objects.
+		}
+
+		ShowPaint: {
+			Label: Show paint layer
+			Tooltip: Mixes the saved paint color into the ghost.
+		}
+
+		ShowActuated: {
+			Label: Show actuated blocks
+			Tooltip: Draws actuated (turned off) blocks.
+		}
+
+		ActuatedOpacity: {
+			Label: Actuated block opacity
+			Tooltip: Opacity of actuated blocks in the ghost.
+		}
+
+		HighlightActuatorMismatch: {
+			Label: Highlight actuator mismatch
+			Tooltip: Orange border where the world's actuator differs from the blueprint.
+		}
+
+		ActuatorBorder: {
+			Label: Actuator border thickness
+			Tooltip: In pixels.
+		}
 	}
 
 	Anchor: {
@@ -247,4 +306,145 @@ UI: {
 	PreviewError: Could not read this file.
 	FileInfo: "{0} x {1}  ·  {2} tiles"
 	LoadHint: Double-click it in the list or press Load to project it in the world.
+	Subtitle: Building blueprints
+	PageLibrary: Library
+	PageLibrarySub: Your saved builds. Click to pick, double-click to project.
+	PageSave: Save area
+	PageSaveSub: Copy a build from the world into a blueprint.
+	PageProjection: Projection
+	PageProjectionSub: The blueprint currently placed in the world.
+	PageMaterials: Materials
+	PageMaterialsSub: What is left to place and what you carry.
+	PageOptions: Options
+	PageOptionsSub: Changes apply right away and are saved.
+	SearchHint: search...
+	NewBlank: New blank
+	NewBlankTip: Creates an empty blueprint and opens it in the editor.
+	NewBlankName: New build
+	Edit: Edit
+	EditTip: "Opens the schematic editor: place and remove blocks, walls, furniture and more."
+	PickOne: Pick a blueprint.
+	NoMatches: No blueprint matches that name.
+	PreviewErrorShort: unreadable file
+	DeleteConfirmShort: Confirm?
+	Step1: Select the area
+	Step2: Give it a name
+	Step2Sub: If left empty, the date and time are used.
+	Step3: Save it
+	Selecting: Selecting...
+	SaveFootnote: "Tip: the maximum area size and what gets saved (liquids, paint) are in All options. Actuators and actuated blocks are saved too."
+	GroupTransform: Transform
+	GroupPosition: Position
+	GroupView: View
+	ShowGhostShort: Ghost in the world
+	ShowMapShort: Show on map
+	ShowCorrectShort: Show correct blocks
+	AutoBuildTip: Hold to place the blocks in reach using your inventory.
+	NoProjectionShort: No blueprint loaded
+	StateMovingShort: "Following the mouse: click to place"
+	ProgressBar: "{0}%  ·  {1}/{2} correct  ·  {3} missing  ·  {4} wrong"
+	BadgeTitle: PROJECTION
+	BadgeNone: None in the world
+	BadgeMoving: moving
+	Cancel: Cancel
+	PickerTitle: Pick an item for the list
+	ItemAddTip: Add item
+	ItemRemoveTip: "{0}\nClick to remove from the list"
+	ListEmpty: Nothing in the list.
+	PaletteEmpty: Nothing found.
+	CatBlocks: Blocks
+	CatWalls: Walls
+	CatFurniture: Furniture
+	CatDecoration: Decoration
+	CatEntities: Entities
+	AllOptions: All options
+	AllOptionsTip: Opens the mod config screen with everything (capture, colors, mouse anchor...).
+	SecBlacklists: Blacklists
+	SecRendering: Rendering
+	SecLayers: Layers
+	SecActuator: Actuator
+	SecGhost: Ghost and map
+	SecAutoBuild: Auto build
+	OptTileBlacklist: Ignored blocks
+	OptTileBlacklistTip: "Blocks and objects placed by these items are ignored: they do not show in the ghost and do not count for progress, materials or auto build."
+	OptWallBlacklist: Ignored walls
+	OptWallBlacklistTip: Walls placed by these items are ignored (natural ones count too, e.g. Dirt Wall also ignores cave dirt walls).
+	OptOpacity: Preview opacity
+	OptOpacityTip: How visible the ghost is in the world.
+	OptBlink: Blink the ghost
+	OptBlinkTip: Makes ghost blocks and walls blink so they stand out from what is built.
+	OptTileBlink: Block blink delay
+	OptTileBlinkTip: Ticks between block blinks (60 = 1 second).
+	OptWallBlink: Wall blink delay
+	OptWallBlinkTip: Ticks between wall blinks (60 = 1 second).
+	OptShowTiles: Block layer
+	OptShowTilesTip: Draws the blueprint's blocks and objects.
+	OptShowWalls: Wall layer
+	OptShowWallsTip: Draws the blueprint's walls.
+	OptShowPaint: Paint layer
+	OptShowPaintTip: Mixes the saved paint color into the ghost.
+	OptShowLiquids: Liquid layer
+	OptShowLiquidsTip: Draws saved liquids (they do not count for progress).
+	OptShowActuated: Show actuated blocks
+	OptShowActuatedTip: Draws blocks that are actuated (turned off) in the blueprint.
+	OptActuatedOpacity: Actuated block opacity
+	OptActuatedOpacityTip: Actuated blocks are drawn darker and with this opacity.
+	OptActuatorMismatch: Highlight actuator mismatch
+	OptActuatorMismatchTip: Orange border where the world block's actuator (or on/off state) differs from the blueprint.
+	OptActuatorBorder: Border thickness
+	OptActuatorBorderTip: Thickness in pixels of the actuator mismatch border.
+	OptShowCorrectTip: "Draws already correct blocks in green. Off: they disappear from the ghost."
+	OptShowCorrect: Highlight correct blocks
+	OptObstructions: Mark blocks to remove
+	OptObstructionsTip: Red X on solid blocks where the blueprint wants empty space.
+	OptOutline: Gold outline
+	OptOutlineTip: Rectangle around the blueprint in the world.
+	OptProgress: Progress at top of screen
+	OptProgressTip: Shows how many blocks are done.
+	OptMinimap: Show on minimap
+	OptMinimapTip: Also applies to the overlay map.
+	OptFullMap: Show on fullscreen map
+	OptFullMapTip: Hover it to see the progress.
+	OptPerTick: Blocks per tick
+	OptPerTickTip: How many blocks auto build places per tick (limited in multiplayer).
+	OptBuildWalls: Place walls
+	OptBuildWallsTip: Auto build also places walls.
+	OptBuildFurniture: Place furniture
+	OptBuildFurnitureTip: Auto build also places furniture and large objects.
+	OptBuildSlopes: Apply slopes and actuators
+	OptBuildSlopesTip: Blocks get the blueprint's slope or half block. Actuators are placed if you carry them.
+	EditorTitle: Schematic editor
+	EditorProject: Project
+	EditorProjectTip: Saves and places this blueprint in the world.
+	DiscardConfirm: Discard changes?
+	EditorSaved: "[Terraprint] {0} saved."
+	EditorLayer: Eraser layer
+	LayerTiles: Blocks
+	LayerWalls: Walls
+	LayerTip: What the eraser and right click remove. Picking an item in the palette switches it.
+	ToolBrush: Brush
+	ToolBrushTip: Left places the item picked in the palette, right erases. Drag to paint.
+	ToolRect: Rectangle
+	ToolRectTip: "Drag to fill a rectangle (right: erase the rectangle)."
+	ToolEraser: Eraser
+	ToolEraserTip: Erases blocks or walls (see the layer). Furniture is removed whole.
+	ToolPicker: Picker
+	ToolPickerTip: Click a block to pick the same item in the palette.
+	ToolHammer: Hammer
+	ToolHammerTip: Click a block to cycle full, half block and slopes.
+	ToolActuator: Actuator
+	ToolActuatorTip: Left adds/removes an actuator; right toggles the block on/off (actuated).
+	ToolPan: Hand
+	ToolPanTip: Drag to move the view (the middle mouse button does it with any tool).
+	Undo: Undo
+	Redo: Redo
+	ZoomTip: Zoom (or the mouse wheel over the grid)
+	ZoomFit: Fit
+	GrowBorders: Borders +4
+	GrowBordersTip: Grows the area by 4 tiles on each side.
+	TrimEmpty: Trim empty
+	TrimEmptyTip: Removes empty rows and columns at the edges.
+	EditorStatus: "{0} x {1}  ·  mouse: {2}  ·  item: {3}"
+	EditorNothing: none
+	EditorHelp: "Wheel: zoom · middle: drag · Ctrl+Z / Ctrl+Y"
 }

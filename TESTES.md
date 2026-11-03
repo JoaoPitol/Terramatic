@@ -118,19 +118,42 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
    Se algum não couber (ficaria em cima de outro bloco), ele some e o chat diz quantos blocos de móveis ficaram de fora.
 5. Gire 4 vezes: tudo volta exatamente como era.
 
-## Passo 9: menu em formato de catálogo
+## Passo 9: menu novo (barra lateral)
 
-1. Aperte **K**. A janela tem o título **Terraprint** à esquerda e, no topo à direita, os botões
-   **Blueprints**, **Salvar**, **Projeção**, **Materiais**, **Opções** e **X**. O botão da aba aberta fica dourado.
-   Arraste a janela pela faixa do título.
-2. **Blueprints**: lista de nomes à esquerda (com o tamanho em cinza). Clique em um para ver à direita o nome,
-   o tamanho, quantos blocos tem e uma **prévia grande** da construção (cores do mapa). Clique duas vezes
-   ou em **Carregar** para projetar. **Excluir** fica vermelho e pede um segundo clique. **Salvar nova** vai
-   para a aba Salvar. Embaixo da lista: **Atualizar** e **Abrir pasta**.
-3. **Salvar**: campo **Nome:**, **Selecionar área** (dourado enquanto seleciona) e **Salvar**. Depois de salvar,
-   a janela volta para Blueprints com o arquivo novo selecionado.
-4. **Projeção**: à esquerda, o nome/tamanho/rotação, os botões Fantasma, Mapa e Certos (dourado = ligado)
-   e as quatro setas. À direita, a prévia da projeção já girada/espelhada e, em amarelo, o progresso.
-   Embaixo: Girar, Espelhar, Mover, Remover e **Construir (segure)**.
-5. **Materiais**: grade de slots, o número é quanto falta colocar; vermelho = falta no inventário,
-   verde com ✓ = já colocado. Passe o mouse para ver os detalhes; a roda do mouse rola.
+1. Aperte **K**. À esquerda fica a barra com **Biblioteca**, **Salvar área**, **Projeção**, **Materiais** e **Opções**
+   (a ativa tem uma faixa dourada) e, embaixo, um cartão com a projeção atual e a barra de progresso
+   (clique nele para ir à Projeção). O título da página e uma frase de ajuda ficam no topo; **X** fecha.
+2. **Biblioteca**: cartões com a prévia, o nome e o tamanho de cada blueprint. Busca por nome no campo
+   **buscar...**; a roda do mouse rola. Clique escolhe (borda dourada), clique duplo projeta.
+   Embaixo: **Carregar**, **Editar**, **Excluir** (vermelho, pede um segundo clique). No topo: **Atualizar**,
+   **Abrir pasta** e **Nova em branco**.
+3. **Salvar área**: três passos (selecionar, nome, salvar). Depois de salvar, volta para a Biblioteca com o arquivo novo.
+4. **Projeção**: prévia grande, nome e barra de progresso. À direita: Girar/Espelhar, Mover e as setas,
+   interruptores de Fantasma, Mapa e Certos, **Construir (segure)**, **Editar** e **Remover**.
+5. **Materiais**: igual antes (número = falta colocar, vermelho = falta no inventário).
+
+## Passo 10: opções no menu
+
+1. Em **Opções**, confira as seções **Listas de bloqueio**, **Renderização**, **Camadas**, **Atuador**,
+   **Fantasma e mapa** e **Construção automática**. Interruptores mudam na hora; as barras gravam ao soltar o mouse;
+   os **- / +** mudam os números.
+2. **Blocos ignorados**: clique no **+**, busque "grama" e escolha **Sementes de Grama**. A grama do blueprint some do
+   fantasma, do progresso e dos materiais. Clique no ícone na lista para tirar. Faça o mesmo com **Paredes ignoradas** e
+   **Parede de Terra** (as paredes de terra naturais também somem).
+3. **Piscar o fantasma** ligado: blocos e paredes piscam; os intervalos mudam a velocidade.
+4. **Camadas**: desligue blocos, paredes e tinta, um de cada vez, e veja o fantasma mudar.
+5. **Atuador**: salve uma área com atuadores e blocos desativados, projete e confira: blocos desativados aparecem
+   mais escuros (somem com "Mostrar blocos desativados" desligado). Tire um atuador no mundo: aparece a borda laranja.
+6. Construção automática com atuadores no inventário: coloca os atuadores junto.
+
+## Passo 11: editor de schematic
+
+1. Na Biblioteca, escolha um blueprint e clique em **Editar** (ou **Nova em branco**). Abre uma janela própria.
+2. Paleta à direita com abas **Blocos**, **Paredes**, **Móveis**, **Decoração** e **Entidades** (baús, molduras,
+   manequins...), com busca. Escolha um item e pinte na grade com o botão esquerdo; o direito apaga.
+3. Ferramentas: **Retângulo** (arraste), **Borracha** (camada Blocos ou Paredes), **Conta-gotas**, **Martelo**
+   (inteiro, meio-bloco, rampas), **Atuador** (esquerdo põe/tira, direito desativa) e **Mão**.
+   Roda do mouse = zoom, botão do meio arrasta, **Ctrl+Z / Ctrl+Y** desfazem e refazem.
+4. Móveis aparecem inteiros e são apagados inteiros. **Bordas +4** aumenta a área, **Cortar vazio** tira bordas vazias.
+5. **Salvar** grava no mesmo arquivo (com * quando há mudanças). Se esse blueprint estiver projetado, o fantasma
+   atualiza na hora. **Projetar** salva e coloca no mundo. **X** com mudanças pede confirmação.

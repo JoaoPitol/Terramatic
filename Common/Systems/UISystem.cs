@@ -17,6 +17,7 @@ namespace Terraprint.Common.Systems
 		public static bool MenuOpen => _interface?.CurrentState != null;
 		public static bool MouseOverMenu => MenuOpen && _menu.IsMouseOverPanel;
 		public static bool Typing => MenuOpen && _menu.IsTyping;
+		public static bool EditorOpen => MenuOpen && _menu.EditorOpen;
 		public static TerraprintMenu Menu => _menu;
 
 		public override void Load()
@@ -31,6 +32,7 @@ namespace Terraprint.Common.Systems
 			_interface = null;
 			_menu = null;
 			TerraprintStyle.Unload();
+			PaletteData.Unload();
 			Main.QueueMainThreadAction(BlueprintPreview.Clear);
 		}
 

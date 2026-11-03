@@ -20,6 +20,10 @@ Configs: {
 			Colors: Cores
 			General: Geral
 			AutoBuild: Construção automática
+			Blacklists: Listas de bloqueio
+			Rendering: Renderização
+			Layers: Camadas
+			Actuator: Atuador
 		}
 
 		CaptureLiquids: {
@@ -151,6 +155,61 @@ Configs: {
 			Label: Aplicar rampas e meio-blocos
 			Tooltip: Os blocos colocados ficam com a mesma rampa ou meio-bloco do blueprint.
 		}
+
+		TileBlacklist: {
+			Label: Blocos ignorados
+			Tooltip: Blocos e objetos colocados por estes itens não aparecem no fantasma e não contam no progresso, materiais nem construção automática.
+		}
+
+		WallBlacklist: {
+			Label: Paredes ignoradas
+			Tooltip: Paredes colocadas por estes itens são ignoradas.
+		}
+
+		EnableBlinking: {
+			Label: Piscar o fantasma
+			Tooltip: Faz blocos e paredes do fantasma piscarem.
+		}
+
+		TileBlinkDelay: {
+			Label: Intervalo do piscar dos blocos
+			Tooltip: Ticks entre cada piscada (60 = 1 segundo).
+		}
+
+		WallBlinkDelay: {
+			Label: Intervalo do piscar das paredes
+			Tooltip: Ticks entre cada piscada (60 = 1 segundo).
+		}
+
+		ShowTiles: {
+			Label: Mostrar camada de blocos
+			Tooltip: Desenha os blocos e objetos do blueprint.
+		}
+
+		ShowPaint: {
+			Label: Mostrar camada de tinta
+			Tooltip: Mistura a cor da tinta salva no fantasma.
+		}
+
+		ShowActuated: {
+			Label: Mostrar blocos desativados
+			Tooltip: Desenha os blocos desativados por atuador.
+		}
+
+		ActuatedOpacity: {
+			Label: Opacidade dos desativados
+			Tooltip: Opacidade dos blocos desativados no fantasma.
+		}
+
+		HighlightActuatorMismatch: {
+			Label: Destacar atuador diferente
+			Tooltip: Borda laranja onde o atuador do mundo é diferente do blueprint.
+		}
+
+		ActuatorBorder: {
+			Label: Espessura da borda do atuador
+			Tooltip: Em pixels.
+		}
 	}
 
 	Anchor: {
@@ -247,4 +306,145 @@ UI: {
 	PreviewError: Não foi possível ler este arquivo.
 	FileInfo: "{0} x {1}  ·  {2} blocos"
 	LoadHint: Clique duas vezes na lista ou em Carregar para projetar no mundo.
+	Subtitle: Blueprints de construção
+	PageLibrary: Biblioteca
+	PageLibrarySub: Suas construções salvas. Clique para escolher, clique duplo para projetar.
+	PageSave: Salvar área
+	PageSaveSub: Copie uma construção do mundo para um blueprint.
+	PageProjection: Projeção
+	PageProjectionSub: O blueprint que está no mundo agora.
+	PageMaterials: Materiais
+	PageMaterialsSub: O que falta colocar e o que você tem no inventário.
+	PageOptions: Opções
+	PageOptionsSub: Mudanças valem na hora e ficam salvas.
+	SearchHint: buscar...
+	NewBlank: Nova em branco
+	NewBlankTip: Cria um blueprint vazio e abre no editor.
+	NewBlankName: Nova construção
+	Edit: Editar
+	EditTip: "Abre o editor de schematic: coloque e tire blocos, paredes, móveis e mais."
+	PickOne: Escolha um blueprint.
+	NoMatches: Nenhum blueprint com esse nome.
+	PreviewErrorShort: arquivo com erro
+	DeleteConfirmShort: Confirmar?
+	Step1: Selecione a área
+	Step2: Dê um nome
+	Step2Sub: Se ficar vazio, usa a data e a hora.
+	Step3: Salve
+	Selecting: Selecionando...
+	SaveFootnote: "Dica: o tamanho máximo da área e o que é salvo (líquidos, tinta) ficam em Todas as opções. Atuadores e blocos desativados também são salvos."
+	GroupTransform: Transformar
+	GroupPosition: Posição
+	GroupView: Visualização
+	ShowGhostShort: Fantasma no mundo
+	ShowMapShort: Mostrar no mapa
+	ShowCorrectShort: Mostrar os certos
+	AutoBuildTip: Segure para colocar os blocos ao seu alcance usando o inventário.
+	NoProjectionShort: Nenhum blueprint carregado
+	StateMovingShort: "Seguindo o mouse: clique para fixar"
+	ProgressBar: "{0}%  ·  {1}/{2} certos  ·  faltam {3}  ·  errados {4}"
+	BadgeTitle: PROJEÇÃO
+	BadgeNone: Nenhuma no mundo
+	BadgeMoving: movendo
+	Cancel: Cancelar
+	PickerTitle: Escolha um item para a lista
+	ItemAddTip: Adicionar item
+	ItemRemoveTip: "{0}\nClique para tirar da lista"
+	ListEmpty: Nada na lista.
+	PaletteEmpty: Nada encontrado.
+	CatBlocks: Blocos
+	CatWalls: Paredes
+	CatFurniture: Móveis
+	CatDecoration: Decoração
+	CatEntities: Entidades
+	AllOptions: Todas as opções
+	AllOptionsTip: Abre a tela de configuração do mod com tudo (captura, cores, ponto do mouse...).
+	SecBlacklists: Listas de bloqueio
+	SecRendering: Renderização
+	SecLayers: Camadas
+	SecActuator: Atuador
+	SecGhost: Fantasma e mapa
+	SecAutoBuild: Construção automática
+	OptTileBlacklist: Blocos ignorados
+	OptTileBlacklistTip: "Blocos e objetos colocados por estes itens são ignorados: não aparecem no fantasma e não contam no progresso, nos materiais nem na construção automática."
+	OptWallBlacklist: Paredes ignoradas
+	OptWallBlacklistTip: "Paredes colocadas por estes itens são ignoradas (as naturais contam junto, ex.: Parede de Terra também ignora a terra das cavernas)."
+	OptOpacity: Opacidade da prévia
+	OptOpacityTip: Quão visível o fantasma fica no mundo.
+	OptBlink: Piscar o fantasma
+	OptBlinkTip: Faz blocos e paredes do fantasma piscarem, para separar do que já está construído.
+	OptTileBlink: Intervalo dos blocos
+	OptTileBlinkTip: Ticks entre cada piscada dos blocos (60 = 1 segundo).
+	OptWallBlink: Intervalo das paredes
+	OptWallBlinkTip: Ticks entre cada piscada das paredes (60 = 1 segundo).
+	OptShowTiles: Camada de blocos
+	OptShowTilesTip: Desenha os blocos e objetos do blueprint.
+	OptShowWalls: Camada de paredes
+	OptShowWallsTip: Desenha as paredes do blueprint.
+	OptShowPaint: Camada de tinta
+	OptShowPaintTip: Mistura a cor da tinta salva no fantasma.
+	OptShowLiquids: Camada de líquidos
+	OptShowLiquidsTip: Desenha os líquidos salvos (não contam no progresso).
+	OptShowActuated: Mostrar blocos desativados
+	OptShowActuatedTip: Desenha os blocos que estão desativados por atuador no blueprint.
+	OptActuatedOpacity: Opacidade dos desativados
+	OptActuatedOpacityTip: Os blocos desativados aparecem mais escuros e com esta opacidade.
+	OptActuatorMismatch: Destacar atuador diferente
+	OptActuatorMismatchTip: Borda laranja onde o bloco do mundo tem atuador (ou está ligado/desligado) diferente do blueprint.
+	OptActuatorBorder: Espessura da borda
+	OptActuatorBorderTip: Espessura em pixels da borda do atuador diferente.
+	OptShowCorrectTip: "Desenha em verde os blocos já certos. Desligado: eles somem do fantasma."
+	OptShowCorrect: Destacar blocos certos
+	OptObstructions: Marcar blocos a remover
+	OptObstructionsTip: X vermelho em blocos sólidos onde o blueprint pede espaço vazio.
+	OptOutline: Contorno dourado
+	OptOutlineTip: Retângulo em volta do blueprint no mundo.
+	OptProgress: Progresso no topo da tela
+	OptProgressTip: Mostra quantos blocos já estão prontos.
+	OptMinimap: Mostrar no minimapa
+	OptMinimapTip: Vale também para o mapa sobreposto.
+	OptFullMap: Mostrar no mapa grande
+	OptFullMapTip: Passe o mouse em cima para ver o progresso.
+	OptPerTick: Blocos por tick
+	OptPerTickTip: Quantos blocos a construção automática coloca por tick (no multiplayer o ritmo é limitado).
+	OptBuildWalls: Colocar paredes
+	OptBuildWallsTip: A construção automática também coloca paredes.
+	OptBuildFurniture: Colocar móveis
+	OptBuildFurnitureTip: A construção automática também coloca móveis e objetos grandes.
+	OptBuildSlopes: Aplicar rampas e atuadores
+	OptBuildSlopesTip: Os blocos ficam com a rampa ou meio-bloco do blueprint. Atuadores são colocados se você tiver no inventário.
+	EditorTitle: Editor de schematic
+	EditorProject: Projetar
+	EditorProjectTip: Salva e coloca este blueprint no mundo.
+	DiscardConfirm: Descartar alterações?
+	EditorSaved: "[Terraprint] {0} salvo."
+	EditorLayer: Camada da borracha
+	LayerTiles: Blocos
+	LayerWalls: Paredes
+	LayerTip: O que a borracha e o botão direito apagam. Escolher um item na paleta troca sozinho.
+	ToolBrush: Pincel
+	ToolBrushTip: Esquerdo coloca o item escolhido na paleta, direito apaga. Arraste para pintar.
+	ToolRect: Retângulo
+	ToolRectTip: "Arraste para preencher um retângulo (direito: apagar o retângulo)."
+	ToolEraser: Borracha
+	ToolEraserTip: Apaga blocos ou paredes (veja a camada). Móveis saem inteiros.
+	ToolPicker: Conta-gotas
+	ToolPickerTip: Clique num bloco para escolher o mesmo item na paleta.
+	ToolHammer: Martelo
+	ToolHammerTip: Clique num bloco para trocar entre inteiro, meio-bloco e as rampas.
+	ToolActuator: Atuador
+	ToolActuatorTip: Esquerdo põe/tira atuador; direito liga/desliga o bloco (desativado).
+	ToolPan: Mão
+	ToolPanTip: Arraste para mover a vista (o botão do meio do mouse faz isso em qualquer ferramenta).
+	Undo: Desfazer
+	Redo: Refazer
+	ZoomTip: Zoom (ou a roda do mouse em cima da grade)
+	ZoomFit: Ajustar
+	GrowBorders: Bordas +4
+	GrowBordersTip: Aumenta a área em 4 blocos para cada lado.
+	TrimEmpty: Cortar vazio
+	TrimEmptyTip: Remove as linhas e colunas vazias das bordas.
+	EditorStatus: "{0} x {1}  ·  mouse: {2}  ·  item: {3}"
+	EditorNothing: nenhum
+	EditorHelp: "Roda: zoom · meio: arrastar · Ctrl+Z / Ctrl+Y"
 }

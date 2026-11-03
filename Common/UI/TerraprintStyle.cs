@@ -12,22 +12,30 @@ namespace Terraprint.Common.UI
 	/// <summary>Cores e desenhos comuns do visual do Terraprint (painel azul e slots iguais ao inventario do Terraria).</summary>
 	public static class TerraprintStyle
 	{
-		public static readonly Color PanelBackground = new Color(44, 57, 112) * 0.94f;
-		public static readonly Color Button = new Color(63, 82, 151) * 0.9f;
-		public static readonly Color ButtonHover = new(88, 110, 190);
-		public static readonly Color ButtonActive = new(200, 150, 35);
-		public static readonly Color ButtonActiveHover = new(225, 175, 55);
-		public static readonly Color ButtonDisabled = new Color(45, 52, 85) * 0.85f;
-		public static readonly Color Row = new Color(63, 82, 151) * 0.75f;
-		public static readonly Color RowHover = new Color(78, 100, 178) * 0.85f;
-		public static readonly Color RowSelected = new(110, 135, 220);
-		public static readonly Color PreviewBackground = new Color(30, 48, 100) * 0.85f;
-		public static readonly Color Highlight = new(255, 235, 110);
+		// Tema escuro "vidro": fundo quase preto azulado, cartoes um pouco mais claros, destaque dourado.
+		public static readonly Color PanelBackground = new Color(16, 20, 36) * 0.94f;
+		public static readonly Color Sidebar = new Color(10, 13, 25) * 0.85f;
+		public static readonly Color Card = new Color(30, 36, 60) * 0.85f;
+		public static readonly Color CardHover = new Color(42, 50, 82) * 0.9f;
+		public static readonly Color Accent = new(236, 184, 64);
+		public static readonly Color AccentDim = new Color(236, 184, 64) * 0.35f;
+		public static readonly Color Button = new Color(44, 54, 92) * 0.9f;
+		public static readonly Color ButtonHover = new(66, 80, 132);
+		public static readonly Color ButtonActive = new(190, 140, 40);
+		public static readonly Color ButtonActiveHover = new(220, 168, 58);
+		public static readonly Color ButtonDisabled = new Color(32, 36, 56) * 0.85f;
+		public static readonly Color Row = new Color(30, 36, 60) * 0.75f;
+		public static readonly Color RowHover = new Color(44, 52, 86) * 0.85f;
+		public static readonly Color RowSelected = new(80, 92, 150);
+		public static readonly Color PreviewBackground = new Color(8, 10, 20) * 0.8f;
+		public static readonly Color Highlight = new(255, 222, 120);
 		public static readonly Color PanelBorder = Color.Black;
-		public static readonly Color Separator = new(82, 146, 217);
+		public static readonly Color Separator = new Color(120, 130, 170) * 0.35f;
 		public static readonly Color Title = Color.White;
-		public static readonly Color Muted = new(170, 190, 220);
-		public static readonly Color InputBackground = new Color(22, 42, 88) * 0.85f;
+		public static readonly Color Muted = new(150, 160, 192);
+		public static readonly Color InputBackground = new Color(8, 10, 22) * 0.85f;
+		public static readonly Color Danger = new(180, 56, 56);
+		public static readonly Color Good = new(110, 210, 130);
 
 		public const float SlotSize = 40f;
 
@@ -42,6 +50,39 @@ namespace Terraprint.Common.UI
 		}
 
 		public static void Unload() => _icons.Clear();
+
+		public static Texture2D Pixel => TextureAssets.MagicPixel.Value;
+
+		public static void Fill(SpriteBatch sb, Rectangle r, Color c) => sb.Draw(Pixel, r, c);
+
+		/// <summary>Texto com contorno, com a largura limitada (encolhe para caber).</summary>
+		public static void Text(SpriteBatch sb, string text, Vector2 pos, Color color, float scale, float maxWidth = 0f, float originX = 0f)
+		{
+			if (string.IsNullOrEmpty(text))
+				return;
+			var size = FontAssets.MouseText.Value.MeasureString(text);
+			if (maxWidth > 0f && size.X * scale > maxWidth)
+				scale = maxWidth / size.X;
+			Utils.DrawBorderString(sb, text, pos - new Vector2(size.X * scale * originX, 0f), color, scale);
+		}
+
+		/// <summary>Corta o texto com "..." para caber na largura.</summary>
+		public static string Ellipsis(string text, float scale, float maxWidth)
+		{
+			var font = FontAssets.MouseText.Value;
+			if (font.MeasureString(text).X * scale <= maxWidth)
+				return text;
+			while (text.Length > 1 && font.MeasureString(text + "…").X * scale > maxWidth)
+				text = text.Substring(0, text.Length - 1);
+			return text + "…";
+		}
+
+		/// <summary>Painel arredondado do jogo (fundo + borda preta) desenhado direto num retangulo.</summary>
+		public static void RoundedBox(SpriteBatch sb, Rectangle r, Color background, Color border)
+		{
+			Utils.DrawSplicedPanel(sb, Main.Assets.Request<Texture2D>("Images/UI/PanelBackground").Value, r.X, r.Y, r.Width, r.Height, 12, 12, 12, 12, background);
+			Utils.DrawSplicedPanel(sb, Main.Assets.Request<Texture2D>("Images/UI/PanelBorder").Value, r.X, r.Y, r.Width, r.Height, 12, 12, 12, 12, border);
+		}
 
 		public static void ApplyPanel(UIPanel panel)
 		{

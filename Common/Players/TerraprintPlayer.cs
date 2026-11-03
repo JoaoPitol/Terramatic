@@ -33,14 +33,14 @@ namespace Terraprint.Common.Players
 			if (KeybindSystem.ToggleMenu.JustPressed)
 				UISystem.ToggleMenu();
 
-			if (ProjectionSystem.HasProjection && (Moving || UISystem.MenuOpen)) {
+			if (ProjectionSystem.HasProjection && (Moving || UISystem.MenuOpen && !UISystem.EditorOpen)) {
 				if (KeybindSystem.Rotate.JustPressed)
 					ProjectionSystem.Rotate();
 				if (KeybindSystem.Flip.JustPressed)
 					ProjectionSystem.Flip();
 			}
 
-			if (ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed && UISystem.MenuOpen) {
+			if (ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed && UISystem.MenuOpen && !UISystem.EditorOpen) {
 				if (KeybindSystem.NudgeUp.JustPressed) ProjectionSystem.Nudge(0, -1);
 				if (KeybindSystem.NudgeDown.JustPressed) ProjectionSystem.Nudge(0, 1);
 				if (KeybindSystem.NudgeLeft.JustPressed) ProjectionSystem.Nudge(-1, 0);

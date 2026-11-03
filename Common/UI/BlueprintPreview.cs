@@ -139,7 +139,7 @@ namespace Terraprint.Common.UI
 			return tex;
 		}
 
-		private static Color CellColor(in BlueprintCell c)
+		internal static Color CellColor(in BlueprintCell c)
 		{
 			if (c.HasTile && c.TileType < MapHelper.tileLookup.Length && MapHelper.tileLookup[c.TileType] != 0)
 				return MapColor(MapHelper.tileLookup[c.TileType], c.TilePaint);
