@@ -126,6 +126,8 @@ namespace Terraprint.Common.Systems
 		private static CellStatus CompareTile(in BlueprintCell c, Tile t, TerraprintConfig cfg)
 		{
 			if (!c.HasTile) {
+				if (c.SkipTile)
+					return CellStatus.None;
 				// Bloco solido onde o blueprint pede vazio: precisa ser removido.
 				if (cfg.MarkObstructions && t.HasTile && Main.tileSolid[t.TileType] && !Main.tileSolidTop[t.TileType])
 					return CellStatus.Wrong;

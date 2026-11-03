@@ -15,7 +15,8 @@ namespace Terraprint.Common.Blueprints
 	/// </summary>
 	public class Blueprint
 	{
-		public const int FormatVersion = 1;
+		/// <summary>2: atuadores e blocos desativados (bits 1 e 2 de flags).</summary>
+		public const int FormatVersion = 2;
 		public const string Extension = ".tprint";
 
 		public string Name = "";
@@ -59,7 +60,9 @@ namespace Terraprint.Common.Blueprints
 						c.Slope = (byte)t.Slope;
 						c.HalfBlock = t.IsHalfBlock;
 						c.TilePaint = includePaint ? t.TileColor : (byte)0;
+						c.Inactive = t.IsActuated;
 					}
+					c.HasActuator = t.HasActuator;
 					c.WallType = t.WallType;
 					c.WallPaint = includePaint && t.WallType != WallID.None ? t.WallColor : (byte)0;
 					if (includeLiquids && t.LiquidAmount > 0) {
@@ -69,6 +72,53 @@ namespace Terraprint.Common.Blueprints
 				}
 			}
 			return bp;
+		}
+
+		public Blueprint Clone()
+		{
+			var bp = new Blueprint(Width, Height) { Name = Name, Author = Author, CreatedUtc = CreatedUtc, UnknownTypes = UnknownTypes };
+			Array.Copy(Cells, bp.Cells, Cells.Length);
+			return bp;
+		}
+
+		/// <summary>
+		/// Copia com bordas diferentes: valores positivos acrescentam linhas/colunas vazias, negativos cortam.
+		/// </summary>
+		public Blueprint Resized(int left, int top, int right, int bottom)
+		{
+			int w = Math.Max(1, Width + left + right);
+			int h = Math.Max(1, Height + top + bottom);
+			var bp = new Blueprint(w, h) { Name = Name, Author = Author, CreatedUtc = CreatedUtc };
+			for (int y = 0; y < h; y++) {
+				int sy = y - top;
+				if (sy < 0 || sy >= Height)
+					continue;
+				for (int x = 0; x < w; x++) {
+					int sx = x - left;
+					if (sx >= 0 && sx < Width)
+						bp.Cells[y * w + x] = Cells[sy * Width + sx];
+				}
+			}
+			return bp;
+		}
+
+		/// <summary>Menor retangulo com alguma coisa dentro (ou o blueprint todo, se estiver vazio).</summary>
+		public Microsoft.Xna.Framework.Rectangle ContentBounds()
+		{
+			int minX = Width, minY = Height, maxX = -1, maxY = -1;
+			for (int y = 0; y < Height; y++) {
+				for (int x = 0; x < Width; x++) {
+					if (Cells[y * Width + x].IsEmpty)
+						continue;
+					if (x < minX) minX = x;
+					if (x > maxX) maxX = x;
+					if (y < minY) minY = y;
+					if (y > maxY) maxY = y;
+				}
+			}
+			if (maxX < 0)
+				return new Microsoft.Xna.Framework.Rectangle(0, 0, Width, Height);
+			return new Microsoft.Xna.Framework.Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
 		}
 
 		public int CountTiles()
@@ -160,6 +210,8 @@ namespace Terraprint.Common.Blueprints
 
 					byte flags = 0;
 					if (c.HalfBlock) flags |= 1;
+					if (c.HasActuator) flags |= 2;
+					if (c.Inactive) flags |= 4;
 					w.Write((ushort)ti);
 					w.Write(c.FrameX);
 					w.Write(c.FrameY);
@@ -226,10 +278,12 @@ namespace Terraprint.Common.Blueprints
 				c.LiquidAmount = r.ReadByte();
 				c.LiquidType = r.ReadByte();
 				c.HalfBlock = (flags & 1) != 0;
+				c.HasActuator = (flags & 2) != 0;
 
 				if (ti > 0 && ti < tileMap.Length && tileMap[ti] >= 0) {
 					c.HasTile = true;
 					c.TileType = (ushort)tileMap[ti];
+					c.Inactive = (flags & 4) != 0;
 				}
 				if (wi > 0 && wi < wallMap.Length && wallMap[wi] >= 0)
 					c.WallType = (ushort)wallMap[wi];

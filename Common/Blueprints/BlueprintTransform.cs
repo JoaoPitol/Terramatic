@@ -61,6 +61,8 @@ namespace Terraprint.Common.Blueprints
 			to.Slope = from.Slope;
 			to.HalfBlock = from.HalfBlock;
 			to.TilePaint = from.TilePaint;
+			to.HasActuator = from.HasActuator;
+			to.Inactive = from.Inactive;
 		}
 
 		private static void CopyWallAndLiquid(in BlueprintCell from, ref BlueprintCell to)

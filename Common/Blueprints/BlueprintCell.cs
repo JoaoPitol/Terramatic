@@ -13,12 +13,20 @@ namespace Terraprint.Common.Blueprints
 		public byte Slope;      // SlopeType (0 = solido)
 		public bool HalfBlock;
 		public byte TilePaint;
+		public bool HasActuator;
+		/// <summary>Bloco desativado por atuador (o jogador passa por dentro).</summary>
+		public bool Inactive;
 
 		public ushort WallType; // 0 = sem parede
 		public byte WallPaint;
 
 		public byte LiquidAmount;
 		public byte LiquidType;
+
+		// So em memoria (nao vao para o arquivo): celulas ignoradas pelas listas de bloqueio das opcoes.
+		// O fantasma, o progresso, os materiais e a construcao automatica nao exigem nada nelas.
+		public bool SkipTile;
+		public bool SkipWall;
 
 		/// <summary>True quando a celula nao exige nada (sem bloco, parede ou liquido).</summary>
 		public readonly bool IsEmpty => !HasTile && WallType == 0 && LiquidAmount == 0;

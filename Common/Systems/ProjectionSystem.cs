@@ -37,8 +37,12 @@ namespace Terraprint.Common.Systems
 
 		public static Rectangle Area => HasProjection ? new Rectangle(Origin.X, Origin.Y, Current.Width, Current.Height) : Rectangle.Empty;
 
-		public static void Load(Blueprint bp)
+		/// <summary>Arquivo de onde o blueprint veio (null se nao veio de um arquivo, ou se nao se sabe).</summary>
+		public static string SourcePath { get; private set; }
+
+		public static void Load(Blueprint bp, string path = null)
 		{
+			SourcePath = path;
 			Source = bp;
 			Current = null;
 			_originBeforeMove = null;
@@ -63,6 +67,7 @@ namespace Terraprint.Common.Systems
 		{
 			State = ProjectionState.None;
 			Source = null;
+			SourcePath = null;
 			Current = null;
 			Version++;
 		}
@@ -71,13 +76,40 @@ namespace Terraprint.Common.Systems
 		{
 			// Mantem o centro no mesmo lugar ao girar.
 			Point center = Current != null ? new Point(Origin.X + Current.Width / 2, Origin.Y + Current.Height / 2) : Origin;
-			Current = BlueprintTransform.Apply(Source, Rotation, FlippedX, out int dropped);
+			Current = Transformed(out int dropped);
 			DroppedTiles = dropped;
 			if (State == ProjectionState.Fixed) {
 				Origin = new Point(center.X - Current.Width / 2, center.Y - Current.Height / 2);
 				MarkDirty();
 			}
 			Version++;
+		}
+
+		private static string _blacklistApplied = "";
+
+		/// <summary>Source girado/espelhado e sem o que estiver nas listas de bloqueio das opcoes.</summary>
+		private static Blueprint Transformed(out int dropped)
+		{
+			var bp = BlueprintTransform.Apply(Source, Rotation, FlippedX, out dropped);
+			_blacklistApplied = Blacklist.CurrentSignature();
+			if (!Blacklist.Empty) {
+				if (ReferenceEquals(bp, Source))
+					bp = bp.Clone();
+				Blacklist.Apply(bp);
+			}
+			return bp;
+		}
+
+		/// <summary>
+		/// Depois que o editor grava o arquivo: troca o conteudo da projecao, mantendo posicao, giro e espelho.
+		/// </summary>
+		public static void ReplaceSource(string path, Blueprint bp)
+		{
+			if (Source == null || SourcePath == null || !string.Equals(System.IO.Path.GetFullPath(SourcePath), System.IO.Path.GetFullPath(path), System.StringComparison.OrdinalIgnoreCase))
+				return;
+			Source = bp;
+			Rebuild();
+			MarkDirty();
 		}
 
 		public static void Rotate()
@@ -170,6 +202,9 @@ namespace Terraprint.Common.Systems
 					Version++;
 				}
 			}
+			// Listas de bloqueio mudaram nas opcoes: refaz o que aparece no mundo.
+			if (Source != null && _blacklistApplied != Blacklist.CurrentSignature())
+				Rebuild();
 			// Grava a projecao um pouco depois da ultima mudanca (mover com as setas nao grava a cada passo).
 			if (_saveTimer > 0 && --_saveTimer == 0)
 				SaveToFile();
@@ -236,6 +271,7 @@ namespace Terraprint.Common.Systems
 
 		private static TagCompound WriteTag() => new() {
 			["blueprint"] = Source.Save(),
+			["path"] = SourcePath ?? "",
 			["rotation"] = Rotation,
 			["flipX"] = FlippedX,
 			["x"] = Origin.X,
@@ -247,7 +283,9 @@ namespace Terraprint.Common.Systems
 			Source = Blueprint.Load(p.GetCompound("blueprint"));
 			Rotation = p.GetInt("rotation");
 			FlippedX = p.GetBool("flipX");
-			Current = BlueprintTransform.Apply(Source, Rotation, FlippedX, out int dropped);
+			string sourcePath = p.GetString("path");
+			SourcePath = string.IsNullOrEmpty(sourcePath) ? null : sourcePath;
+			Current = Transformed(out int dropped);
 			DroppedTiles = dropped;
 			Origin = new Point(p.GetInt("x"), p.GetInt("y"));
 			State = ProjectionState.Fixed;

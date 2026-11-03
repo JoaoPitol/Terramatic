@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel;
 using Microsoft.Xna.Framework;
 using Terraria.ModLoader;
@@ -40,14 +41,6 @@ namespace Terraprint.Common.Configs
 		[DefaultValue(true)]
 		public bool ShowGhost;
 
-		[Range(0.1f, 1f)]
-		[Increment(0.05f)]
-		[DefaultValue(0.55f)]
-		public float GhostOpacity;
-
-		[DefaultValue(true)]
-		public bool ShowWalls;
-
 		[DefaultValue(false)]
 		public bool ShowLiquids;
 
@@ -68,6 +61,54 @@ namespace Terraprint.Common.Configs
 
 		[DefaultValue(true)]
 		public bool ShowProgress;
+
+		[Header("Blacklists")]
+		public List<ItemDefinition> TileBlacklist = new();
+
+		public List<ItemDefinition> WallBlacklist = new();
+
+		[Header("Rendering")]
+		[Range(0.1f, 1f)]
+		[Increment(0.05f)]
+		[DefaultValue(0.55f)]
+		public float GhostOpacity;
+
+		[DefaultValue(false)]
+		public bool EnableBlinking;
+
+		[Range(5, 240)]
+		[DefaultValue(30)]
+		public int TileBlinkDelay;
+
+		[Range(5, 240)]
+		[DefaultValue(30)]
+		public int WallBlinkDelay;
+
+		[Header("Layers")]
+		[DefaultValue(true)]
+		public bool ShowTiles;
+
+		[DefaultValue(true)]
+		public bool ShowWalls;
+
+		[DefaultValue(true)]
+		public bool ShowPaint;
+
+		[Header("Actuator")]
+		[DefaultValue(true)]
+		public bool ShowActuated;
+
+		[Range(0.1f, 1f)]
+		[Increment(0.05f)]
+		[DefaultValue(0.6f)]
+		public float ActuatedOpacity;
+
+		[DefaultValue(true)]
+		public bool HighlightActuatorMismatch;
+
+		[Range(1, 4)]
+		[DefaultValue(2)]
+		public int ActuatorBorder;
 
 		[Header("AutoBuild")]
 		[Range(1, 10)]

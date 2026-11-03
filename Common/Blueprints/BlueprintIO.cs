@@ -38,6 +38,27 @@ namespace Terraprint.Common.Blueprints
 			return path;
 		}
 
+		/// <summary>Grava por cima de um arquivo existente (usado pelo editor).</summary>
+		public static void Overwrite(Blueprint bp, string path)
+		{
+			EnsureFolder();
+			string tmp = path + ".tmp";
+			TagIO.ToFile(bp.Save(), tmp, compress: true);
+			File.Copy(tmp, path, overwrite: true);
+			File.Delete(tmp);
+		}
+
+		/// <summary>Caminho livre para um nome novo: nome.tprint, nome (2).tprint...</summary>
+		public static string FreePath(string name)
+		{
+			EnsureFolder();
+			string baseName = SanitizeFileName(name);
+			string path = Path.Combine(Folder, baseName + Blueprint.Extension);
+			for (int i = 2; File.Exists(path); i++)
+				path = Path.Combine(Folder, $"{baseName} ({i}){Blueprint.Extension}");
+			return path;
+		}
+
 		public static Blueprint Load(string path)
 		{
 			TagCompound tag = TagIO.FromFile(path, compressed: true);

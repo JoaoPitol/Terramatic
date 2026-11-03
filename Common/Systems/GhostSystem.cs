@@ -5,20 +5,23 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 using Terraria.UI;
 using Terraprint.Common.Blueprints;
 using Terraprint.Common.Configs;
+using Terraprint.Common.UI;
 
 namespace Terraprint.Common.Systems
 {
 	/// <summary>
 	/// Desenha o fantasma do blueprint no mundo, por cima dos blocos:
 	/// azul = falta colocar, vermelho = errado ou precisa remover, verde = certo (opcional).
+	/// As camadas (blocos, paredes, tinta), o piscar e os atuadores seguem as opcoes.
 	/// </summary>
 	[Autoload(Side = ModSide.Client)]
 	public class GhostSystem : ModSystem
 	{
+		private static readonly Color ActuatorColor = new(255, 150, 40);
+
 		public override void PostDrawTiles()
 		{
 			var cfg = TerraprintConfig.Instance;
@@ -43,9 +46,11 @@ namespace Terraprint.Common.Systems
 				Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
 			float alpha = cfg.GhostOpacity;
+			float tileAlpha = alpha * Blink(cfg.EnableBlinking, cfg.TileBlinkDelay);
+			float wallAlpha = alpha * 0.7f * Blink(cfg.EnableBlinking, cfg.WallBlinkDelay);
 
 			// Paredes primeiro, blocos por cima.
-			if (cfg.ShowWalls) {
+			if (cfg.ShowWalls && wallAlpha > 0f) {
 				for (int y = y0; y <= y1; y++) {
 					for (int x = x0; x <= x1; x++) {
 						int i = y * bp.Width + x;
@@ -54,12 +59,15 @@ namespace Terraprint.Common.Systems
 							continue;
 						var status = haveStatus && !moving ? walls[i] : CellStatus.Missing;
 						Color? color = StatusColor(status, cfg);
-						if (color.HasValue)
-							DrawWall(sb, c, ScreenPos(o.X + x, o.Y + y), color.Value * (alpha * 0.7f));
+						if (!color.HasValue)
+							continue;
+						Color col = cfg.ShowPaint ? WithPaint(color.Value, c.WallPaint) : color.Value;
+						CellRenderer.DrawWall(sb, c, ScreenPos(o.X + x, o.Y + y), col * wallAlpha);
 					}
 				}
 			}
 
+			int border = System.Math.Clamp(cfg.ActuatorBorder, 1, 4);
 			for (int y = y0; y <= y1; y++) {
 				for (int x = x0; x <= x1; x++) {
 					int i = y * bp.Width + x;
@@ -67,17 +75,34 @@ namespace Terraprint.Common.Systems
 					var pos = ScreenPos(o.X + x, o.Y + y);
 
 					if (cfg.ShowLiquids && c.LiquidAmount > 0 && !c.HasTile)
-						DrawLiquid(sb, c, pos, alpha);
+						CellRenderer.DrawLiquid(sb, c, pos, alpha);
 
 					var status = haveStatus && !moving ? tiles[i] : (c.HasTile ? CellStatus.Missing : CellStatus.None);
 					if (!c.HasTile) {
 						if (status == CellStatus.Wrong) // obstrucao: algo solido onde deveria estar vazio
-							DrawCross(sb, pos, cfg.ColorWrong * alpha);
+							CellRenderer.DrawCross(sb, pos, cfg.ColorWrong * alpha);
 						continue;
 					}
+
+					// Atuador diferente do blueprint (falta, sobra, ou bloco ligado/desligado diferente).
+					if (cfg.HighlightActuatorMismatch && !moving && ActuatorMismatch(c, o.X + x, o.Y + y))
+						CellRenderer.DrawBorder(sb, new Rectangle((int)pos.X, (int)pos.Y, 16, 16), ActuatorColor * System.Math.Max(alpha, 0.6f), border);
+
+					if (!cfg.ShowTiles || tileAlpha <= 0f)
+						continue;
+					if (c.Inactive && !cfg.ShowActuated)
+						continue;
 					Color? color = StatusColor(status, cfg);
-					if (color.HasValue)
-						DrawTile(sb, c, pos, color.Value * alpha);
+					if (!color.HasValue)
+						continue;
+					Color col = cfg.ShowPaint ? WithPaint(color.Value, c.TilePaint) : color.Value;
+					float a = tileAlpha;
+					if (c.Inactive) {
+						// Bloco desativado: mais escuro e com a opacidade propria, como o jogo mostra.
+						col = Color.Lerp(col, Color.Black, 0.35f);
+						a *= cfg.ActuatedOpacity;
+					}
+					CellRenderer.DrawTile(sb, c, pos, col * a);
 				}
 			}
 
@@ -89,6 +114,30 @@ namespace Terraprint.Common.Systems
 			sb.End();
 		}
 
+		/// <summary>Piscar: alterna entre cheio e quase apagado a cada "delay" ticks.</summary>
+		private static float Blink(bool enabled, int delay)
+		{
+			if (!enabled || delay <= 0)
+				return 1f;
+			return Main.GameUpdateCount / (uint)delay % 2 == 0 ? 1f : 0.15f;
+		}
+
+		private static Color WithPaint(Color status, byte paint)
+		{
+			var p = CellRenderer.PaintColor(paint);
+			return p.HasValue ? Color.Lerp(status, p.Value, 0.55f) : status;
+		}
+
+		private static bool ActuatorMismatch(in BlueprintCell c, int wx, int wy)
+		{
+			if (!WorldGen.InWorld(wx, wy, 1))
+				return false;
+			Tile t = Main.tile[wx, wy];
+			if (!t.HasTile || t.TileType != c.TileType)
+				return false;
+			return t.HasActuator != c.HasActuator || t.IsActuated != c.Inactive;
+		}
+
 		private static Vector2 ScreenPos(int tx, int ty) => new Vector2(tx * 16, ty * 16) - Main.screenPosition;
 
 		private static Color? StatusColor(CellStatus s, TerraprintConfig cfg) => s switch {
@@ -97,103 +146,6 @@ namespace Terraprint.Common.Systems
 			CellStatus.Correct when cfg.ShowCorrect => cfg.ColorCorrect * 0.6f,
 			_ => null,
 		};
-
-		private static void DrawWall(SpriteBatch sb, in BlueprintCell c, Vector2 pos, Color color)
-		{
-			Main.instance.LoadWall(c.WallType);
-			var tex = TextureAssets.Wall[c.WallType].Value;
-			// Miolo de um quadro de parede (36x36 por quadro): textura lisa, sem bordas.
-			sb.Draw(tex, pos, new Rectangle(44, 44, 16, 16), color);
-		}
-
-		private static void DrawLiquid(SpriteBatch sb, in BlueprintCell c, Vector2 pos, float alpha)
-		{
-			Color color = (int)c.LiquidType switch {
-				LiquidID.Lava => new Color(255, 120, 30),
-				LiquidID.Honey => new Color(255, 200, 40),
-				LiquidID.Shimmer => new Color(220, 150, 255),
-				_ => new Color(40, 110, 255),
-			};
-			int h = System.Math.Max(1, c.LiquidAmount * 16 / 255);
-			sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)pos.X, (int)pos.Y + 16 - h, 16, h), color * (alpha * 0.5f));
-		}
-
-		private static void DrawCross(SpriteBatch sb, Vector2 pos, Color color)
-		{
-			var px = TextureAssets.MagicPixel.Value;
-			for (int k = 0; k < 16; k += 2) {
-				sb.Draw(px, new Rectangle((int)pos.X + k, (int)pos.Y + k, 2, 2), color);
-				sb.Draw(px, new Rectangle((int)pos.X + 14 - k, (int)pos.Y + k, 2, 2), color);
-			}
-		}
-
-		private static void DrawTile(SpriteBatch sb, in BlueprintCell c, Vector2 pos, Color color)
-		{
-			Main.instance.LoadTiles(c.TileType);
-			var tex = TextureAssets.Tile[c.TileType].Value;
-
-			var data = TileObjectData.GetTileData(c.TileType, 0);
-			bool multi = data != null && (data.Width > 1 || data.Height > 1);
-
-			if (multi || (!Main.tileSolid[c.TileType] && c.FrameX >= 0)) {
-				// Objetos: usa o quadro original do sprite.
-				int w = data?.CoordinateWidth ?? 16;
-				int h = RowHeight(data, c.FrameY);
-				int yOff = data?.DrawYOffset ?? 0;
-				var src = new Rectangle(c.FrameX, c.FrameY, w, h);
-				if (src.Right <= tex.Width && src.Bottom <= tex.Height)
-					sb.Draw(tex, pos + new Vector2(0, yOff), src, color);
-				else
-					sb.Draw(TextureAssets.MagicPixel.Value, new Rectangle((int)pos.X, (int)pos.Y, 16, 16), color * 0.6f);
-				return;
-			}
-
-			// Blocos: quadro original, ou um quadro "bloco inteiro" quando foi girado/espelhado.
-			int fx = c.FrameX >= 0 ? c.FrameX : 18;
-			int fy = c.FrameX >= 0 ? c.FrameY : 18;
-			if (fx + 16 > tex.Width || fy + 16 > tex.Height) {
-				fx = 18;
-				fy = 18;
-			}
-
-			if (c.HalfBlock) {
-				sb.Draw(tex, pos + new Vector2(0, 8), new Rectangle(fx, fy, 16, 8), color);
-				return;
-			}
-			if (c.Slope == 0) {
-				sb.Draw(tex, pos, new Rectangle(fx, fy, 16, 16), color);
-				return;
-			}
-
-			// Rampas em tiras de 2px, como o jogo faz.
-			for (int k = 0; k < 8; k++) {
-				int col = k * 2;
-				int top, height;
-				switch (c.Slope) {
-					case 1: top = col; height = 16 - col; break;           // base + esquerda solidas
-					case 2: top = 14 - col; height = col + 2; break;       // base + direita
-					case 3: top = 0; height = 16 - col; break;             // topo + esquerda
-					default: top = 0; height = col + 2; break;             // topo + direita
-				}
-				sb.Draw(tex, pos + new Vector2(col, top), new Rectangle(fx + col, fy + top, 2, height), color);
-			}
-		}
-
-		/// <summary>Altura da linha do objeto a que este FrameY pertence (alguns objetos tem a ultima linha com 18px).</summary>
-		private static int RowHeight(TileObjectData data, short frameY)
-		{
-			if (data?.CoordinateHeights == null || data.CoordinateHeights.Length == 0)
-				return 16;
-			int full = data.CoordinateFullHeight;
-			int fy = full > 0 ? frameY % full : frameY;
-			int acc = 0;
-			foreach (int h in data.CoordinateHeights) {
-				if (fy < acc + h + data.CoordinatePadding)
-					return h;
-				acc += h + data.CoordinatePadding;
-			}
-			return 16;
-		}
 
 		// --- Texto de progresso no topo da tela ---
 

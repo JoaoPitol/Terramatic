@@ -246,6 +246,16 @@ namespace Terraprint.Common.Systems
 			if (mp)
 				NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, x, y, c.TileType, style);
 
+			// Atuador, se o blueprint tiver e o jogador tiver atuadores no inventario.
+			if (c.HasActuator && !t.HasActuator) {
+				int act = FindItem(player, ItemID.Actuator);
+				if (act >= 0 && WorldGen.PlaceActuator(x, y)) {
+					Consume(player, act, x, y);
+					if (mp)
+						NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 8, x, y);
+				}
+			}
+
 			if (cfg.AutoBuildSlopes && Main.tileSolid[c.TileType] && !BlueprintTransform.IsMultitile(c)) {
 				if (c.HalfBlock) {
 					WorldGen.PoundTile(x, y);
