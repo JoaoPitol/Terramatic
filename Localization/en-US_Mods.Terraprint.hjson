@@ -210,7 +210,7 @@ UI: {
 	PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
 	MovingStart: "[Terraprint] Move the mouse and left click to place. Right click returns to where it was."
 	UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
-	RotateDropped: "[Terraprint] {0} furniture tiles can't be rotated and are hidden while rotated (mirroring keeps them)."
+	RotateDropped: "[Terraprint] {0} furniture tiles did not fit after rotating and are hidden (furniture stays upright; only its position rotates)."
 	Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
 	Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
 	Options: Options

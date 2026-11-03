@@ -20,8 +20,8 @@ Mod para tModLoader que salva construções do Terraria como blueprints e projet
 - Multiplayer: o servidor e todos os jogadores precisam do mod. Cada jogador tem a sua projeção, salva no próprio PC
   (pasta Terraprint/Projections, um arquivo por mundo). A construção automática coloca no máximo
   15 blocos por segundo em servidores, para não cair no anti-spam do jogo.
-- Girar: blocos, paredes e rampas giram; móveis e objetos maiores que 1 bloco só espelham
-  (e somem do fantasma enquanto girado). Ao espelhar, o sprite do móvel não vira de lado.
+- Girar: blocos, paredes e rampas giram; móveis continuam em pé e só a posição deles gira
+  (os que não couberem ficam de fora). Ao espelhar, móveis com versão para o outro lado viram junto.
 - Fios, atuadores e itens dentro de baús não são salvos.
 - Uma projeção por mundo.
 

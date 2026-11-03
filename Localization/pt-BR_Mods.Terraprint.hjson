@@ -210,7 +210,7 @@ UI: {
 	PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
 	MovingStart: "[Terraprint] Mova o mouse e clique esquerdo para fixar. Botão direito volta para onde estava."
 	UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
-	RotateDropped: "[Terraprint] {0} blocos de móveis não podem ser girados e ficam ocultos enquanto girado (espelhar mantém eles)."
+	RotateDropped: "[Terraprint] {0} blocos de móveis não couberam depois de girar e ficam ocultos (os móveis ficam em pé; só a posição deles gira)."
 	Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
 	Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
 	Options: Opções

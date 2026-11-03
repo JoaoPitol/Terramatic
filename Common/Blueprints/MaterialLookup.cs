@@ -90,6 +90,38 @@ namespace Terraprint.Common.Blueprints
 		}
 
 		/// <summary>
+		/// TileObjectData que corresponde aos quadros da celula, com o estilo e a variacao (alternate) certos,
+		/// do mesmo jeito que TileObjectData.GetTileData(Tile). altOffset e o numero da variacao encontrada.
+		/// </summary>
+		public static TileObjectData GetData(in BlueprintCell c, out int style, out int alternate, out int altOffset)
+		{
+			altOffset = 0;
+			GetStyle(c, out style, out alternate);
+			var styleData = TileObjectData.GetTileData(c.TileType, style);
+			if (styleData == null)
+				return null;
+			int count = AlternatesCount(styleData);
+			for (int k = 1; k <= count; k++) {
+				var d = TileObjectData.GetTileData(c.TileType, style, k);
+				if (d != null && d != styleData && alternate >= d.Style && alternate <= d.Style + d.RandomStyleRange) {
+					altOffset = d.Style;
+					return d;
+				}
+			}
+			return styleData;
+		}
+
+		public static int AlternatesCount(TileObjectData data)
+		{
+			try {
+				return data.AlternatesCount;
+			}
+			catch (System.NullReferenceException) {
+				return 0;
+			}
+		}
+
+		/// <summary>
 		/// Para objetos com TileObjectData (moveis, tochas, plataformas...): tamanho do objeto e a posicao
 		/// deste tile dentro dele. False para blocos comuns.
 		/// </summary>
@@ -99,8 +131,7 @@ namespace Terraprint.Common.Blueprints
 			data = null;
 			if (!c.HasTile || c.FrameX < 0 || c.FrameY < 0)
 				return false;
-			GetStyle(c, out int style, out int alt);
-			data = TileObjectData.GetTileData(c.TileType, style, alt) ?? TileObjectData.GetTileData(c.TileType, 0);
+			data = GetData(c, out _, out _, out _);
 			if (data == null)
 				return false;
 

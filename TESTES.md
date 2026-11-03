@@ -30,8 +30,9 @@ vá em **Workshop > Develop Mods**, encontre **Terraprint** e clique em **Build 
 
 Regras de transformação (o padrão combinado):
 - Blocos, paredes e rampas giram e espelham. Meio-blocos viram blocos inteiros ao girar.
-- Móveis e objetos maiores que 1 bloco só espelham (o objeto troca de lado, mas o sprite
-  continua virado para o mesmo lado). Ao girar, eles somem do fantasma e o chat avisa quantos.
+- Móveis e objetos maiores que 1 bloco: ao espelhar, trocam de lado e viram para o outro lado
+  (cadeiras, camas, banheiras...). Ao girar, continuam em pé e só a posição deles gira; os que
+  não couberem somem do fantasma e o chat avisa quantos (veja o passo 8).
 
 ## Passo 3: fantasma no mundo e no mapa
 
@@ -105,3 +106,14 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
 5. Selecionar e salvar uma área longe de você avisa que parte dela ainda não veio do servidor.
 6. Enquanto você seleciona uma área, os outros jogadores continuam usando os itens normalmente.
 7. Um mundo de single player que já tinha projeção salva (versão anterior do mod) continua com ela.
+
+## Passo 8: móveis ao espelhar e girar
+
+1. Salve uma construção com cadeiras, camas, banheiras, mesas, portas e baús.
+2. Carregue e clique em **Espelhar**: os móveis trocam de lado e cadeiras/camas/banheiras passam a olhar
+   para o outro lado no fantasma.
+3. Fixe e construa (à mão ou com **Construir**): os móveis colocados ficam virados igual ao fantasma,
+   também no multiplayer.
+4. Clique em **Girar**: os blocos giram e os móveis continuam aparecendo, em pé, no lugar para onde giraram.
+   Se algum não couber (ficaria em cima de outro bloco), ele some e o chat diz quantos blocos de móveis ficaram de fora.
+5. Gire 4 vezes: tudo volta exatamente como era.
