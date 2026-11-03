@@ -272,6 +272,14 @@ namespace Terraprint.Common.Systems
 
 		// Versoes antigas guardavam a projecao dentro do arquivo do mundo. Ela e lida uma vez e
 		// passa para o arquivo do jogador ao entrar no mundo; o mundo nao guarda mais nada.
+		/// <summary>
+		/// A projecao agora fica em arquivo por jogador; o mundo nao guarda mais nada. O tModLoader exige
+		/// sobrescrever Save e Load juntos, entao este fica vazio (e assim a tag antiga some depois da migracao).
+		/// </summary>
+		public override void SaveWorldData(TagCompound tag)
+		{
+		}
+
 		public override void LoadWorldData(TagCompound tag)
 		{
 			if (Main.dedServ || !tag.TryGet("terraprint", out TagCompound p))
