@@ -101,7 +101,7 @@ namespace Terraprint.Common.UI
 			}
 			else if (_icon != null) {
 				var tex = TerraprintStyle.Icon(_icon);
-				float scale = System.Math.Min(1f, (r.Width - 6f) / tex.Width);
+				float scale = System.Math.Min(1f, (r.Width - (Bare ? 0f : 6f)) / tex.Width);
 				spriteBatch.Draw(tex, center, null, iconColor, _rotation, tex.Size() / 2f, scale, SpriteEffects.None, 0f);
 			}
 		}
