@@ -117,3 +117,24 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
 4. Clique em **Girar**: os blocos giram e os móveis continuam aparecendo, em pé, no lugar para onde giraram.
    Se algum não couber (ficaria em cima de outro bloco), ele some e o chat diz quantos blocos de móveis ficaram de fora.
 5. Gire 4 vezes: tudo volta exatamente como era.
+
+## Passo 9: menu novo (estilo do Terraria)
+
+O menu e a janela de materiais agora usam o visual do inventário: painel azul, botões em forma de slot
+e dicas ao passar o mouse (os nomes dos botões aparecem só na dica). Os passos anteriores continuam
+valendo; só mudou onde cada botão fica.
+
+1. Aperte **K**. No topo: título, o X para fechar e, abaixo, três abas: **Projeção** (casa),
+   **Salvar construção** (retângulo tracejado) e **Blueprints salvos** (pasta). A aba ativa fica com borda dourada.
+   À direita ficam **Materiais** e **Opções**. Arraste o menu pela linha do título.
+2. Sem blueprint carregado, o menu abre em **Blueprints salvos**. Cada linha tem o nome, **Carregar** (seta para baixo)
+   e **Excluir** (lixeira, fica vermelha e pede um segundo clique). Os dois botões de cima atualizam a lista
+   e abrem a pasta. Carregar um blueprint pula para a aba **Projeção**.
+3. Aba **Projeção**: o texto mostra nome, tamanho, rotação e progresso. Primeira linha: Girar, Espelhar, Mover,
+   Remover e, à direita, o martelo **Construir (segure)**, que fica dourado enquanto está pressionado.
+   Segunda linha: as quatro setas e, à direita, Fantasma, Mapa e Certos (dourado = ligado).
+4. Aba **Salvar construção**: campo **Nome:**, botão de selecionar área e o disquete para salvar
+   (apagado até ter uma área). Depois de salvar, o menu vai para a lista e o arquivo novo aparece no topo.
+5. **Materiais** abre a janela em grade: cada slot é um item, e o número é quanto ainda falta colocar.
+   Slot vermelho = falta no inventário, normal = você tem o suficiente, verde com ✓ = já colocado.
+   Passe o mouse para ver nome, total, falta e quanto você tem. A roda do mouse rola a grade.

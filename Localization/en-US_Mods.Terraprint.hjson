@@ -176,13 +176,13 @@ Configs: {
 UI: {
 	Title: Terraprint
 	SaveHeader: Save a build
-	NameHint: Blueprint name (click to type)
+	NameHint: click to type
 	SelectArea: Select area
 	Save: Save
 	FilesHeader: Saved blueprints
 	Refresh: Refresh
 	OpenFolder: Open folder
-	NoFiles: No blueprints yet. Select an area and save one.
+	NoFiles: No blueprints yet. Save an area in the tab next to this one.
 	InfoFirstCorner: Click the first corner in the world (right click cancels).
 	InfoSecondCorner: Click the opposite corner.
 	InfoSelection: Selected area: {0} x {1} tiles
@@ -195,7 +195,7 @@ UI: {
 	Saved: "[Terraprint] Saved {0} ({1} x {2})."
 	SaveError: "[Terraprint] Could not save: {0}"
 	ProjectionHeader: Projection
-	NoProjection: No blueprint loaded. Click Load on a saved one below.
+	NoProjection: No blueprint loaded. Open the saved blueprints tab and load one.
 	ProjectionLine: "{0} ({1} x {2}), rotation {3}° {4}"
 	Mirrored: (mirrored)
 	StateMoving: Following the mouse: left click to place, right click to cancel.
@@ -204,7 +204,7 @@ UI: {
 	Flip: Mirror
 	Move: Move
 	Remove: Remove
-	NudgeHint: Moves 1 tile (arrow keys too)
+	NudgeHint: Move 1 tile (arrow keys too)
 	Load: Load
 	LoadError: "[Terraprint] Could not load {0}: {1}"
 	PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
@@ -220,7 +220,7 @@ UI: {
 	On: on
 	Off: off
 	Delete: Delete
-	DeleteConfirm: Sure?
+	DeleteConfirm: Click again to delete
 	Deleted: "[Terraprint] Deleted {0}."
 	DeleteError: "[Terraprint] Could not delete: {0}"
 	Materials: Materials
@@ -238,4 +238,7 @@ UI: {
 	AutoBuildNothing: "[Terraprint] Nothing to place within reach: get closer, or you are missing the items (see Materials)."
 	AutoBuildNoProjection: "[Terraprint] Place a blueprint first (load it and left click) to auto-build."
 	SelectNotLoaded: "[Terraprint] Part of this area hasn't been loaded from the server yet. Walk near it and try again."
+	Close: Close
+	NameLabel: Name:
+	FilesCount: "{0} blueprints. Load one to project it."
 }

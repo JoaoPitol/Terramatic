@@ -1,86 +1,72 @@
+using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using Terraprint.Common.Systems;
 
 namespace Terraprint.Common.UI
 {
-	/// <summary>Janela separada com os materiais da projecao: quanto precisa, quanto falta colocar e quanto voce tem.</summary>
+	/// <summary>
+	/// Janela separada com os materiais da projecao, em slots como o inventario do jogo.
+	/// O numero do slot e quanto ainda falta colocar; a dica mostra total, falta e quanto voce tem.
+	/// </summary>
 	public class MaterialsPanel : UIState
 	{
-		private const float PanelWidth = 400f;
+		private const int Columns = 8;
+		private const float Pad = 10f;
+		private const float GridTop = 62f;
+		private static readonly float PanelWidth = Columns * MaterialsGrid.Step - 4f + 2 * Pad + 22f;
 
-		private UIDragPanel _panel;
+		private UITerraprintPanel _panel;
 		private UIText _summary;
-		private UIList _list;
-		private int _shownListVersion = -1;
 
 		public override void OnInitialize()
 		{
-			_panel = new UIDragPanel();
+			_panel = new UITerraprintPanel {
+				SeparatorY = GridTop - 8f,
+			};
 			_panel.Width.Set(PanelWidth, 0f);
-			_panel.Height.Set(System.Math.Min(520f, Main.screenHeight - 160f), 0f);
-			_panel.MinHeight.Set(260f, 0f);
-			_panel.Left.Set(System.Math.Min(Main.screenWidth / 2f + 270f, Main.screenWidth - PanelWidth - 10f), 0f);
+			_panel.Height.Set(Math.Min(GridTop + 2 * Pad + 6 * MaterialsGrid.Step, Main.screenHeight - 160f), 0f);
+			_panel.Left.Set(Math.Min(Main.screenWidth / 2f + 196f, Main.screenWidth - PanelWidth - 10f), 0f);
 			_panel.Top.Set(120f, 0f);
-			_panel.SetPadding(10f);
+			_panel.SetPadding(Pad);
 			Append(_panel);
 
-			_panel.Append(new UIText(Lang.UI("MaterialsTitle"), 0.5f, large: true));
+			var title = new UIText(Lang.UI("MaterialsTitle"), 0.9f);
+			title.Top.Set(2f, 0f);
+			_panel.Append(title);
 
-			var close = new UIButton("X", UISystem.CloseMaterials);
-			close.Width.Set(30f, 0f);
-			close.Height.Set(30f, 0f);
-			close.Left.Set(-30f, 1f);
+			var close = new UIIconButton("Close", Lang.UI("Close"), UISystem.CloseMaterials) { Bare = true };
+			close.Width.Set(26f, 0f);
+			close.Height.Set(26f, 0f);
+			close.Left.Set(-26f, 1f);
+			close.Top.Set(-2f, 0f);
 			_panel.Append(close);
 
-			_summary = new UIText("", 0.8f);
-			_summary.Top.Set(38f, 0f);
+			_summary = new UIText("", 0.75f) {
+				TextColor = TerraprintStyle.Muted,
+				IsWrapped = true,
+				TextOriginX = 0f,
+			};
+			_summary.Top.Set(28f, 0f);
 			_summary.Width.Set(0f, 1f);
-			_summary.IsWrapped = true;
 			_panel.Append(_summary);
 
-			// Cabecalho das colunas, alinhado com as linhas da lista.
-			float top = 82f;
-			AddColumn(Lang.UI("ColNeeded"), top, MaterialRow.ColNeeded, Color.LightSkyBlue);
-			AddColumn(Lang.UI("ColRemaining"), top, MaterialRow.ColRemaining, Color.LightSkyBlue);
-			AddColumn(Lang.UI("ColHave"), top, MaterialRow.ColHave, Color.LightSkyBlue);
-			top += 22f;
-
-			var listPanel = new UIPanel();
-			listPanel.Top.Set(top, 0f);
-			listPanel.Width.Set(0f, 1f);
-			listPanel.Height.Set(-top, 1f);
-			listPanel.SetPadding(6f);
-			listPanel.BackgroundColor = new Color(33, 43, 79) * 0.6f;
-			_panel.Append(listPanel);
-
-			_list = new UIList();
-			_list.Width.Set(-24f, 1f);
-			_list.Height.Set(0f, 1f);
-			_list.ListPadding = 3f;
-			_list.ManualSortMethod = _ => { }; // mantem a ordem do MaterialsTracker
-			listPanel.Append(_list);
+			var grid = new MaterialsGrid();
+			grid.Top.Set(GridTop, 0f);
+			grid.Width.Set(-22f, 1f);
+			grid.Height.Set(-GridTop, 1f);
+			_panel.Append(grid);
 
 			var scroll = new UIScrollbar();
-			scroll.Height.Set(0f, 1f);
+			scroll.Top.Set(GridTop + 4f, 0f);
+			scroll.Height.Set(-GridTop - 8f, 1f);
 			scroll.Left.Set(-18f, 1f);
-			listPanel.Append(scroll);
-			_list.SetScrollbar(scroll);
-		}
-
-		// As colunas ficam a direita; o deslocamento extra compensa a barra de rolagem e o padding da lista.
-		private void AddColumn(string text, float top, float rightOffset, Color color)
-		{
-			var t = new UIText(text, 0.75f) {
-				TextOriginX = 1f,
-				TextColor = color,
-			};
-			t.Top.Set(top, 0f);
-			t.Width.Set(MaterialRow.ColWidth, 0f);
-			t.Left.Set(rightOffset - MaterialRow.ColWidth - 36f, 1f);
-			_panel.Append(t);
+			_panel.Append(scroll);
+			grid.Scrollbar = scroll;
 		}
 
 		public bool IsMouseOverPanel => _panel != null && _panel.ContainsPoint(Main.MouseScreen);
@@ -88,12 +74,6 @@ namespace Terraprint.Common.UI
 		public override void Update(GameTime gameTime)
 		{
 			MaterialsTracker.Update();
-			if (_shownListVersion != MaterialsTracker.ListVersion) {
-				_shownListVersion = MaterialsTracker.ListVersion;
-				_list.Clear();
-				foreach (var e in MaterialsTracker.Entries)
-					_list.Add(new MaterialRow(e));
-			}
 
 			if (!ProjectionSystem.HasProjection)
 				_summary.SetText(Lang.UI("MaterialsNone"));
@@ -108,75 +88,92 @@ namespace Terraprint.Common.UI
 		}
 	}
 
-	/// <summary>Uma linha da lista de materiais: icone, nome e as tres quantidades.</summary>
-	public class MaterialRow : UIPanel
+	/// <summary>Grade de slots dos materiais, rolando de linha em linha.</summary>
+	public class MaterialsGrid : UIElement
 	{
-		public const float ColWidth = 54f;
-		public const float ColNeeded = -2f * ColWidth;
-		public const float ColRemaining = -ColWidth;
-		public const float ColHave = 0f;
+		public const float Step = TerraprintStyle.SlotSize + 4f;
 
-		private static readonly Color Lacking = new(255, 110, 110);
-		private static readonly Color Enough = new(255, 240, 140);
-		private static readonly Color Done = new(120, 230, 130);
+		private static readonly Color LackingTint = new(255, 120, 120);
+		private static readonly Color DoneTint = new(130, 200, 140);
 
-		private readonly MaterialEntry _entry;
-		private readonly UIText _name, _needed, _remaining, _have;
-		private readonly Item _item;
+		public UIScrollbar Scrollbar;
+		private readonly Item _item = new();
+		private int _hovered = -1;
 
-		public MaterialRow(MaterialEntry entry)
+		private int ColumnCount => Math.Max(1, (int)((GetDimensions().Width + 4f) / Step));
+		private int VisibleRows => Math.Max(1, (int)((GetDimensions().Height + 4f) / Step));
+		private int FirstRow => Scrollbar == null ? 0 : (int)Math.Round(Scrollbar.ViewPosition);
+
+		public override void ScrollWheel(UIScrollWheelEvent evt)
 		{
-			_entry = entry;
-			Width.Set(0f, 1f);
-			Height.Set(38f, 0f);
-			SetPadding(4f);
-
-			float nameLeft = 4f;
-			if (entry.ItemType > 0) {
-				_item = new Item(entry.ItemType);
-				var icon = new UIItemIcon(_item, false);
-				icon.VAlign = 0.5f;
-				Append(icon);
-				nameLeft = 38f;
-			}
-
-			string name = entry.ItemType > 0 ? entry.Name : Lang.UI("NoItem", entry.Name);
-			if (name.Length > 22)
-				name = name.Substring(0, 21) + "…";
-			_name = new UIText(name, 0.8f);
-			_name.Left.Set(nameLeft, 0f);
-			_name.VAlign = 0.5f;
-			Append(_name);
-
-			_needed = Column(ColNeeded);
-			_remaining = Column(ColRemaining);
-			_have = Column(ColHave);
+			base.ScrollWheel(evt);
+			if (Scrollbar != null)
+				Scrollbar.ViewPosition -= evt.ScrollWheelValue / 120f;
 		}
 
-		private UIText Column(float rightOffset)
+		private Rectangle SlotRect(int index, int first)
 		{
-			var t = new UIText("", 0.8f) { TextOriginX = 1f };
-			t.Width.Set(ColWidth, 0f);
-			t.Left.Set(rightOffset - ColWidth, 1f);
-			t.VAlign = 0.5f;
-			Append(t);
-			return t;
+			var d = GetDimensions();
+			int cols = ColumnCount;
+			int row = index / cols - first;
+			int col = index % cols;
+			return new Rectangle((int)(d.X + col * Step), (int)(d.Y + row * Step), (int)TerraprintStyle.SlotSize, (int)TerraprintStyle.SlotSize);
 		}
 
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
-			_needed.SetText(_entry.Needed.ToString());
-			_remaining.SetText(_entry.Remaining.ToString());
-			_have.SetText(_entry.ItemType > 0 ? _entry.Have.ToString() : "-");
+			var entries = MaterialsTracker.Entries;
+			int cols = ColumnCount;
+			int rows = (entries.Count + cols - 1) / cols;
+			Scrollbar?.SetView(VisibleRows, Math.Max(rows, VisibleRows));
 
-			Color c = _entry.Done ? Done : _entry.Lacking ? Lacking : Enough;
-			_name.TextColor = _remaining.TextColor = _have.TextColor = c;
-			BackgroundColor = _entry.Lacking ? new Color(90, 40, 50) * 0.75f : new Color(63, 82, 151) * 0.7f;
+			_hovered = -1;
+			if (!IsMouseHovering)
+				return;
+			int first = FirstRow;
+			int last = Math.Min(entries.Count, (first + VisibleRows) * cols);
+			for (int i = first * cols; i < last; i++) {
+				if (!SlotRect(i, first).Contains(Main.MouseScreen.ToPoint()))
+					continue;
+				_hovered = i;
+				Main.LocalPlayer.mouseInterface = true;
+				break;
+			}
+		}
 
-			if (IsMouseHovering && _item != null) {
-				Main.HoverItem = _item.Clone();
-				Main.hoverItemName = _item.Name;
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var entries = MaterialsTracker.Entries;
+			int cols = ColumnCount;
+			int first = FirstRow;
+			int last = Math.Min(entries.Count, (first + VisibleRows) * cols);
+			for (int i = first * cols; i < last; i++) {
+				var e = entries[i];
+				var r = SlotRect(i, first);
+				Color? tint = e.Done ? DoneTint : e.Lacking ? LackingTint : null;
+				TerraprintStyle.DrawSlot(sb, r, false, i == _hovered, true, tint);
+				if (i == _hovered) {
+					string counts = $"{Lang.UI("ColNeeded")} {e.Needed} · {Lang.UI("ColRemaining")} {e.Remaining} · {Lang.UI("ColHave")} {(e.ItemType > 0 ? e.Have : 0)}";
+					string name = e.ItemType > 0 ? e.Name : Lang.UI("NoItem", e.Name);
+					Main.hoverItemName = name + "\n" + counts;
+				}
+
+				Vector2 center = r.Center.ToVector2();
+				if (e.ItemType > 0) {
+					if (_item.type != e.ItemType)
+						_item.SetDefaults(e.ItemType);
+					ItemSlot.DrawItemIcon(_item, ItemSlot.Context.InventoryItem, sb, center, _item.scale, 30f, e.Done ? Color.White * 0.5f : Color.White);
+				}
+				else {
+					var font = FontAssets.MouseText.Value;
+					Utils.DrawBorderString(sb, "?", center - font.MeasureString("?") / 2f + new Vector2(0f, 4f), TerraprintStyle.Muted);
+				}
+
+				if (!e.Done)
+					TerraprintStyle.DrawStackNumber(sb, e.Remaining.ToString(), r, e.Lacking ? LackingTint : Color.White);
+				else
+					sb.Draw(TerraprintStyle.Icon("Check"), new Vector2(r.Right - 16f, r.Bottom - 16f), null, DoneTint, 0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0f);
 			}
 		}
 	}

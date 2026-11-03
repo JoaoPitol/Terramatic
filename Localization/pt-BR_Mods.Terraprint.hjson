@@ -176,13 +176,13 @@ Configs: {
 UI: {
 	Title: Terraprint
 	SaveHeader: Salvar construção
-	NameHint: Nome do blueprint (clique para digitar)
+	NameHint: clique para digitar
 	SelectArea: Selecionar área
 	Save: Salvar
 	FilesHeader: Blueprints salvos
 	Refresh: Atualizar
 	OpenFolder: Abrir pasta
-	NoFiles: Nenhum blueprint ainda. Selecione uma área e salve.
+	NoFiles: Nenhum blueprint ainda. Salve uma área na aba ao lado.
 	InfoFirstCorner: Clique no primeiro canto no mundo (botão direito cancela).
 	InfoSecondCorner: Clique no canto oposto.
 	InfoSelection: Área selecionada: {0} x {1} blocos
@@ -195,7 +195,7 @@ UI: {
 	Saved: "[Terraprint] Salvo {0} ({1} x {2})."
 	SaveError: "[Terraprint] Não foi possível salvar: {0}"
 	ProjectionHeader: Projeção
-	NoProjection: Nenhum blueprint carregado. Clique em Carregar em um dos salvos abaixo.
+	NoProjection: Nenhum blueprint carregado. Abra a aba de blueprints salvos e carregue um.
 	ProjectionLine: "{0} ({1} x {2}), rotação {3}° {4}"
 	Mirrored: (espelhado)
 	StateMoving: Seguindo o mouse: clique esquerdo para fixar, direito para cancelar.
@@ -204,7 +204,7 @@ UI: {
 	Flip: Espelhar
 	Move: Mover
 	Remove: Remover
-	NudgeHint: Move 1 bloco (setas também)
+	NudgeHint: Mover 1 bloco (setas do teclado também)
 	Load: Carregar
 	LoadError: "[Terraprint] Não foi possível carregar {0}: {1}"
 	PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
@@ -220,7 +220,7 @@ UI: {
 	On: lig.
 	Off: desl.
 	Delete: Excluir
-	DeleteConfirm: Certeza?
+	DeleteConfirm: Clique de novo para excluir
 	Deleted: "[Terraprint] {0} excluído."
 	DeleteError: "[Terraprint] Não foi possível excluir: {0}"
 	Materials: Materiais
@@ -238,4 +238,7 @@ UI: {
 	AutoBuildNothing: "[Terraprint] Nada para colocar ao seu alcance: chegue mais perto ou faltam os itens (veja Materiais)."
 	AutoBuildNoProjection: "[Terraprint] Fixe um blueprint primeiro (carregue e clique esquerdo) para construir automaticamente."
 	SelectNotLoaded: "[Terraprint] Parte desta área ainda não veio do servidor. Ande perto dela e tente de novo."
+	Close: Fechar
+	NameLabel: Nome:
+	FilesCount: "{0} blueprints. Carregue um para projetar."
 }

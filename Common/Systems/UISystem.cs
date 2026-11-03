@@ -37,6 +37,7 @@ namespace Terraprint.Common.Systems
 			_menu = null;
 			_materialsInterface = null;
 			_materials = null;
+			TerraprintStyle.Unload();
 		}
 
 		public static void ToggleMenu()
