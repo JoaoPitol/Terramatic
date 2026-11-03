@@ -118,24 +118,19 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
    Se algum não couber (ficaria em cima de outro bloco), ele some e o chat diz quantos blocos de móveis ficaram de fora.
 5. Gire 4 vezes: tudo volta exatamente como era.
 
-## Passo 9: menu no estilo do Terraria
+## Passo 9: menu em formato de catálogo
 
-O menu usa o visual da tela de crafting: abas em forma de slot no topo da janela, painel azul com borda
-preta arredondada, slots e ícones semitransparentes (ficam cheios ao passar o mouse) e dicas com o nome
-de cada botão.
-
-1. Aperte **K**. Em cima da janela ficam as abas **Projeção** (casa), **Salvar construção** (retângulo
-   tracejado), **Blueprints salvos** (pasta) e **Materiais**; na ponta direita, **Opções** (engrenagem).
-   A aba ativa fica com borda dourada e o nome dela aparece no título do painel, com o X redondo à direita.
-   Arraste a janela inteira (abas junto) pela faixa do título.
-2. **Blueprints salvos**: cada linha mostra a **prévia** da construção (com as cores do mapa), o nome, o tamanho,
-   **Excluir** (lixeira, fica vermelha e pede um segundo clique) e **Carregar** (seta para baixo).
-   Passe o mouse sobre uma linha: uma prévia grande aparece ao lado da janela. Carregar pula para **Projeção**.
-3. **Projeção**: texto com nome, tamanho, rotação e progresso. Primeira linha: Girar, Espelhar, Mover, Remover
-   e, à direita, o martelo **Construir (segure)**. Segunda linha: as quatro setas e Fantasma, Mapa e Certos
-   (dourado = ligado).
-4. **Salvar construção**: campo **Nome:**, selecionar área e o disquete para salvar. Depois de salvar, a
-   janela vai para a lista, com a prévia do arquivo novo no topo.
-5. **Materiais** agora é uma aba (não é mais uma janela separada): grade de slots, o número é quanto falta
-   colocar; vermelho = falta no inventário, verde com ✓ = já colocado. Passe o mouse para ver nome, total,
-   falta e quanto você tem. A roda do mouse rola a grade.
+1. Aperte **K**. A janela tem o título **Terraprint** à esquerda e, no topo à direita, os botões
+   **Blueprints**, **Salvar**, **Projeção**, **Materiais**, **Opções** e **X**. O botão da aba aberta fica dourado.
+   Arraste a janela pela faixa do título.
+2. **Blueprints**: lista de nomes à esquerda (com o tamanho em cinza). Clique em um para ver à direita o nome,
+   o tamanho, quantos blocos tem e uma **prévia grande** da construção (cores do mapa). Clique duas vezes
+   ou em **Carregar** para projetar. **Excluir** fica vermelho e pede um segundo clique. **Salvar nova** vai
+   para a aba Salvar. Embaixo da lista: **Atualizar** e **Abrir pasta**.
+3. **Salvar**: campo **Nome:**, **Selecionar área** (dourado enquanto seleciona) e **Salvar**. Depois de salvar,
+   a janela volta para Blueprints com o arquivo novo selecionado.
+4. **Projeção**: à esquerda, o nome/tamanho/rotação, os botões Fantasma, Mapa e Certos (dourado = ligado)
+   e as quatro setas. À direita, a prévia da projeção já girada/espelhada e, em amarelo, o progresso.
+   Embaixo: Girar, Espelhar, Mover, Remover e **Construir (segure)**.
+5. **Materiais**: grade de slots, o número é quanto falta colocar; vermelho = falta no inventário,
+   verde com ✓ = já colocado. Passe o mouse para ver os detalhes; a roda do mouse rola.

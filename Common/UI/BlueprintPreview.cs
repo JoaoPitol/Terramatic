@@ -24,6 +24,8 @@ namespace Terraprint.Common.UI
 			public DateTime WriteTime;
 			public Texture2D Texture;
 			public int Width, Height;
+			/// <summary>Blocos e objetos (celulas com bloco).</summary>
+			public int Tiles;
 			public bool Failed;
 		}
 
@@ -45,9 +47,7 @@ namespace Terraprint.Common.UI
 			e = new Entry { WriteTime = time };
 			try {
 				var bp = BlueprintIO.Load(path);
-				e.Width = bp.Width;
-				e.Height = bp.Height;
-				e.Texture = Build(bp);
+				Fill(e, bp);
 			}
 			catch (Exception ex) {
 				e.Failed = true;
@@ -55,6 +55,44 @@ namespace Terraprint.Common.UI
 			}
 			_cache[path] = e;
 			return e;
+		}
+
+		private static Entry _projection;
+		private static Blueprint _projectionSource;
+		private static int _projectionVersion = -1;
+
+		/// <summary>Previa da projecao ativa (ja girada/espelhada); refeita quando ela muda.</summary>
+		public static Entry ForProjection(Blueprint bp, int version)
+		{
+			if (bp == null)
+				return null;
+			if (_projection != null && ReferenceEquals(bp, _projectionSource) && version == _projectionVersion)
+				return _projection;
+			_projection?.Texture?.Dispose();
+			_projection = new Entry();
+			_projectionSource = bp;
+			_projectionVersion = version;
+			try {
+				Fill(_projection, bp);
+			}
+			catch (Exception ex) {
+				_projection.Failed = true;
+				ModContentLogger.Warn("Could not build projection preview", ex);
+			}
+			return _projection;
+		}
+
+		private static void Fill(Entry e, Blueprint bp)
+		{
+			e.Width = bp.Width;
+			e.Height = bp.Height;
+			int tiles = 0;
+			foreach (var c in bp.Cells) {
+				if (c.HasTile)
+					tiles++;
+			}
+			e.Tiles = tiles;
+			e.Texture = Build(bp);
 		}
 
 		/// <summary>Esquece arquivos que nao estao mais na lista.</summary>
@@ -76,6 +114,9 @@ namespace Terraprint.Common.UI
 			foreach (var e in _cache.Values)
 				e.Texture?.Dispose();
 			_cache.Clear();
+			_projection?.Texture?.Dispose();
+			_projection = null;
+			_projectionSource = null;
 		}
 
 		private static Texture2D Build(Blueprint bp)

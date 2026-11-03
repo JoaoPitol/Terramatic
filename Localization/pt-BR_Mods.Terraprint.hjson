@@ -241,4 +241,10 @@ UI: {
 	Close: Fechar
 	NameLabel: Nome:
 	FilesCount: "{0} blueprints. Carregue um para projetar."
+	TabCatalog: Blueprints
+	NewBlueprint: Salvar nova
+	SaveHint: Depois de salvar, o blueprint aparece na aba Blueprints com a prévia.
+	PreviewError: Não foi possível ler este arquivo.
+	FileInfo: "{0} x {1}  ·  {2} blocos"
+	LoadHint: Clique duas vezes na lista ou em Carregar para projetar no mundo.
 }

@@ -241,4 +241,10 @@ UI: {
 	Close: Close
 	NameLabel: Name:
 	FilesCount: "{0} blueprints. Load one to project it."
+	TabCatalog: Blueprints
+	NewBlueprint: Save new
+	SaveHint: After saving, the blueprint shows up in the Blueprints tab with its preview.
+	PreviewError: Could not read this file.
+	FileInfo: "{0} x {1}  ·  {2} tiles"
+	LoadHint: Double-click it in the list or press Load to project it in the world.
 }
