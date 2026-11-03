@@ -91,3 +91,17 @@ Regras de transformação (o padrão combinado):
 7. Você nunca fica preso: blocos sólidos em cima do personagem são pulados até você sair dali.
 8. Nas opções, seção **Construção automática**: blocos por tick (1 a 10, padrão 2), e ligar/desligar
    paredes, móveis e rampas.
+
+## Passo 7: multiplayer
+
+Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se der, um amigo.
+
+1. Entre no servidor, carregue e fixe um blueprint. O fantasma, o mapa e o progresso funcionam igual.
+2. Saia e entre de novo: a projeção volta no mesmo lugar. Ela fica salva no seu PC, em
+   `Terraprint/Projections` (um arquivo por mundo). Cada jogador tem a sua.
+3. Segure **Construir**: os blocos aparecem para todos os jogadores (peça para o amigo conferir).
+   No servidor o ritmo é de no máximo 15 blocos por segundo, para o jogo não te expulsar por spam.
+4. Rampas, meio-blocos, paredes, móveis virados para o lado certo e baús funcionam para todos.
+5. Selecionar e salvar uma área longe de você avisa que parte dela ainda não veio do servidor.
+6. Enquanto você seleciona uma área, os outros jogadores continuam usando os itens normalmente.
+7. Um mundo de single player que já tinha projeção salva (versão anterior do mod) continua com ela.

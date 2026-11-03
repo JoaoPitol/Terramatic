@@ -17,7 +17,9 @@ Mod para tModLoader que salva construções do Terraria como blueprints e projet
 
 ## Limitações conhecidas
 
-- Single player. Em multiplayer o fantasma funciona só no seu cliente e a projeção não é salva no mundo do servidor.
+- Multiplayer: o servidor e todos os jogadores precisam do mod. Cada jogador tem a sua projeção, salva no próprio PC
+  (pasta Terraprint/Projections, um arquivo por mundo). A construção automática coloca no máximo
+  15 blocos por segundo em servidores, para não cair no anti-spam do jogo.
 - Girar: blocos, paredes e rampas giram; móveis e objetos maiores que 1 bloco só espelham
   (e somem do fantasma enquanto girado). Ao espelhar, o sprite do móvel não vira de lado.
 - Fios, atuadores e itens dentro de baús não são salvos.

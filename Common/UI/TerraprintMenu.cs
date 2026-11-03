@@ -235,6 +235,10 @@ namespace Terraprint.Common.UI
 		{
 			if (!SelectionSystem.HasSelection)
 				return;
+			if (!SelectionSystem.SelectionLoaded()) {
+				Main.NewText(Lang.UI("SelectNotLoaded"), Color.OrangeRed);
+				return;
+			}
 			try {
 				var bp = SelectionSystem.CaptureSelection(_nameBox.Text);
 				string path = BlueprintIO.Save(bp);

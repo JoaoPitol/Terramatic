@@ -31,6 +31,13 @@ namespace Terraprint.Common.Systems
 		private static int _retryTimer;
 		private static readonly HashSet<long> _failed = new();
 
+		/// <summary>
+		/// No multiplayer o servidor expulsa quem coloca blocos rapido demais (acima de ~18 por segundo,
+		/// quando o anti-spam esta ligado). Ali o ritmo fica em 1 bloco a cada 4 ticks (15 por segundo).
+		/// </summary>
+		private const float MultiplayerBlocksPerTick = 0.25f;
+		private static float _mpBudget;
+
 		public static bool Holding => Main.GameUpdateCount <= _heldUntil;
 
 		/// <summary>Chamado a cada tick enquanto o botao do menu ou a tecla estao pressionados.</summary>
@@ -69,7 +76,16 @@ namespace Terraprint.Common.Systems
 			if (ProjectionSystem.State != ProjectionSystem.ProjectionState.Fixed || player == null || !player.active || player.dead || player.noBuilding)
 				return;
 
-			int placed = PlaceBatch(player, TerraprintConfig.Instance.AutoBuildPerTick);
+			int max = TerraprintConfig.Instance.AutoBuildPerTick;
+			if (Main.netMode == NetmodeID.MultiplayerClient) {
+				_mpBudget = System.Math.Min(1f, _mpBudget + MultiplayerBlocksPerTick);
+				max = (int)_mpBudget;
+				if (max == 0)
+					return;
+			}
+			int placed = PlaceBatch(player, max);
+			if (Main.netMode == NetmodeID.MultiplayerClient)
+				_mpBudget -= placed;
 			if (placed > 0) {
 				_placedThisHold = true;
 				SoundEngine.PlaySound(SoundID.Dig, player.Center);
@@ -109,7 +125,8 @@ namespace Terraprint.Common.Systems
 			var candidates = new List<Candidate>();
 			for (int wy = area.Top; wy < area.Bottom; wy++) {
 				for (int wx = area.Left; wx < area.Right; wx++) {
-					if (!WorldGen.InWorld(wx, wy, 10))
+					// No multiplayer so mexe em partes do mundo que o servidor ja enviou.
+					if (!WorldGen.InWorld(wx, wy, 10) || Main.netMode == NetmodeID.MultiplayerClient && !Main.sectionManager.TileLoaded(wx, wy))
 						continue;
 					int i = (wy - origin.Y) * bp.Width + (wx - origin.X);
 					ref BlueprintCell c = ref bp.Cells[i];
@@ -185,7 +202,7 @@ namespace Terraprint.Common.Systems
 				return false;
 			Consume(player, slot, x, y);
 			if (Main.netMode == NetmodeID.MultiplayerClient)
-				NetMessage.SendTileSquare(-1, x, y, 1, 1);
+				NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 3, x, y, c.WallType);
 			return true;
 		}
 
@@ -212,8 +229,6 @@ namespace Terraprint.Common.Systems
 				return false;
 
 			Consume(player, slot, x, y);
-			if (Main.netMode == NetmodeID.MultiplayerClient)
-				NetMessage.SendTileSquare(-1, x, y, w, h);
 			return true;
 		}
 
@@ -224,29 +239,51 @@ namespace Terraprint.Common.Systems
 			Tile t = Main.tile[x, y];
 			if (!t.HasTile || t.TileType != c.TileType)
 				return false;
+			bool mp = Main.netMode == NetmodeID.MultiplayerClient;
+			// Mesmas mensagens que o jogo manda quando o jogador coloca um bloco e usa o martelo.
+			if (mp)
+				NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 1, x, y, c.TileType, style);
 
 			if (cfg.AutoBuildSlopes && Main.tileSolid[c.TileType] && !BlueprintTransform.IsMultitile(c)) {
-				if (c.HalfBlock)
-					t.IsHalfBlock = true;
-				else if (c.Slope != 0)
-					t.Slope = (SlopeType)c.Slope;
-				WorldGen.SquareTileFrame(x, y);
+				if (c.HalfBlock) {
+					WorldGen.PoundTile(x, y);
+					if (mp)
+						NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 7, x, y);
+				}
+				else if (c.Slope != 0) {
+					WorldGen.SlopeTile(x, y, c.Slope, noEffects: true);
+					if (mp)
+						NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 14, x, y, c.Slope);
+				}
 			}
 			return true;
 		}
 
-		/// <summary>Moveis e objetos: coloca pelo canto superior esquerdo e copia os quadros do blueprint (lado, estado).</summary>
+		/// <summary>
+		/// Moveis e objetos: coloca pelo canto superior esquerdo, virado para o mesmo lado do blueprint,
+		/// do mesmo jeito que o jogo faz quando o jogador coloca o item.
+		/// </summary>
 		private static bool PlaceObject(Player player, in BlueprintCell c, int x, int y, int style, TileObjectData data)
 		{
 			int cx = x + data.Origin.X, cy = y + data.Origin.Y;
-			foreach (int dir in new[] { player.direction, -player.direction }) {
+			int wanted = data.Direction switch {
+				Terraria.Enums.TileObjectDirection.PlaceLeft => -1,
+				Terraria.Enums.TileObjectDirection.PlaceRight => 1,
+				_ => player.direction,
+			};
+			foreach (int dir in new[] { wanted, -wanted }) {
 				if (!TileObject.CanPlace(cx, cy, c.TileType, style, dir, out TileObject obj) || obj.xCoord != x || obj.yCoord != y)
 					continue;
 				if (!TileObject.Place(obj))
 					continue;
 				WorldGen.SquareTileFrame(cx, cy);
 				TileObjectData.CallPostPlacementPlayerHook(cx, cy, c.TileType, style, dir, obj.alternate, obj);
-				if (data.Width > 1 || data.Height > 1)
+				if (Main.netMode == NetmodeID.MultiplayerClient) {
+					// Bau, caixa e afins ja avisam o servidor pelo gancho acima; o sensor logico tem mensagem propria (igual ao jogo).
+					if (!Main.tileContainer[c.TileType] && c.TileType != TileID.LogicSensor)
+						NetMessage.SendObjectPlacement(-1, cx, cy, obj.type, obj.style, obj.alternate, obj.random, dir);
+				}
+				else if (data.Width > 1 || data.Height > 1)
 					CopyFrames(x, y, data.Width, data.Height, c.TileType);
 				return Main.tile[x, y].HasTile && Main.tile[x, y].TileType == c.TileType;
 			}

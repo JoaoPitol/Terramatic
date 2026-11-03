@@ -22,6 +22,9 @@ namespace Terraprint.Common.Players
 		/// </summary>
 		public static void SwallowClick() => _waitForRelease = true;
 
+		// So roda para o jogador local, tanto em single player quanto ao entrar num servidor.
+		public override void OnEnterWorld() => ProjectionSystem.OnEnterWorld();
+
 		public override void ProcessTriggers(TriggersSet triggersSet)
 		{
 			if (Main.drawingPlayerChat || PlayerInput.WritingText || UISystem.Typing)
@@ -78,6 +81,7 @@ namespace Terraprint.Common.Players
 		}
 
 		// Enquanto uma ferramenta usa o mouse, nao deixa o item da mao ser usado (minerar, atacar...).
-		public override bool CanUseItem(Item item) => !ToolActive;
+		// So vale para o jogador local: no multiplayer os outros jogadores continuam usando seus itens.
+		public override bool CanUseItem(Item item) => Player.whoAmI != Main.myPlayer || !ToolActive;
 	}
 }

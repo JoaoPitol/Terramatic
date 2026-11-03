@@ -66,6 +66,21 @@ namespace Terraprint.Common.Systems
 			Lang.Info(Lang.UI("SelectDone", r.Width, r.Height), Color.LightGreen);
 		}
 
+		/// <summary>No multiplayer o jogo so tem os pedacos do mundo perto do jogador; o resto viria vazio.</summary>
+		public static bool SelectionLoaded()
+		{
+			if (Main.netMode != Terraria.ID.NetmodeID.MultiplayerClient)
+				return true;
+			var r = SelectionRect;
+			for (int y = r.Top; y < r.Bottom; y++) {
+				for (int x = r.Left; x < r.Right; x++) {
+					if (!Main.sectionManager.TileLoaded(x, y))
+						return false;
+				}
+			}
+			return true;
+		}
+
 		public static Blueprint CaptureSelection(string name)
 		{
 			var r = SelectionRect;

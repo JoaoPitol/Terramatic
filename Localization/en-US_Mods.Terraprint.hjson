@@ -237,4 +237,5 @@ UI: {
 	AutoBuilding: Building...
 	AutoBuildNothing: "[Terraprint] Nothing to place within reach: get closer, or you are missing the items (see Materials)."
 	AutoBuildNoProjection: "[Terraprint] Place a blueprint first (load it and left click) to auto-build."
+	SelectNotLoaded: "[Terraprint] Part of this area hasn't been loaded from the server yet. Walk near it and try again."
 }
