@@ -95,7 +95,7 @@ Regras de transformação (o padrão combinado):
 
 ## Passo 7: multiplayer
 
-Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se der, um amigo.
+O mod é só do cliente: funciona num servidor **sem** o mod (ou com Host & Play). Se der, chame um amigo sem o mod.
 
 1. Entre no servidor, carregue e fixe um blueprint. O fantasma, o mapa e o progresso funcionam igual.
 2. Saia e entre de novo: a projeção volta no mesmo lugar. Ela fica salva no seu PC, em
@@ -106,6 +106,8 @@ Precisa de um servidor com o mod (pode ser **Host & Play** no próprio PC) e, se
 5. Selecionar e salvar uma área longe de você avisa que parte dela ainda não veio do servidor.
 6. Enquanto você seleciona uma área, os outros jogadores continuam usando os itens normalmente.
 7. Um mundo de single player que já tinha projeção salva (versão anterior do mod) continua com ela.
+8. Num servidor sem o Terraprint, entre com ele ativo: o jogo não pede para baixar nem sincronizar mods,
+   e um amigo sem o mod entra normalmente.
 
 ## Passo 8: móveis ao espelhar e girar
 
