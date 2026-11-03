@@ -149,7 +149,7 @@ namespace Terraprint.Common.Systems
 				return CellStatus.None;
 			if (t.WallType == WallID.None)
 				return CellStatus.Missing;
-			if (t.WallType != c.WallType)
+			if (!MaterialLookup.SameWall(t.WallType, c.WallType))
 				return CellStatus.Wrong;
 			if (cfg.CheckPaint && t.WallColor != c.WallPaint)
 				return CellStatus.Wrong;

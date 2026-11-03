@@ -40,14 +40,61 @@ namespace Terraprint.Common.Blueprints
 		{
 			_tileItems = null;
 			_wallItems = null;
+			_placeableWalls = new();
 		}
 
-		/// <summary>Item que coloca esta parede, ou 0.</summary>
+		/// <summary>
+		/// Item que coloca esta parede, ou 0. Paredes naturais sem item (ex.: DirtUnsafe, a parede de terra
+		/// das cavernas) usam o item da versao que o jogador consegue colocar (Parede de Terra).
+		/// </summary>
 		public static int ItemForWall(int wallType)
 		{
 			EnsureBuilt();
-			return _wallItems.TryGetValue(wallType, out int item) ? item : 0;
+			return _wallItems.TryGetValue(PlaceableWall(wallType), out int item) ? item : 0;
 		}
+
+		private static Dictionary<int, int> _placeableWalls = new();
+
+		/// <summary>
+		/// Parede que o jogador consegue colocar no lugar desta: ela mesma quando algum item a coloca, senao
+		/// a versao "segura" (WallID.Sets.BlendType do jogo, ou o mesmo nome sem "Unsafe"). Sem equivalente, ela mesma.
+		/// </summary>
+		public static int PlaceableWall(int wallType)
+		{
+			EnsureBuilt();
+			if (wallType <= WallID.None || _wallItems.ContainsKey(wallType))
+				return wallType;
+			if (_placeableWalls.TryGetValue(wallType, out int cached))
+				return cached;
+
+			int found = wallType;
+			int w = wallType;
+			for (int step = 0; step < 4; step++) {
+				var blend = WallID.Sets.BlendType;
+				if (w < 0 || w >= blend.Length || blend[w] <= WallID.None || blend[w] == w)
+					break;
+				w = blend[w];
+				if (_wallItems.ContainsKey(w)) {
+					found = w;
+					break;
+				}
+			}
+			if (found == wallType && WallLoader.GetWall(wallType) == null) {
+				string name = WallID.Search.GetName(wallType);
+				string safe = System.Text.RegularExpressions.Regex.Replace(name ?? "", "Unsafe[0-9]*$", "");
+				foreach (string candidate in new[] { safe, safe + "Wall", safe.Replace("Unsafe", "") }) {
+					if (candidate.Length > 0 && candidate != name && WallID.Search.TryGetId(candidate, out int id) && _wallItems.ContainsKey(id)) {
+						found = id;
+						break;
+					}
+				}
+			}
+			_placeableWalls[wallType] = found;
+			return found;
+		}
+
+		/// <summary>Duas paredes contam como iguais se forem a mesma ou tiverem a mesma versao colocavel.</summary>
+		public static bool SameWall(int a, int b) => a == b || PlaceableWall(a) == PlaceableWall(b);
 
 		/// <summary>Item que coloca o bloco/movel desta celula, ou 0.</summary>
 		public static int ItemForTile(in BlueprintCell c)

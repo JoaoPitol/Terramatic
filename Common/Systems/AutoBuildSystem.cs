@@ -197,12 +197,14 @@ namespace Terraprint.Common.Systems
 			int slot = FindItem(player, MaterialLookup.ItemForWall(c.WallType));
 			if (slot < 0)
 				return false;
-			WorldGen.PlaceWall(x, y, c.WallType, mute: true);
-			if (Main.tile[x, y].WallType != c.WallType)
+			// Paredes naturais (ex.: terra das cavernas) saem na versao que o item coloca.
+			int wall = MaterialLookup.PlaceableWall(c.WallType);
+			WorldGen.PlaceWall(x, y, wall, mute: true);
+			if (Main.tile[x, y].WallType != wall)
 				return false;
 			Consume(player, slot, x, y);
 			if (Main.netMode == NetmodeID.MultiplayerClient)
-				NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 3, x, y, c.WallType);
+				NetMessage.SendData(MessageID.TileManipulation, -1, -1, null, 3, x, y, wall);
 			return true;
 		}
 
