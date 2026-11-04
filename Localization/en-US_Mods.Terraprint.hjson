@@ -322,7 +322,7 @@ UI: {
 	NewBlankTip: Creates an empty blueprint and opens it in the editor.
 	NewBlankName: New build
 	Edit: Edit
-	EditTip: "Opens the schematic editor: place and remove blocks, walls, furniture and more."
+	EditTip: Opens the schematic editor: place and remove blocks, walls, furniture and more.
 	PickOne: Pick a blueprint.
 	NoMatches: No blueprint matches that name.
 	PreviewErrorShort: unreadable file
@@ -332,7 +332,7 @@ UI: {
 	Step2Sub: If left empty, the date and time are used.
 	Step3: Save it
 	Selecting: Selecting...
-	SaveFootnote: "Tip: the maximum area size and what gets saved (liquids, paint) are in All options. Actuators and actuated blocks are saved too."
+	SaveFootnote: Tip: the maximum area size and what gets saved (liquids, paint) are in All options. Actuators and actuated blocks are saved too.
 	GroupTransform: Transform
 	GroupPosition: Position
 	GroupView: View
@@ -341,7 +341,7 @@ UI: {
 	ShowCorrectShort: Show correct blocks
 	AutoBuildTip: Hold to place the blocks in reach using your inventory.
 	NoProjectionShort: No blueprint loaded
-	StateMovingShort: "Following the mouse: click to place"
+	StateMovingShort: Following the mouse: click to place
 	ProgressBar: "{0}%  ·  {1}/{2} correct  ·  {3} missing  ·  {4} wrong"
 	BadgeTitle: PROJECTION
 	BadgeNone: None in the world
@@ -349,7 +349,11 @@ UI: {
 	Cancel: Cancel
 	PickerTitle: Pick an item for the list
 	ItemAddTip: Add item
-	ItemRemoveTip: "{0}\nClick to remove from the list"
+	ItemRemoveTip:
+		'''
+		{0}
+		Click to remove from the list
+		'''
 	ListEmpty: Nothing in the list.
 	PaletteEmpty: Nothing found.
 	CatBlocks: Blocks
@@ -366,7 +370,7 @@ UI: {
 	SecGhost: Ghost and map
 	SecAutoBuild: Auto build
 	OptTileBlacklist: Ignored blocks
-	OptTileBlacklistTip: "Blocks and objects placed by these items are ignored: they do not show in the ghost and do not count for progress, materials or auto build."
+	OptTileBlacklistTip: Blocks and objects placed by these items are ignored: they do not show in the ghost and do not count for progress, materials or auto build.
 	OptWallBlacklist: Ignored walls
 	OptWallBlacklistTip: Walls placed by these items are ignored (natural ones count too, e.g. Dirt Wall also ignores cave dirt walls).
 	OptOpacity: Preview opacity
@@ -393,7 +397,7 @@ UI: {
 	OptActuatorMismatchTip: Orange border where the world block's actuator (or on/off state) differs from the blueprint.
 	OptActuatorBorder: Border thickness
 	OptActuatorBorderTip: Thickness in pixels of the actuator mismatch border.
-	OptShowCorrectTip: "Draws already correct blocks in green. Off: they disappear from the ghost."
+	OptShowCorrectTip: Draws already correct blocks in green. Off: they disappear from the ghost.
 	OptShowCorrect: Highlight correct blocks
 	OptObstructions: Mark blocks to remove
 	OptObstructionsTip: Red X on solid blocks where the blueprint wants empty space.
@@ -425,7 +429,7 @@ UI: {
 	ToolBrush: Brush
 	ToolBrushTip: Left places the item picked in the palette, right erases. Drag to paint.
 	ToolRect: Rectangle
-	ToolRectTip: "Drag to fill a rectangle (right: erase the rectangle)."
+	ToolRectTip: Drag to fill a rectangle (right: erase the rectangle).
 	ToolEraser: Eraser
 	ToolEraserTip: Erases blocks or walls (see the layer). Furniture is removed whole.
 	ToolPicker: Picker
@@ -446,5 +450,5 @@ UI: {
 	TrimEmptyTip: Removes empty rows and columns at the edges.
 	EditorStatus: "{0} x {1}  ·  mouse: {2}  ·  item: {3}"
 	EditorNothing: none
-	EditorHelp: "Wheel: zoom · middle: drag · Ctrl+Z / Ctrl+Y"
+	EditorHelp: Wheel: zoom · middle: drag · Ctrl+Z / Ctrl+Y
 }
