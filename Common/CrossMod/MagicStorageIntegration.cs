@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using MagicStorage;
 using MagicStorage.Common.Systems;
 using MagicStorage.Components;
@@ -8,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -26,7 +28,7 @@ namespace Terraprint.Common.CrossMod
 	/// </summary>
 	[ExtendsFromMod("MagicStorage")]
 	[Autoload(Side = ModSide.Client)]
-	public class MagicStorageIntegration : ModSystem
+	public partial class MagicStorageIntegration : ModSystem
 	{
 		private static UserInterface _interface;
 		private static MagicStorageState _state;
@@ -59,6 +61,7 @@ namespace Terraprint.Common.CrossMod
 		public override void UpdateUI(GameTime gameTime)
 		{
 			_lastTime = gameTime;
+			UpdatePendingRecipe();
 			bool show = StorageOpen && TerraprintConfig.Instance.MagicStorageButton;
 			if (!show) {
 				if (_interface.CurrentState != null)
@@ -179,6 +182,127 @@ namespace Terraprint.Common.CrossMod
 			else
 				Lang.Info(Lang.UI(full ? "MSWithdrewPartial" : "MSWithdrew", taken), full ? Color.Orange : Color.LightGreen);
 			CountStorage();
+		}
+	}
+
+	// ----- Abrir a receita no Crafting Terminal (parte da mesma classe) -----
+	public partial class MagicStorageIntegration
+	{
+		private static Recipe[] _pendingRecipes;
+		private static int _pendingTicks;
+
+		/// <summary>Receitas do Magic Storage que fazem este item (vazio se nao tiver nenhuma).</summary>
+		internal static Recipe[] RecipesFor(int itemType)
+		{
+			var map = MagicCache.ResultToRecipe;
+			return itemType > 0 && map != null && map.TryGetValue(itemType, out Recipe[] recipes) ? recipes : Array.Empty<Recipe>();
+		}
+
+		/// <summary>O Crafting Access ligado a este storage mais perto do jogador, ou null.</summary>
+		private static Point16? NearestCraftingAccess(TEStorageHeart heart)
+		{
+			Vector2 player = Main.LocalPlayer.Center / 16f;
+			Point16? best = null;
+			float bestDist = float.MaxValue;
+			foreach (Point16 p in heart.ComponentManager.GetCraftingAccesses()) {
+				float d = Vector2.DistanceSquared(player, new Vector2(p.X + 1f, p.Y + 1f));
+				if (d < bestDist) {
+					bestDist = d;
+					best = p;
+				}
+			}
+			return best;
+		}
+
+		/// <summary>
+		/// Troca o terminal do storage pelo Crafting Terminal ligado a ele e, quando a lista de receitas
+		/// terminar de carregar, seleciona a receita do item (a primeira que der para fazer agora, se houver).
+		/// Se o terminal estiver longe (ou o storage foi aberto pelo acesso portatil), abre como acesso remoto.
+		/// </summary>
+		internal static void OpenRecipe(int itemType)
+		{
+			Recipe[] recipes = RecipesFor(itemType);
+			if (recipes.Length == 0) {
+				Main.NewText(Lang.UI("MSNoRecipe", Terraria.Lang.GetItemNameValue(itemType)), Color.Orange);
+				return;
+			}
+			TEStorageHeart heart = StorageGUI.GetHeart();
+			if (heart == null)
+				return;
+			Point16? found = NearestCraftingAccess(heart);
+			if (found == null) {
+				Main.NewText(Lang.UI("MSNoCraftingAccess"), Color.Orange);
+				return;
+			}
+			Point16 access = found.Value;
+			Player player = Main.LocalPlayer;
+			StoragePlayer sp = StoragePlayer.LocalPlayer;
+
+			// Mesmo criterio do Magic Storage para fechar o terminal quando o jogador se afasta.
+			int px = (int)(player.Center.X / 16f), py = (int)(player.Center.Y / 16f);
+			bool near = px >= access.X - player.lastTileRangeX && px <= access.X + player.lastTileRangeX + 1
+				&& py >= access.Y - player.lastTileRangeY && py <= access.Y + player.lastTileRangeY + 1;
+			bool wasRemote = sp.remoteAccess;
+			float rangeToPylons = sp.portableAccessRangePlayerToPylons;
+			int rangeToStorage = sp.portableAccessRangePylonsToStorage;
+			bool remote = wasRemote || !near;
+
+			sp.CloseStorage();
+			sp.OpenStorage(access, remote);
+			sp.remoteCrafting = remote;
+			if (remote) {
+				// Acesso portatil: mantem o alcance dele. Aberto pelo terminal do proprio storage: sem limite,
+				// ja que o jogador estava usando a mesma rede.
+				sp.portableAccessRangePlayerToPylons = wasRemote ? rangeToPylons : -1f;
+				sp.portableAccessRangePylonsToStorage = wasRemote ? rangeToStorage : 0;
+			}
+			Main.playerInventory = true;
+			SoundEngine.PlaySound(SoundID.MenuOpen);
+			_pendingRecipes = recipes;
+			_pendingTicks = 0;
+		}
+
+		private static MethodInfo _setSelectedRecipe;
+		private static FieldInfo _disableNetPrinting;
+
+		private static void UpdatePendingRecipe()
+		{
+			if (_pendingRecipes == null)
+				return;
+			// Desiste se o terminal nao abriu (ou fechou) em 3 segundos.
+			if (++_pendingTicks > 180) {
+				_pendingRecipes = null;
+				return;
+			}
+			if (!MagicUI.IsCraftingUIOpen() || MagicUI.CurrentlyRefreshing || MagicUI.RefreshUI || _pendingTicks < 3)
+				return;
+			Recipe[] recipes = _pendingRecipes;
+			_pendingRecipes = null;
+			try {
+				_setSelectedRecipe ??= typeof(CraftingGUI).GetMethod("SetSelectedRecipe", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+				_disableNetPrinting ??= typeof(CraftingGUI).GetField("disableNetPrintingForIsAvailable", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+				if (_setSelectedRecipe == null)
+					throw new MissingMethodException(nameof(CraftingGUI), "SetSelectedRecipe");
+				Recipe pick = recipes[0];
+				_disableNetPrinting?.SetValue(null, true);
+				try {
+					foreach (Recipe r in recipes) {
+						if (CraftingGUI.IsAvailable(r)) {
+							pick = r;
+							break;
+						}
+					}
+				}
+				finally {
+					_disableNetPrinting?.SetValue(null, false);
+				}
+				_setSelectedRecipe.Invoke(null, new object[] { pick });
+				MagicUI.SetRefresh();
+			}
+			catch (Exception e) {
+				// Versao do Magic Storage diferente da esperada: o terminal abre, so sem a receita selecionada.
+				ModContent.GetInstance<Terraprint>().Logger.Warn("Could not select the recipe in Magic Storage", e);
+			}
 		}
 	}
 
@@ -363,6 +487,8 @@ namespace Terraprint.Common.CrossMod
 
 		public UIScrollbar Scrollbar;
 		private readonly Item _item = new();
+		/// <summary>Indice (em MaterialsTracker.Entries) da linha sob o mouse, ou -1.</summary>
+		private int _hovered = -1;
 
 		private int VisibleRows => Math.Max(1, (int)(GetDimensions().Height / RowH));
 		private int FirstRow => Scrollbar == null ? 0 : (int)Math.Round(Scrollbar.ViewPosition);
@@ -379,10 +505,29 @@ namespace Terraprint.Common.CrossMod
 			base.Update(gameTime);
 			int count = MaterialsTracker.Entries.Count + 1;
 			Scrollbar?.SetView(VisibleRows, Math.Max(count, VisibleRows));
+			_hovered = -1;
+			if (IsMouseHovering && ProjectionSystem.HasProjection) {
+				var d = GetDimensions();
+				int row = (int)((Main.MouseScreen.Y - d.Y) / RowH) - 1;
+				int index = FirstRow + row;
+				if (row >= 0 && row < VisibleRows - 1 && index < MaterialsTracker.Entries.Count)
+					_hovered = index;
+			}
 			if (IsMouseHovering) {
 				Main.LocalPlayer.mouseInterface = true;
 				Terraria.GameInput.PlayerInput.LockVanillaMouseScroll("Terraprint/MagicStorage");
 			}
+		}
+
+		/// <summary>Clique esquerdo num material com receita: abre o Crafting Terminal com ela selecionada.</summary>
+		public override void LeftClick(UIMouseEvent evt)
+		{
+			base.LeftClick(evt);
+			var entries = MaterialsTracker.Entries;
+			if (_hovered < 0 || _hovered >= entries.Count || entries[_hovered].ItemType <= 0)
+				return;
+			SoundEngine.PlaySound(SoundID.MenuTick);
+			MagicStorageIntegration.OpenRecipe(entries[_hovered].ItemType);
 		}
 
 		protected override void DrawSelf(SpriteBatch sb)
@@ -408,7 +553,7 @@ namespace Terraprint.Common.CrossMod
 				var e = entries[first + k];
 				float y = d.Y + RowH * (k + 1);
 				var row = new Rectangle((int)d.X, (int)y, (int)d.Width, (int)RowH - 4);
-				bool hover = row.Contains(Main.MouseScreen.ToPoint()) && IsMouseHovering;
+				bool hover = first + k == _hovered;
 				TerraprintStyle.RoundedBox(sb, row, hover ? TerraprintStyle.RowHover : TerraprintStyle.Row, TerraprintStyle.PanelBorder);
 
 				long stored = MagicStorageIntegration.InStorage(e.ItemType);
@@ -432,10 +577,13 @@ namespace Terraprint.Common.CrossMod
 				TerraprintStyle.Text(sb, e.ItemType > 0 ? Short(stored) : "-", new Vector2(colStorage + numW / 2f, row.Y + 7f), TerraprintStyle.Title, scale, numW, 0.5f);
 
 				if (hover) {
-					Main.hoverItemName = name + "\n" + (e.Done ? Lang.UI("MSRowDone")
+					string tip = name + "\n" + (e.Done ? Lang.UI("MSRowDone")
 						: lacking == 0 ? Lang.UI("MSRowHave")
 						: stored >= lacking ? Lang.UI("MSRowStorage", lacking)
 						: Lang.UI("MSRowLacking", lacking - stored));
+					if (MagicStorageIntegration.RecipesFor(e.ItemType).Length > 0)
+						tip += "\n" + Lang.UI("MSRowCraft");
+					Main.hoverItemName = tip;
 				}
 			}
 		}

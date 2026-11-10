@@ -348,6 +348,9 @@ UI: {
 	MSRowHave: Você já tem o suficiente no inventário.
 	MSRowStorage: Pegue {0} do storage.
 	MSRowLacking: Faltam {0}, nem no inventário nem no storage.
+	MSRowCraft: Clique: abrir a receita no Crafting Terminal
+	MSNoRecipe: "[Terraprint] {0} não tem receita para craftar."
+	MSNoCraftingAccess: "[Terraprint] Nenhum Crafting Terminal está conectado a este storage."
 	MSWithdraw: Pegar o que falta
 	MSWithdrawTip: Tira do storage os materiais que faltam para terminar o blueprint (descontando o que já está no inventário) e põe no inventário.
 	MSWithdrew: "[Terraprint] {0} itens tirados do storage para o inventário."

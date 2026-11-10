@@ -187,5 +187,9 @@ Só com o Magic Storage ativo. Sem ele, nada muda.
 3. Arraste o painel do storage ou mude a altura dele: o botão e o painel do Terraprint acompanham.
 4. **Pegar o que falta** tira do storage o que falta (descontando o inventário) e põe no inventário. Com o inventário
    cheio, o que não couber volta para o storage e o chat avisa.
-5. Sem blueprint fixado, o painel avisa e o botão fica desligado. Em multiplayer, teste num servidor com o
+5. Clique esquerdo num material com receita (a dica do item avisa): o terminal do storage dá lugar ao Crafting Terminal
+   conectado, já com a receita do item selecionada (a primeira que dá para fazer agora, se houver mais de uma).
+   Sem Crafting Terminal no storage, ou item sem receita, o chat avisa. Com o terminal longe ou aberto pelo acesso
+   portátil, ele abre como acesso remoto.
+6. Sem blueprint fixado, o painel avisa e o botão fica desligado. Em multiplayer, teste num servidor com o
    Magic Storage: os itens chegam pelo próprio storage.
