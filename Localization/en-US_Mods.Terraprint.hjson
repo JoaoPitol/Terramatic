@@ -312,8 +312,8 @@ UI: {
 	SaveHint: After saving, the blueprint shows up in the Blueprints tab with its preview.
 	PreviewError: Could not read this file.
 	FileInfo: "{0} x {1}  ·  {2} tiles"
-	ModsUsed: "Mods: {0}"
-	ModsMissing: "(not loaded: {0})"
+	ModsUsed: Mods: {0}
+	ModsMissing: (not loaded: {0})
 	LoadHint: Double-click it in the list or press Load to project it in the world.
 	Subtitle: Building blueprints
 	PageLibrary: Library
@@ -328,7 +328,7 @@ UI: {
 	PageOptionsSub: Changes apply right away and are saved.
 	SearchHint: search...
 	PaletteSearchHint: search item or mod...
-	FromMod: "Mod: {0}"
+	FromMod: Mod: {0}
 	MSButton: Terraprint
 	MSButtonOpen: Terraprint (close)
 	MSButtonTip: Shows the blueprint placed on the map and how much of the missing materials this storage has.
@@ -346,7 +346,7 @@ UI: {
 	MSColStorage: Storage
 	MSRowDone: All placed.
 	MSRowHave: You already have enough in your inventory.
-	MSRowStorage: "Take {0} from the storage."
+	MSRowStorage: Take {0} from the storage.
 	MSRowLacking: "{0} missing, neither in your inventory nor in the storage."
 	MSWithdraw: Take what is missing
 	MSWithdrawTip: Takes the materials still needed to finish the blueprint (minus what is already in your inventory) out of the storage and into your inventory.

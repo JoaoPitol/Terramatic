@@ -312,8 +312,8 @@ UI: {
 	SaveHint: Depois de salvar, o blueprint aparece na aba Blueprints com a prévia.
 	PreviewError: Não foi possível ler este arquivo.
 	FileInfo: "{0} x {1}  ·  {2} blocos"
-	ModsUsed: "Mods: {0}"
-	ModsMissing: "(inativos: {0})"
+	ModsUsed: Mods: {0}
+	ModsMissing: (inativos: {0})
 	LoadHint: Clique duas vezes na lista ou em Carregar para projetar no mundo.
 	Subtitle: Blueprints de construção
 	PageLibrary: Biblioteca
@@ -328,7 +328,7 @@ UI: {
 	PageOptionsSub: Mudanças valem na hora e ficam salvas.
 	SearchHint: buscar...
 	PaletteSearchHint: buscar item ou mod...
-	FromMod: "Mod: {0}"
+	FromMod: Mod: {0}
 	MSButton: Terraprint
 	MSButtonOpen: Terraprint (fechar)
 	MSButtonTip: Mostra o blueprint fixado no mapa e quanto dos materiais que faltam está neste storage.
@@ -340,14 +340,14 @@ UI: {
 	MSNoProjection: Nenhum blueprint carregado. Abra o menu do Terraprint (K) e carregue um.
 	MSProjectionMoving: "{0} ({1} x {2}): seguindo o mouse, ainda não fixado"
 	MSProjectionLine: "{0} ({1} x {2})  ·  a {3} blocos daqui"
-	MSSummary: "Faltam colocar {0}: {1} no inventário, {2} dá para pegar do storage, {3} não tem."
+	MSSummary: Faltam colocar {0}: {1} no inventário, {2} dá para pegar do storage, {3} não tem.
 	MSColItem: Material
 	MSColInventory: Inventário
 	MSColStorage: Storage
 	MSRowDone: Tudo colocado.
 	MSRowHave: Você já tem o suficiente no inventário.
-	MSRowStorage: "Pegue {0} do storage."
-	MSRowLacking: "Faltam {0}, nem no inventário nem no storage."
+	MSRowStorage: Pegue {0} do storage.
+	MSRowLacking: Faltam {0}, nem no inventário nem no storage.
 	MSWithdraw: Pegar o que falta
 	MSWithdrawTip: Tira do storage os materiais que faltam para terminar o blueprint (descontando o que já está no inventário) e põe no inventário.
 	MSWithdrew: "[Terraprint] {0} itens tirados do storage para o inventário."
