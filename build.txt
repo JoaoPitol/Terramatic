@@ -6,3 +6,4 @@ hideCode = false
 hideResources = false
 includeSource = true
 side = Client
+weakReferences = MagicStorage@0.7.0.11

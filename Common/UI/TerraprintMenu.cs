@@ -632,6 +632,9 @@ namespace Terraprint.Common.UI
 			Toggle("OptBuildFurniture", c => c.AutoBuildFurniture, (c, v) => c.AutoBuildFurniture = v);
 			Toggle("OptBuildSlopes", c => c.AutoBuildSlopes, (c, v) => c.AutoBuildSlopes = v);
 
+			list.Add(new UISectionHeader(L("SecIntegrations")));
+			Toggle("OptMagicStorage", c => c.MagicStorageButton, (c, v) => c.MagicStorageButton = v);
+
 			var all = new UITextButton(L("AllOptions"), () => Cfg.Open()) { Tooltip = () => L("AllOptionsTip") };
 			all.Width.Set(0f, 1f);
 			all.Height.Set(BtnH, 0f);

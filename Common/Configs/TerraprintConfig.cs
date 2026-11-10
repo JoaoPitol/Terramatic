@@ -147,6 +147,10 @@ namespace Terraprint.Common.Configs
 		[DefaultValue(typeof(Color), "90, 255, 120, 255")]
 		public Color ColorCorrect;
 
+		[Header("Integrations")]
+		[DefaultValue(true)]
+		public bool MagicStorageButton;
+
 		/// <summary>Contador que muda sempre que alguma opcao e salva (o fantasma e o mapa se redesenham).</summary>
 		public static int ChangeCount { get; private set; }
 

@@ -24,6 +24,7 @@ Configs: {
 			Rendering: Renderização
 			Layers: Camadas
 			Actuator: Atuador
+			Integrations: Integração com outros mods
 		}
 
 		CaptureLiquids: {
@@ -119,6 +120,11 @@ Configs: {
 		ColorCorrect: {
 			Label: Cor do certo
 			Tooltip: Blocos já certos (quando destacados).
+		}
+
+		MagicStorageButton: {
+			Label: Botão no Magic Storage
+			Tooltip: Com o Magic Storage ativo, mostra um botão Terraprint ao lado do terminal do storage, com o blueprint fixado e os materiais que faltam.
 		}
 
 		ShowChatMessages: {
@@ -323,6 +329,32 @@ UI: {
 	SearchHint: buscar...
 	PaletteSearchHint: buscar item ou mod...
 	FromMod: "Mod: {0}"
+	MSButton: Terraprint
+	MSButtonOpen: Terraprint (fechar)
+	MSButtonTip: Mostra o blueprint fixado no mapa e quanto dos materiais que faltam está neste storage.
+	MSTitle: Terraprint no Magic Storage
+	MSStorage: Storage
+	MSStorageLine: "{0} unidades  ·  {1}/{2} espaços  ·  {3} itens ({4} tipos)"
+	MSNoHeart: Não foi possível ler este storage.
+	MSBlueprint: Blueprint no mapa
+	MSNoProjection: Nenhum blueprint carregado. Abra o menu do Terraprint (K) e carregue um.
+	MSProjectionMoving: "{0} ({1} x {2}): seguindo o mouse, ainda não fixado"
+	MSProjectionLine: "{0} ({1} x {2})  ·  a {3} blocos daqui"
+	MSSummary: "Faltam colocar {0}: {1} no inventário, {2} dá para pegar do storage, {3} não tem."
+	MSColItem: Material
+	MSColInventory: Inventário
+	MSColStorage: Storage
+	MSRowDone: Tudo colocado.
+	MSRowHave: Você já tem o suficiente no inventário.
+	MSRowStorage: "Pegue {0} do storage."
+	MSRowLacking: "Faltam {0}, nem no inventário nem no storage."
+	MSWithdraw: Pegar o que falta
+	MSWithdrawTip: Tira do storage os materiais que faltam para terminar o blueprint (descontando o que já está no inventário) e põe no inventário.
+	MSWithdrew: "[Terraprint] {0} itens tirados do storage para o inventário."
+	MSWithdrewPartial: "[Terraprint] {0} itens tirados do storage; o inventário encheu e o resto ficou no storage."
+	MSWithdrawFull: "[Terraprint] O inventário está cheio. Libere espaço e tente de novo."
+	MSWithdrawNothing: "[Terraprint] Nada para pegar: o storage não tem os materiais que faltam."
+	MSWithdrawRequested: "[Terraprint] Pedido de {0} itens enviado ao storage."
 	NewBlank: Nova em branco
 	NewBlankTip: Cria um blueprint vazio e abre no editor.
 	NewBlankName: Nova construção
@@ -434,6 +466,9 @@ UI: {
 	OptBuildFurnitureTip: A construção automática também coloca móveis e objetos grandes.
 	OptBuildSlopes: Aplicar rampas e atuadores
 	OptBuildSlopesTip: Os blocos ficam com a rampa ou meio-bloco do blueprint. Atuadores são colocados se você tiver no inventário.
+	SecIntegrations: Outros mods
+	OptMagicStorage: Botão no Magic Storage
+	OptMagicStorageTip: Com o Magic Storage ativo, mostra um botão Terraprint ao lado do terminal do storage, com o blueprint fixado e os materiais que faltam.
 	EditorTitle: Editor de schematic
 	EditorProject: Projetar
 	EditorProjectTip: Salva e coloca este blueprint no mundo.
