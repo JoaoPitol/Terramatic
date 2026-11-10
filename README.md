@@ -36,8 +36,20 @@ Mod para tModLoader que salva construções do Terraria como blueprints e projet
 | `Common/UI` | Menu, editor de schematic, paleta de itens, grade de materiais, prévias e controles (interruptor, barra, listas) |
 | `Assets/UI` | Ícones dos botões do menu |
 | `Common/Configs` | Opções do mod |
+| `Common/CrossMod` | Integrações opcionais com outros mods (Magic Storage) |
 | `Localization` | Textos em português (pt-BR) e inglês (en-US) |
 
 O formato `.tprint` é um TagCompound comprimido: tamanho, paletas de tipos de bloco/parede por
 nome (`Terraria/Dirt`, `OutroMod/Tijolo`) e as células em binário. Blueprints que usam blocos de
-mods desativados carregam mesmo assim; esses blocos são ignorados com aviso no chat.
+mods desativados carregam mesmo assim: esses blocos ficam fora do fantasma (o chat diz quais mods
+faltam), mas continuam guardados e voltam para o arquivo se ele for salvo de novo pelo editor.
+
+## Blocos de mods e integrações
+
+- Blocos, paredes e móveis de qualquer mod (Calamity, Thorium...) funcionam como os vanilla: fantasma,
+  materiais, progresso, editor e construção automática. A Biblioteca mostra os mods que cada blueprint usa,
+  e a busca da paleta do editor aceita o nome do mod.
+- **Magic Storage** (opcional, `weakReferences`): com ele ativo, o terminal do storage ganha um botão
+  **Terraprint** que mostra o storage, o blueprint fixado e quanto dos materiais que faltam está no
+  inventário e no storage, com um botão para pegar o que falta. O código fica em `Common/CrossMod`
+  e só é carregado quando o Magic Storage está ativo.

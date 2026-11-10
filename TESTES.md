@@ -159,3 +159,33 @@ O mod é só do cliente: funciona num servidor **sem** o mod (ou com Host & Play
 4. Móveis aparecem inteiros e são apagados inteiros. **Bordas +4** aumenta a área, **Cortar vazio** tira bordas vazias.
 5. **Salvar** grava no mesmo arquivo (com * quando há mudanças). Se esse blueprint estiver projetado, o fantasma
    atualiza na hora. **Projetar** salva e coloca no mundo. **X** com mudanças pede confirmação.
+
+## Passo 12: blocos de mods
+
+Teste com Calamity, Thorium ou outro mod de conteúdo ativo.
+
+1. Construa algo com blocos, paredes e móveis do mod e salve a área. Na **Biblioteca**, a linha de baixo mostra
+   `Mods: Calamity Mod` (os mods que o blueprint usa).
+2. Carregue e fixe: o fantasma mostra os blocos do mod com a textura certa, e **Materiais** lista os itens do mod.
+   **Construir** e **Construir tudo** colocam os blocos e móveis do mod.
+3. Salve uma área de bioma do mod com paredes naturais (as que não têm item). Em **Materiais** elas aparecem com o
+   item da parede que o jogador coloca, e essa parede conta como certa no progresso.
+4. No editor, busque o nome do mod na paleta (ex.: "calamity"): aparecem só os itens dele. A dica do item diz o mod.
+5. Desative o mod e recarregue. Na **Biblioteca** aparece `(inativos: CalamityMod)`. Ao carregar, o chat avisa quais
+   mods faltam e esses blocos ficam fora do fantasma. Abra no **Editor**, mude um bloco vanilla e salve.
+   Ative o mod de novo: os blocos do mod continuam no blueprint.
+
+## Passo 13: Magic Storage (opcional)
+
+Só com o Magic Storage ativo. Sem ele, nada muda.
+
+1. Fixe um blueprint e abra o terminal do storage (coração, acesso ou acesso remoto). Ao lado do painel do storage
+   aparece o botão **Terraprint**. Ele some ao fechar o storage e pode ser desligado em **Opções > Outros mods**.
+2. Clique nele: abre o painel com o resumo do storage (unidades, espaços, itens e tipos), o blueprint (nome,
+   tamanho, distância e progresso) e a lista de materiais com **Falta**, **Inventário** e **Storage**.
+   Verde: o inventário já basta; amarelo: o storage cobre; vermelho: não tem o suficiente. Passe o mouse para ver a dica.
+3. Arraste o painel do storage ou mude a altura dele: o botão e o painel do Terraprint acompanham.
+4. **Pegar o que falta** tira do storage o que falta (descontando o inventário) e põe no inventário. Com o inventário
+   cheio, o que não couber volta para o storage e o chat avisa.
+5. Sem blueprint fixado, o painel avisa e o botão fica desligado. Em multiplayer, teste num servidor com o
+   Magic Storage: os itens chegam pelo próprio storage.
