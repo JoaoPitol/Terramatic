@@ -321,6 +321,8 @@ UI: {
 	PageOptions: Opções
 	PageOptionsSub: Mudanças valem na hora e ficam salvas.
 	SearchHint: buscar...
+	PaletteSearchHint: buscar item ou mod...
+	FromMod: "Mod: {0}"
 	NewBlank: Nova em branco
 	NewBlankTip: Cria um blueprint vazio e abre no editor.
 	NewBlankName: Nova construção

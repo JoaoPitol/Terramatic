@@ -23,6 +23,9 @@ namespace Terraprint.Common.UI
 		public int Style;
 		public int WallType;
 		public string Name;
+		/// <summary>Nome do mod que adiciona o item (null no vanilla).</summary>
+		public string ModName;
+		/// <summary>Nome do item e do mod, em minusculas: a busca acha "calamity", "thorium"...</summary>
 		public string SearchName;
 
 		public bool IsWall => WallType > 0;
@@ -62,7 +65,8 @@ namespace Terraprint.Common.UI
 						Style = item.placeStyle,
 						Category = Classify(item.createTile, item.placeStyle),
 						Name = item.Name,
-						SearchName = item.Name.ToLowerInvariant(),
+						ModName = ModName(item),
+						SearchName = SearchText(item),
 					});
 				}
 				else if (item.createWall > WallID.None && item.createWall < WallLoader.WallCount) {
@@ -73,10 +77,20 @@ namespace Terraprint.Common.UI
 						WallType = item.createWall,
 						Category = PaletteCategory.Walls,
 						Name = item.Name,
-						SearchName = item.Name.ToLowerInvariant(),
+						ModName = ModName(item),
+						SearchName = SearchText(item),
 					});
 				}
 			}
+		}
+
+		private static string ModName(Item item) => item.ModItem?.Mod.DisplayNameClean;
+
+		private static string SearchText(Item item)
+		{
+			var mod = item.ModItem?.Mod;
+			string text = mod == null ? item.Name : item.Name + "\n" + mod.DisplayNameClean + "\n" + mod.Name;
+			return text.ToLowerInvariant();
 		}
 
 		private static PaletteCategory Classify(int tile, int style)
@@ -225,7 +239,7 @@ namespace Terraprint.Common.UI
 				var item = ContentSamples.ItemsByType.TryGetValue(e.ItemType, out var sample) ? sample : _item;
 				ItemSlot.DrawItemIcon(item, ItemSlot.Context.InventoryItem, sb, r.Center.ToVector2(), item.scale, 26f, Color.White * TerraprintStyle.IconAlpha(active, hover, true));
 				if (hover)
-					Main.hoverItemName = e.Name;
+					Main.hoverItemName = e.ModName == null ? e.Name : e.Name + "\n" + Lang.UI("FromMod", e.ModName);
 			}
 			if (_visible.Count == 0) {
 				var d = GetDimensions();
@@ -253,7 +267,7 @@ namespace Terraprint.Common.UI
 			_categories = categories;
 			_category = categories[0];
 
-			_search = new UITextBox(Lang.UI("SearchHint"));
+			_search = new UITextBox(Lang.UI("PaletteSearchHint"));
 			_search.Width.Set(0f, 1f);
 			_search.Height.Set(30f, 0f);
 			Append(_search);
