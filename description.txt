@@ -9,7 +9,8 @@ Terraprint: salve suas construções como blueprints e reconstrua em qualquer lu
 - Todas as opções podem ser ligadas e desligadas nas configurações do mod
 
 Abra o menu com a tecla K (pode trocar em Configurações > Controles).
-Funciona em single player e multiplayer (o servidor também precisa do mod).
+Crie e edite blueprints também no navegador: https://terramatic.com.br
+Funciona em single player e multiplayer. O mod é só do cliente: dá para usar em qualquer servidor, mesmo sem o mod instalado nele.
 
 ---
 
@@ -24,4 +25,5 @@ Terraprint: save your builds as blueprints and rebuild them anywhere.
 - Every option can be turned on or off in the mod config
 
 Open the menu with K (change it in Settings > Controls).
-Works in single player and multiplayer (the server needs the mod too).
+Create and edit blueprints in your browser too: https://terramatic.com.br
+Works in single player and multiplayer. The mod is client-side only: it works on any server, even one without the mod.

@@ -11,7 +11,7 @@ using Terraria.UI;
 
 namespace Terraprint.Common.UI
 {
-	/// <summary>Item da barra lateral: icone + nome. O ativo fica com uma faixa dourada a esquerda.</summary>
+	/// <summary>Aba da barra lateral: icone + nome num painel do jogo. A ativa fica clara, com borda e texto dourados.</summary>
 	public class UINavButton : UIElement
 	{
 		private readonly string _icon;
@@ -42,19 +42,29 @@ namespace Terraprint.Common.UI
 				Main.LocalPlayer.mouseInterface = true;
 		}
 
+		public override void MouseOver(UIMouseEvent evt)
+		{
+			base.MouseOver(evt);
+			if (!IsActive())
+				SoundEngine.PlaySound(SoundID.MenuTick);
+		}
+
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = GetDimensions().ToRectangle();
 			bool active = IsActive();
-			if (active || IsMouseHovering)
-				TerraprintStyle.RoundedBox(sb, r, active ? TerraprintStyle.CardHover : TerraprintStyle.Card, Color.Black * (active ? 0.9f : 0.5f));
+			bool hover = IsMouseHovering;
+			Color bg = active ? TerraprintStyle.TabColor : hover ? Color.Lerp(TerraprintStyle.TabIdle, TerraprintStyle.TabColor, 0.6f) : TerraprintStyle.TabIdle;
+			Color border = active ? TerraprintStyle.Highlight : TerraprintStyle.PanelBorder;
+			TerraprintStyle.RoundedBox(sb, r, bg, border);
 			if (active)
-				TerraprintStyle.Fill(sb, new Rectangle(r.X + 3, r.Y + 8, 3, r.Height - 16), TerraprintStyle.Accent);
+				TerraprintStyle.Fill(sb, new Rectangle(r.X + 6, r.Y + 3, r.Width - 12, 2), Color.White * 0.1f);
 
 			var tex = TerraprintStyle.Icon(_icon);
-			float a = active ? 1f : IsMouseHovering ? 0.95f : 0.65f;
-			sb.Draw(tex, new Vector2(r.X + 12, r.Y + (r.Height - 22) / 2f), null, Color.White * a, 0f, Vector2.Zero, 22f / tex.Height, SpriteEffects.None, 0f);
-			TerraprintStyle.Text(sb, _label(), new Vector2(r.X + 42, r.Y + r.Height / 2f - 9f), active ? TerraprintStyle.Accent : Color.White * a, 0.85f, r.Width - 48f);
+			float a = active ? 1f : hover ? 0.95f : 0.75f;
+			sb.Draw(tex, new Vector2(r.X + 10, r.Y + (r.Height - 22) / 2f), null, Color.White * a, 0f, Vector2.Zero, 22f / tex.Height, SpriteEffects.None, 0f);
+			Color text = active ? TerraprintStyle.Highlight : hover ? Color.Lerp(TerraprintStyle.Title, TerraprintStyle.Highlight, 0.35f) : TerraprintStyle.Title * 0.9f;
+			TerraprintStyle.Text(sb, _label(), new Vector2(r.X + 40, r.Y + r.Height / 2f - 9f), text, 0.85f, r.Width - 46f);
 		}
 	}
 
@@ -73,8 +83,8 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = GetDimensions().ToRectangle();
-			TerraprintStyle.Text(sb, _text, new Vector2(r.X + 2, r.Y + 8), TerraprintStyle.Accent, 0.9f);
-			TerraprintStyle.Fill(sb, new Rectangle(r.X, r.Bottom - 2, r.Width, 1), TerraprintStyle.Separator);
+			TerraprintStyle.Text(sb, _text, new Vector2(r.X + 4, r.Y + 6), TerraprintStyle.Accent, 0.9f);
+			TerraprintStyle.DrawSeparator(sb, r.X, r.Bottom - 5, r.Width);
 		}
 	}
 
@@ -104,8 +114,8 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = Box;
-			TerraprintStyle.RoundedBox(sb, r, IsMouseHovering ? TerraprintStyle.CardHover : TerraprintStyle.Card, Color.Black * 0.6f);
-			TerraprintStyle.Text(sb, Label, new Vector2(r.X + 10, r.Y + 9), Color.White, 0.8f, r.Width * 0.55f);
+			TerraprintStyle.RoundedBox(sb, r, IsMouseHovering ? TerraprintStyle.CardHover : TerraprintStyle.Card, TerraprintStyle.PanelBorder);
+			TerraprintStyle.Text(sb, Label, new Vector2(r.X + 10, r.Y + 9), TerraprintStyle.Title, 0.8f, r.Width * 0.55f);
 			if (IsMouseHovering && !string.IsNullOrEmpty(Tip))
 				Main.hoverItemName = Tip;
 		}
@@ -139,9 +149,10 @@ namespace Terraprint.Common.UI
 		public static void DrawSwitch(SpriteBatch sb, Rectangle row, bool on)
 		{
 			var track = new Rectangle(row.Right - 52, row.Y + row.Height / 2 - 9, 40, 18);
-			TerraprintStyle.RoundedBox(sb, track, on ? TerraprintStyle.ButtonActive : TerraprintStyle.InputBackground, Color.Black);
+			TerraprintStyle.RoundedBox(sb, track, on ? TerraprintStyle.ToggleOn : TerraprintStyle.InputBackground, TerraprintStyle.PanelBorder);
 			var knob = new Rectangle(on ? track.Right - 16 : track.X + 2, track.Y + 2, 14, 14);
-			TerraprintStyle.Fill(sb, knob, on ? Color.White : TerraprintStyle.Muted);
+			TerraprintStyle.Fill(sb, knob, on ? TerraprintStyle.Title : TerraprintStyle.Muted);
+			TerraprintStyle.Fill(sb, new Rectangle(knob.X, knob.Bottom - 2, knob.Width, 2), Color.Black * 0.3f);
 		}
 	}
 
@@ -203,11 +214,12 @@ namespace Terraprint.Common.UI
 			base.DrawSelf(sb);
 			float v = _dragging ? _value : _get();
 			var t = Track;
+			TerraprintStyle.Fill(sb, new Rectangle(t.X - 1, t.Y - 1, t.Width + 2, t.Height + 2), TerraprintStyle.PanelBorder);
 			TerraprintStyle.Fill(sb, t, TerraprintStyle.InputBackground);
 			float f = (_max - _min) <= 0f ? 0f : (v - _min) / (_max - _min);
 			TerraprintStyle.Fill(sb, new Rectangle(t.X, t.Y, (int)(t.Width * f), t.Height), TerraprintStyle.Accent);
 			var knob = new Rectangle((int)(t.X + t.Width * f) - 5, t.Y - 6, 10, 18);
-			TerraprintStyle.RoundedBox(sb, knob, Color.White, Color.Black);
+			TerraprintStyle.RoundedBox(sb, knob, TerraprintStyle.Title, TerraprintStyle.PanelBorder);
 			TerraprintStyle.Text(sb, v.ToString(_step < 1f ? "0.00" : "0"), new Vector2(Box.Right - 14, Box.Y + 9), TerraprintStyle.Highlight, 0.8f, 0f, 1f);
 		}
 	}
@@ -259,8 +271,8 @@ namespace Terraprint.Common.UI
 
 		public static void DrawButton(SpriteBatch sb, Rectangle r, string text, bool hover, bool enabled)
 		{
-			TerraprintStyle.RoundedBox(sb, r, !enabled ? TerraprintStyle.ButtonDisabled : hover ? TerraprintStyle.ButtonHover : TerraprintStyle.Button, Color.Black);
-			TerraprintStyle.Text(sb, text, new Vector2(r.Center.X, r.Y + 3), enabled ? Color.White : TerraprintStyle.Muted, 0.9f, 0f, 0.5f);
+			TerraprintStyle.RoundedBox(sb, r, !enabled ? TerraprintStyle.ButtonDisabled : hover ? TerraprintStyle.ButtonHover : TerraprintStyle.Button, TerraprintStyle.PanelBorder);
+			TerraprintStyle.Text(sb, text, new Vector2(r.Center.X, r.Y + 3), !enabled ? TerraprintStyle.Muted : hover ? TerraprintStyle.Highlight : TerraprintStyle.Title, 0.9f, 0f, 0.5f);
 		}
 	}
 
@@ -359,7 +371,7 @@ namespace Terraprint.Common.UI
 			var plus = SlotRect(list.Count);
 			bool ph = plus.Contains(m);
 			TerraprintStyle.DrawSlot(sb, plus, ph, ph, true);
-			TerraprintStyle.Text(sb, "+", new Vector2(plus.Center.X, plus.Y + 6), Color.White, 1.1f, 0f, 0.5f);
+			TerraprintStyle.Text(sb, "+", new Vector2(plus.Center.X, plus.Y + 6), ph ? TerraprintStyle.Highlight : TerraprintStyle.Title, 1.1f, 0f, 0.5f);
 			if (ph)
 				Main.hoverItemName = Lang.UI("ItemAddTip");
 			if (list.Count == 0)

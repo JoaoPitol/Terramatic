@@ -1,0 +1,58 @@
+[h1]Terraprint[/h1]
+[b]Salve suas construções como blueprints e reconstrua em qualquer lugar.[/b]
+
+[list]
+[*] Selecione uma área e salve como arquivo [b].tprint[/b] (dá para compartilhar com amigos)
+[*] Carregue um blueprint, gire, espelhe e mova antes de fixar no mundo
+[*] Um "fantasma" mostra o que falta colocar, o que está errado e o que já está certo
+[*] O blueprint aparece no minimapa e no mapa grande, com o progresso
+[*] Lista de materiais: quanto precisa, quanto falta e quanto você tem no inventário
+[*] Construção automática: segure o botão (ou a tecla [b]P[/b]) e o mod coloca os blocos ao seu alcance, gastando os itens do inventário
+[*] Editor de schematic dentro do jogo, com paleta de blocos, paredes e móveis
+[*] Todas as opções podem ser ligadas e desligadas nas configurações do mod
+[/list]
+
+Abra o menu com a tecla [b]K[/b] (pode trocar em Configurações > Controles).
+Os blueprints ficam em [i]Documents/My Games/Terraria/tModLoader/Terraprint[/i].
+
+[h2]Multiplayer[/h2]
+O mod é só do cliente: funciona em qualquer servidor, mesmo sem o mod instalado nele. Em servidores, a construção automática coloca no máximo 15 blocos por segundo para não cair no anti-spam do jogo.
+
+[h2]Site[/h2]
+Crie, edite e compartilhe blueprints no navegador: [url=https://terramatic.com.br]terramatic.com.br[/url]
+
+Este é um projeto pessoal, sem fins lucrativos, criado com a ajuda de LLMs. Se encontrar algum bug ou tiver ideias de novas funcionalidades ou mudanças, fique à vontade para comentar!
+
+[hr][/hr]
+
+[h1]Terraprint (English)[/h1]
+[b]Save your builds as blueprints and rebuild them anywhere.[/b]
+
+[list]
+[*] Select an area and save it as a [b].tprint[/b] file (you can share it with friends)
+[*] Load a blueprint, rotate, mirror and move it before placing it in the world
+[*] A "ghost" shows what is missing, what is wrong and what is already right
+[*] The blueprint shows on the minimap and the full map, with progress
+[*] Materials list: how many you need, how many are left and how many you have
+[*] Auto-build: hold the button (or the [b]P[/b] key) and the mod places blocks within reach, using items from your inventory
+[*] In-game schematic editor with a palette of tiles, walls and furniture
+[*] Every option can be turned on or off in the mod config
+[/list]
+
+Open the menu with [b]K[/b] (change it in Settings > Controls).
+Blueprints are stored in [i]Documents/My Games/Terraria/tModLoader/Terraprint[/i].
+
+[h2]Multiplayer[/h2]
+The mod is client-side only: it works on any server, even one without the mod. On servers, auto-build places at most 15 blocks per second to avoid the game's anti-spam kick.
+
+[h2]Website[/h2]
+Create, edit and share blueprints in your browser: [url=https://terramatic.com.br]terramatic.com.br[/url]
+
+[h2]Known limitations[/h2]
+[list]
+[*] Wires and chest contents are not saved
+[*] When rotating, furniture stays upright and only its position rotates
+[*] One projection per world
+[/list]
+
+This is a personal, non-profit project, made with the help of LLMs. If you find a bug or have ideas for new features or changes, feel free to leave a comment!

@@ -23,6 +23,7 @@ namespace Terraprint.Common.UI
 			Hint = hint;
 			SetPadding(6);
 			BackgroundColor = TerraprintStyle.InputBackground;
+			BorderColor = TerraprintStyle.PanelBorder;
 		}
 
 		public void Focus()
@@ -51,7 +52,7 @@ namespace Terraprint.Common.UI
 
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
-			BorderColor = Focused ? Color.Gold : TerraprintStyle.PanelBorder;
+			BorderColor = Focused ? TerraprintStyle.Highlight : TerraprintStyle.PanelBorder;
 			base.DrawSelf(spriteBatch);
 
 			if (Focused) {
@@ -71,7 +72,7 @@ namespace Terraprint.Common.UI
 			string shown = showHint ? Hint : Text;
 			if (Focused && (++_blink / 30) % 2 == 0)
 				shown += "|";
-			Utils.DrawBorderString(spriteBatch, shown, pos, showHint ? TerraprintStyle.Muted * 0.8f : Color.White, 0.85f);
+			Utils.DrawBorderString(spriteBatch, shown, pos, showHint ? TerraprintStyle.Muted * 0.8f : TerraprintStyle.Title, 0.85f);
 		}
 	}
 

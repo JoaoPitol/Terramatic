@@ -272,6 +272,8 @@ namespace Terraprint.Common.UI
 		{
 			_onClose = onClose;
 			DragHeight = HeaderH + Pad;
+			HeaderHeight = HeaderH + Pad;
+			HeaderInset = 6f;
 			SetPadding(Pad);
 		}
 
@@ -303,9 +305,8 @@ namespace Terraprint.Common.UI
 			Top.Set(Math.Max(20f, (sh - h) / 2f - 20f), 0f);
 
 			// Cabecalho: titulo, nome, salvar, projetar e fechar.
-			var title = new Terraria.GameContent.UI.Elements.UIText(Lang.UI("EditorTitle"), 1.05f);
-			title.Top.Set(5f, 0f);
-			Append(title);
+			var title = new UILabel(() => Lang.UI("EditorTitle"), 0.5f, TerraprintStyle.Title) { Big = true };
+			Put(this, title, 4f, 0f, 180f, 30f);
 			_name = new UITextBox(Lang.UI("NameHint")) { Text = Bp?.Name ?? "" };
 			Put(this, _name, 190f, 0f, 240f, 30f);
 
@@ -321,7 +322,7 @@ namespace Terraprint.Common.UI
 				IsActive = () => Dirty,
 			}, 32f + 100f + 2 * Gap, 0f, () => 100f);
 
-			float top = HeaderH + 10f;
+			float top = HeaderH + 14f;
 
 			// Coluna de ferramentas.
 			var tools = new (EditorTool tool, string key)[] {
@@ -859,7 +860,7 @@ namespace Terraprint.Common.UI
 		{
 			var d = GetDimensions();
 			var box = d.ToRectangle();
-			TerraprintStyle.RoundedBox(sb, box, TerraprintStyle.PreviewBackground, Color.Black);
+			TerraprintStyle.RoundedBox(sb, box, TerraprintStyle.PreviewBackground, TerraprintStyle.PanelBorder);
 
 			var bp = _ed.Bp;
 			if (bp == null)
@@ -887,7 +888,7 @@ namespace Terraprint.Common.UI
 
 			// Fundo da area do blueprint.
 			var area = new Rectangle((int)origin.X, (int)origin.Y, (int)(bp.Width * z), (int)(bp.Height * z));
-			TerraprintStyle.Fill(sb, area, new Color(40, 46, 70) * 0.6f);
+			TerraprintStyle.Fill(sb, area, TerraprintStyle.SlotColor * 0.55f);
 
 			if (_zoom < 8) {
 				// Longe: cores do mapa (mais leve e mais legivel).

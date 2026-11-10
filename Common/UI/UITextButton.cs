@@ -40,7 +40,7 @@ namespace Terraprint.Common.UI
 			Label = label;
 			OnClick = onClick;
 			SetPadding(0f);
-			BorderColor = Color.Black;
+			BorderColor = TerraprintStyle.PanelBorder;
 		}
 
 		/// <param name="rotation">Em quartos de volta (para reaproveitar a seta para cima).</param>
@@ -78,29 +78,49 @@ namespace Terraprint.Common.UI
 				Main.LocalPlayer.mouseInterface = true;
 		}
 
+		public override void MouseOver(UIMouseEvent evt)
+		{
+			base.MouseOver(evt);
+			if (IsEnabled())
+				SoundEngine.PlaySound(SoundID.MenuTick);
+		}
+
 		protected override void DrawSelf(SpriteBatch spriteBatch)
 		{
 			bool enabled = IsEnabled();
 			bool active = IsActive() || Held;
 			Color? tint = Tint();
-			if (!enabled)
+			// Como os botoes dos menus do jogo: o painel clareia ao passar o mouse;
+			// o selecionado ganha borda e texto dourados.
+			Color textColor = TerraprintStyle.Title;
+			BorderColor = TerraprintStyle.PanelBorder;
+			if (!enabled) {
 				BackgroundColor = TerraprintStyle.ButtonDisabled;
-			else if (tint.HasValue)
+				textColor = TerraprintStyle.Muted * 0.8f;
+			}
+			else if (tint.HasValue) {
 				BackgroundColor = IsMouseHovering ? Color.Lerp(tint.Value, Color.White, 0.2f) : tint.Value;
-			else if (active)
+			}
+			else if (active) {
 				BackgroundColor = IsMouseHovering ? TerraprintStyle.ButtonActiveHover : TerraprintStyle.ButtonActive;
-			else
+				BorderColor = TerraprintStyle.Highlight;
+				textColor = TerraprintStyle.Highlight;
+			}
+			else {
 				BackgroundColor = IsMouseHovering ? TerraprintStyle.ButtonHover : TerraprintStyle.Button;
+				if (IsMouseHovering)
+					textColor = Color.Lerp(TerraprintStyle.Title, TerraprintStyle.Highlight, 0.35f);
+			}
 			base.DrawSelf(spriteBatch);
 
 			var d = GetDimensions();
 			Vector2 center = new(d.X + d.Width / 2f, d.Y + d.Height / 2f);
-			Color color = enabled ? Color.White : new Color(150, 150, 160);
+			Color color = textColor;
 
 			if (_icon != null) {
 				var tex = TerraprintStyle.Icon(_icon);
 				float s = Math.Min(1f, (d.Height - 8f) / tex.Height);
-				spriteBatch.Draw(tex, center, null, color, _rotation, tex.Size() / 2f, s, SpriteEffects.None, 0f);
+				spriteBatch.Draw(tex, center, null, enabled ? Color.White : Color.White * 0.45f, _rotation, tex.Size() / 2f, s, SpriteEffects.None, 0f);
 			}
 			else {
 				string text = Label?.Invoke() ?? "";

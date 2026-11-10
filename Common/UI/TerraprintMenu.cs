@@ -26,7 +26,12 @@ namespace Terraprint.Common.UI
 
 		private const float SidebarW = 178f;
 		private const float Pad = 14f;
-		private const float PageTop = 52f;
+		private const float Inset = 8f;
+		private const float HeaderH = 44f;
+		// Topo da area abaixo do cabecalho (barra lateral e titulo da pagina).
+		private const float ContentTop = Inset + HeaderH + Inset;
+		private const float PageLeft = Inset + SidebarW + Pad;
+		private const float PageTop = ContentTop + 58f;
 		private const float BtnH = 32f;
 		private const float Gap = 6f;
 
@@ -64,8 +69,8 @@ namespace Terraprint.Common.UI
 		public override void OnInitialize()
 		{
 			float sw = Main.screenWidth / Main.UIScale, sh = Main.screenHeight / Main.UIScale;
-			float w = Math.Min(900f, sw - 40f), h = Math.Min(540f, sh - 140f);
-			_panel = new UITerraprintPanel { DragHeight = 44f };
+			float w = Math.Min(920f, sw - 40f), h = Math.Min(600f, sh - 100f);
+			_panel = new UITerraprintPanel { DragHeight = Inset + HeaderH, HeaderHeight = HeaderH, HeaderInset = Inset };
 			_panel.Width.Set(w, 0f);
 			_panel.Height.Set(h, 0f);
 			_panel.Left.Set((sw - w) / 2f, 0f);
@@ -76,12 +81,12 @@ namespace Terraprint.Common.UI
 			BuildSidebar();
 
 			var close = new UITextButton("X", UISystem.CloseMenu) { Tooltip = () => Lang.UI("Close") };
-			Put(_panel, close, -Pad - 30f, Pad - 2f, 30f, 30f, rightAligned: true);
+			Put(_panel, close, -Inset - 8f - 30f, Inset + (HeaderH - 30f) / 2f, 30f, 30f, rightAligned: true);
 
 			_body = new UIElement();
-			_body.Left.Set(SidebarW + Pad, 0f);
+			_body.Left.Set(PageLeft, 0f);
 			_body.Top.Set(PageTop, 0f);
-			_body.Width.Set(-SidebarW - 2 * Pad, 1f);
+			_body.Width.Set(-PageLeft - Pad, 1f);
 			_body.Height.Set(-PageTop - Pad, 1f);
 			_panel.Append(_body);
 
@@ -130,15 +135,22 @@ namespace Terraprint.Common.UI
 
 		private void BuildSidebar()
 		{
+			// Cabecalho: nome do mod com a fonte de titulos do jogo e o subtitulo ao lado.
+			var title = new UILabel(() => Lang.UI("Title"), 0.62f, TerraprintStyle.Title) { Big = true, VCenter = true };
+			Put(_panel, title, Inset + 14f, Inset, 260f, HeaderH);
+			var subtitle = new UILabel(() => Lang.UI("Subtitle"), 0.75f, TerraprintStyle.Title * 0.8f) { VCenter = true };
+			float titleW = Terraria.GameContent.FontAssets.DeathText.Value.MeasureString(Lang.UI("Title")).X * 0.62f;
+			Put(_panel, subtitle, Inset + 14f + titleW + 16f, Inset, 400f, HeaderH);
+
+			// Barra lateral: abas empilhadas num painel mais escuro, como as abas de categoria do jogo.
 			var side = new UIBox(TerraprintStyle.Sidebar);
+			side.Left.Set(Inset, 0f);
+			side.Top.Set(ContentTop, 0f);
 			side.Width.Set(SidebarW, 0f);
-			side.Height.Set(0f, 1f);
+			side.Height.Set(-ContentTop - Inset, 1f);
 			_panel.Append(side);
 
-			Put(side, new UILabel(() => Lang.UI("Title"), 1.2f, Color.White), 16f, 14f, SidebarW - 24f, 28f);
-			Put(side, new UILabel(() => Lang.UI("Subtitle"), 0.72f, TerraprintStyle.Muted), 16f, 40f, SidebarW - 24f, 18f);
-
-			float y = 72f;
+			float y = 10f;
 			for (int i = 0; i < Pages.Length; i++) {
 				var tab = (Tab)i;
 				string key = Pages[i].key;
@@ -158,9 +170,15 @@ namespace Terraprint.Common.UI
 			badge.OnLeftClick += (_, _) => ShowTab(Tab.Projection);
 			side.Append(badge);
 
-			// Titulo da pagina, ao lado da barra.
-			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key), 1.05f, Color.White), SidebarW + Pad, Pad, 400f, 26f);
-			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key + "Sub"), 0.72f, TerraprintStyle.Muted), SidebarW + Pad, Pad + 24f, 560f, 18f);
+			// Titulo da pagina, ao lado da barra, com o divisor do jogo embaixo.
+			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key), 1.05f, TerraprintStyle.Highlight), PageLeft, ContentTop + 2f, 400f, 26f);
+			Put(_panel, new UILabel(() => Lang.UI(Pages[(int)_tab].key + "Sub"), 0.75f, TerraprintStyle.Muted), PageLeft, ContentTop + 26f, 560f, 18f);
+			var divider = new UIDivider();
+			divider.Left.Set(PageLeft, 0f);
+			divider.Top.Set(ContentTop + 46f, 0f);
+			divider.Width.Set(-PageLeft - Pad, 1f);
+			divider.Height.Set(4f, 0f);
+			_panel.Append(divider);
 		}
 
 		// ----- Biblioteca -----
@@ -401,7 +419,7 @@ namespace Terraprint.Common.UI
 			empty.Height.Set(24f, 0f);
 			preview.Append(empty);
 
-			var line = new UILabel(ProjectionLine, 0.85f, Color.White);
+			var line = new UILabel(ProjectionLine, 0.85f, TerraprintStyle.Title);
 			line.Left.Set(12f, 0f);
 			line.Top.Set(-68f, 1f);
 			line.Width.Set(-24f, 1f);
@@ -502,7 +520,7 @@ namespace Terraprint.Common.UI
 		private UIElement BuildMaterials()
 		{
 			var p = Page();
-			var info = new UILabel(MaterialsSummary.Text, 0.85f, Color.White);
+			var info = new UILabel(MaterialsSummary.Text, 0.85f, TerraprintStyle.Title);
 			info.Width.Set(0f, 1f);
 			info.Height.Set(24f, 0f);
 			p.Append(info);
@@ -600,7 +618,7 @@ namespace Terraprint.Common.UI
 			_pickerOverlay.Width.Set(0f, 1f);
 			_pickerOverlay.Height.Set(0f, 1f);
 			_pickerOverlay.SetPadding(10f);
-			var ptitle = new UILabel(() => Lang.UI("PickerTitle"), 0.9f, Color.White);
+			var ptitle = new UILabel(() => Lang.UI("PickerTitle"), 0.9f, TerraprintStyle.Title);
 			ptitle.Top.Set(4f, 0f);
 			ptitle.Width.Set(-120f, 1f);
 			ptitle.Height.Set(24f, 0f);
@@ -716,6 +734,18 @@ namespace Terraprint.Common.UI
 
 	// ======================= Elementos usados pelo menu =======================
 
+	/// <summary>Divisor horizontal do jogo ocupando a largura do elemento.</summary>
+	public class UIDivider : UIElement
+	{
+		public UIDivider() => IgnoresMouseInteraction = true;
+
+		protected override void DrawSelf(SpriteBatch sb)
+		{
+			var d = GetDimensions();
+			TerraprintStyle.DrawSeparator(sb, d.X, d.Y, d.Width);
+		}
+	}
+
 	/// <summary>Caixa arredondada de uma cor (fundo da barra lateral, cartoes).</summary>
 	public class UIBox : UIElement
 	{
@@ -730,7 +760,7 @@ namespace Terraprint.Common.UI
 				Main.LocalPlayer.mouseInterface = true;
 		}
 
-		protected override void DrawSelf(SpriteBatch sb) => TerraprintStyle.RoundedBox(sb, GetDimensions().ToRectangle(), Color, Color.Black * 0.7f);
+		protected override void DrawSelf(SpriteBatch sb) => TerraprintStyle.RoundedBox(sb, GetDimensions().ToRectangle(), Color, TerraprintStyle.PanelBorder);
 	}
 
 	/// <summary>Texto de uma linha que muda sozinho (cortado com "..." se nao couber).</summary>
@@ -740,6 +770,10 @@ namespace Terraprint.Common.UI
 		private readonly float _scale;
 		public Color Color;
 		public bool Center;
+		/// <summary>Usa a fonte grande de titulos do jogo.</summary>
+		public bool Big;
+		/// <summary>Centraliza o texto na altura do elemento.</summary>
+		public bool VCenter;
 
 		public UILabel(Func<string> text, float scale, Color color)
 		{
@@ -752,7 +786,13 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var d = GetDimensions();
+			if (Big) {
+				TerraprintStyle.TitleText(sb, _text(), Center ? d.X + d.Width / 2f : d.X, d.Y + d.Height / 2f, Color, _scale, d.Width, Center ? 0.5f : 0f);
+				return;
+			}
 			string t = TerraprintStyle.Ellipsis(_text() ?? "", _scale, d.Width);
+			if (VCenter)
+				d.Y += d.Height / 2f - 10f * _scale;
 			if (Center)
 				TerraprintStyle.Text(sb, t, new Vector2(d.X + d.Width / 2f, d.Y), Color, _scale, 0f, 0.5f);
 			else
@@ -766,7 +806,7 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = GetDimensions().ToRectangle();
-			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.InputBackground, Color.Black);
+			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.InputBackground, TerraprintStyle.PanelBorder);
 			if (!ProjectionSystem.HasProjection)
 				return;
 			bool fixedState = ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
@@ -776,7 +816,7 @@ namespace Terraprint.Common.UI
 			string text = fixedState
 				? Lang.UI("ProgressBar", (int)(f * 100f), ProgressTracker.Correct, ProgressTracker.Total, ProgressTracker.Missing, ProgressTracker.Wrong)
 				: Lang.UI("StateMovingShort");
-			TerraprintStyle.Text(sb, text, new Vector2(r.Center.X, r.Y + r.Height / 2f - 9f), Color.White, 0.75f, r.Width - 12f, 0.5f);
+			TerraprintStyle.Text(sb, text, new Vector2(r.Center.X, r.Y + r.Height / 2f - 9f), TerraprintStyle.Title, 0.75f, r.Width - 12f, 0.5f);
 		}
 	}
 
@@ -793,15 +833,16 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = GetDimensions().ToRectangle();
-			TerraprintStyle.RoundedBox(sb, r, IsMouseHovering ? TerraprintStyle.CardHover : TerraprintStyle.Card, Color.Black * 0.7f);
+			TerraprintStyle.RoundedBox(sb, r, IsMouseHovering ? TerraprintStyle.CardHover : TerraprintStyle.Card, TerraprintStyle.PanelBorder);
 			TerraprintStyle.Text(sb, Lang.UI("BadgeTitle"), new Vector2(r.X + 10, r.Y + 8), TerraprintStyle.Accent, 0.7f);
 			if (!ProjectionSystem.HasProjection) {
 				TerraprintStyle.Text(sb, Lang.UI("BadgeNone"), new Vector2(r.X + 10, r.Y + 28), TerraprintStyle.Muted, 0.72f, r.Width - 20);
 				return;
 			}
 			string name = TerraprintStyle.Ellipsis(ProjectionSystem.Current.Name ?? "", 0.8f, r.Width - 20);
-			TerraprintStyle.Text(sb, name, new Vector2(r.X + 10, r.Y + 26), Color.White, 0.8f);
+			TerraprintStyle.Text(sb, name, new Vector2(r.X + 10, r.Y + 26), TerraprintStyle.Title, 0.8f);
 			var bar = new Rectangle(r.X + 10, r.Bottom - 18, r.Width - 20, 10);
+			TerraprintStyle.Fill(sb, new Rectangle(bar.X - 1, bar.Y - 1, bar.Width + 2, bar.Height + 2), TerraprintStyle.PanelBorder);
 			TerraprintStyle.Fill(sb, bar, TerraprintStyle.InputBackground);
 			bool fixedState = ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed;
 			float f = fixedState ? ProgressTracker.Percent : 0f;
@@ -827,13 +868,13 @@ namespace Terraprint.Common.UI
 		protected override void DrawSelf(SpriteBatch sb)
 		{
 			var r = GetDimensions().ToRectangle();
-			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.Card, Color.Black * 0.7f);
-			var circle = new Rectangle(r.X + 14, r.Y + r.Height / 2 - 15, 30, 30);
-			TerraprintStyle.RoundedBox(sb, circle, TerraprintStyle.ButtonActive, Color.Black);
-			TerraprintStyle.Text(sb, _n.ToString(), new Vector2(circle.Center.X, circle.Y + 5), Color.White, 0.95f, 0f, 0.5f);
+			TerraprintStyle.RoundedBox(sb, r, TerraprintStyle.Card, TerraprintStyle.PanelBorder);
+			var circle = new Rectangle(r.X + 14, r.Y + r.Height / 2 - 16, 32, 32);
+			TerraprintStyle.DrawSlot(sb, circle, true, false, true);
+			TerraprintStyle.Text(sb, _n.ToString(), new Vector2(circle.Center.X, circle.Y + 6), TerraprintStyle.Highlight, 0.95f, 0f, 0.5f);
 			float textW = r.Width - 60 - 300;
-			TerraprintStyle.Text(sb, _title(), new Vector2(r.X + 56, r.Y + 16), Color.White, 0.9f, textW);
-			TerraprintStyle.Text(sb, TerraprintStyle.Ellipsis(_sub() ?? "", 0.72f, textW), new Vector2(r.X + 56, r.Y + 42), TerraprintStyle.Muted, 0.72f);
+			TerraprintStyle.Text(sb, _title(), new Vector2(r.X + 58, r.Y + 16), TerraprintStyle.Title, 0.9f, textW);
+			TerraprintStyle.Text(sb, TerraprintStyle.Ellipsis(_sub() ?? "", 0.72f, textW), new Vector2(r.X + 58, r.Y + 42), TerraprintStyle.Muted, 0.72f);
 		}
 	}
 
@@ -970,13 +1011,13 @@ namespace Terraprint.Common.UI
 				bool sel = _menu.Selected == path;
 				bool hover = i == _hovered;
 				TerraprintStyle.RoundedBox(sb, r, sel || hover ? TerraprintStyle.CardHover : TerraprintStyle.Card,
-					sel ? TerraprintStyle.Accent : Color.Black * 0.8f);
+					sel ? TerraprintStyle.Accent : TerraprintStyle.PanelBorder);
 				var img = new Rectangle(r.X + 8, r.Y + 8, r.Width - 16, r.Height - 52);
-				TerraprintStyle.Fill(sb, img, TerraprintStyle.PreviewBackground);
+				TerraprintStyle.RoundedBox(sb, img, TerraprintStyle.PreviewBackground, TerraprintStyle.PanelBorder);
 				var e = BlueprintPreview.Get(path);
 				BlueprintPreview.Draw(sb, e, new Rectangle(img.X + 3, img.Y + 3, img.Width - 6, img.Height - 6), hover || sel ? 1f : 0.85f);
 				string name = TerraprintStyle.Ellipsis(Path.GetFileNameWithoutExtension(path), 0.8f, r.Width - 16);
-				TerraprintStyle.Text(sb, name, new Vector2(r.X + 8, r.Bottom - 40), sel ? TerraprintStyle.Accent : Color.White, 0.8f);
+				TerraprintStyle.Text(sb, name, new Vector2(r.X + 8, r.Bottom - 40), sel ? TerraprintStyle.Accent : TerraprintStyle.Title, 0.8f);
 				string size = e == null || e.Failed ? Lang.UI("PreviewErrorShort") : $"{e.Width} x {e.Height}";
 				TerraprintStyle.Text(sb, size, new Vector2(r.X + 8, r.Bottom - 21), TerraprintStyle.Muted, 0.68f);
 			}
