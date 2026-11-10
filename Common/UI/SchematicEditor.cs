@@ -31,6 +31,7 @@ namespace Terraprint.Common.UI
 			c.TilePaint = 0;
 			c.HasActuator = false;
 			c.Inactive = false;
+			c.MissingTile = 0;
 		}
 
 		private static void SetTile(ref BlueprintCell c, int type, short fx, short fy)
@@ -44,6 +45,7 @@ namespace Terraprint.Common.UI
 			c.TilePaint = 0;
 			c.HasActuator = false;
 			c.Inactive = false;
+			c.MissingTile = 0;
 		}
 
 		/// <summary>Apaga o bloco da celula; se for parte de um movel, apaga o movel inteiro.</summary>
@@ -173,6 +175,7 @@ namespace Terraprint.Common.UI
 			touch(y * bp.Width + x);
 			bp[x, y].WallType = (ushort)wall;
 			bp[x, y].WallPaint = 0;
+			bp[x, y].MissingWall = 0;
 			return true;
 		}
 

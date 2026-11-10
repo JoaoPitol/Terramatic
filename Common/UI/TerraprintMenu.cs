@@ -250,7 +250,19 @@ namespace Terraprint.Common.UI
 			string name = Path.GetFileNameWithoutExtension(_selected);
 			if (e == null || e.Failed)
 				return name + "  ·  " + Lang.UI("PreviewError");
-			return name + "  ·  " + Lang.UI("FileInfo", e.Width, e.Height, e.Tiles);
+			string info = name + "  ·  " + Lang.UI("FileInfo", e.Width, e.Height, e.Tiles);
+			if (e.Mods.Count > 0)
+				info += "  ·  " + ModsText(e.Mods, e.MissingMods);
+			return info;
+		}
+
+		/// <summary>"Mods: Calamity Mod, Thorium (falta: Thorium)".</summary>
+		internal static string ModsText(List<string> mods, List<string> missing)
+		{
+			string text = Lang.UI("ModsUsed", string.Join(", ", mods.ConvertAll(Blueprint.ModDisplayName)));
+			if (missing.Count > 0)
+				text += " " + Lang.UI("ModsMissing", string.Join(", ", missing));
+			return text;
 		}
 
 		internal string Selected => _selected;
@@ -669,7 +681,12 @@ namespace Terraprint.Common.UI
 		public void OpenEditor(string path)
 		{
 			try {
-				OpenEditor(BlueprintIO.Load(path), path);
+				var bp = BlueprintIO.Load(path);
+				if (bp.UnknownTypes > 0) {
+					bp.GetMods(out _, out var missing);
+					Main.NewText(Lang.UI("UnknownTypesEditor", bp.UnknownTypes, string.Join(", ", missing)), Color.Orange);
+				}
+				OpenEditor(bp, path);
 			}
 			catch (Exception e) {
 				Main.NewText(Lang.UI("LoadError", Path.GetFileName(path), e.Message), Color.OrangeRed);

@@ -49,7 +49,7 @@ namespace Terraprint.Common.Blueprints
 		public static bool IsMultitile(in BlueprintCell c) => TryGetMultitile(c, out _, out _);
 
 		private static Blueprint NewLike(Blueprint s, int w, int h) => new(w, h) {
-			Name = s.Name, Author = s.Author, CreatedUtc = s.CreatedUtc,
+			Name = s.Name, Author = s.Author, CreatedUtc = s.CreatedUtc, MissingKeys = s.MissingKeys,
 		};
 
 		private static void CopyTile(in BlueprintCell from, ref BlueprintCell to)
@@ -63,6 +63,7 @@ namespace Terraprint.Common.Blueprints
 			to.TilePaint = from.TilePaint;
 			to.HasActuator = from.HasActuator;
 			to.Inactive = from.Inactive;
+			to.MissingTile = from.MissingTile;
 		}
 
 		private static void CopyWallAndLiquid(in BlueprintCell from, ref BlueprintCell to)
@@ -71,6 +72,7 @@ namespace Terraprint.Common.Blueprints
 			to.WallPaint = from.WallPaint;
 			to.LiquidAmount = from.LiquidAmount;
 			to.LiquidType = from.LiquidType;
+			to.MissingWall = from.MissingWall;
 		}
 
 		public static byte MirrorSlope(byte slope) => slope switch {

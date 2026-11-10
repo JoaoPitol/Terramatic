@@ -268,7 +268,8 @@ UI: {
 	LoadError: "[Terraprint] Não foi possível carregar {0}: {1}"
 	PlacingStart: "[Terraprint] {0} carregado. Mova o mouse e clique esquerdo para fixar. Use . para girar e , para espelhar."
 	MovingStart: "[Terraprint] Mova o mouse e clique esquerdo para fixar. Botão direito volta para onde estava."
-	UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos e foram ignorados."
+	UnknownTypes: "[Terraprint] {0} tipos de bloco/parede deste blueprint vêm de mods que não estão ativos ({1}) e ficam fora do fantasma. Ative o mod para vê-los."
+	UnknownTypesEditor: "[Terraprint] {0} tipos de bloco/parede vêm de mods que não estão ativos ({1}). Eles não aparecem no editor, mas continuam no arquivo ao salvar (a menos que você coloque algo por cima)."
 	RotateDropped: "[Terraprint] {0} blocos de móveis não couberam depois de girar e ficam ocultos (os móveis ficam em pé; só a posição deles gira)."
 	Fixed: "[Terraprint] Blueprint fixado em {0}, {1}. Ele fica salvo junto com este mundo."
 	Progress: "{0}: {1}/{2} ({3}%), faltam {4}, errados {5}"
@@ -305,6 +306,8 @@ UI: {
 	SaveHint: Depois de salvar, o blueprint aparece na aba Blueprints com a prévia.
 	PreviewError: Não foi possível ler este arquivo.
 	FileInfo: "{0} x {1}  ·  {2} blocos"
+	ModsUsed: "Mods: {0}"
+	ModsMissing: "(inativos: {0})"
 	LoadHint: Clique duas vezes na lista ou em Carregar para projetar no mundo.
 	Subtitle: Blueprints de construção
 	PageLibrary: Biblioteca

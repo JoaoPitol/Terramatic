@@ -268,7 +268,8 @@ UI: {
 	LoadError: "[Terraprint] Could not load {0}: {1}"
 	PlacingStart: "[Terraprint] {0} loaded. Move the mouse and left click to place it. Use . to rotate and , to mirror."
 	MovingStart: "[Terraprint] Move the mouse and left click to place. Right click returns to where it was."
-	UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded and were skipped."
+	UnknownTypes: "[Terraprint] {0} block/wall types in this blueprint come from mods that are not loaded ({1}) and are left out of the ghost. Enable the mod to see them."
+	UnknownTypesEditor: "[Terraprint] {0} block/wall types come from mods that are not loaded ({1}). They are hidden in the editor but stay in the file when you save (unless you place something over them)."
 	RotateDropped: "[Terraprint] {0} furniture tiles did not fit after rotating and are hidden (furniture stays upright; only its position rotates)."
 	Fixed: "[Terraprint] Blueprint placed at {0}, {1}. It stays saved with this world."
 	Progress: "{0}: {1}/{2} ({3}%), missing {4}, wrong {5}"
@@ -305,6 +306,8 @@ UI: {
 	SaveHint: After saving, the blueprint shows up in the Blueprints tab with its preview.
 	PreviewError: Could not read this file.
 	FileInfo: "{0} x {1}  ·  {2} tiles"
+	ModsUsed: "Mods: {0}"
+	ModsMissing: "(not loaded: {0})"
 	LoadHint: Double-click it in the list or press Load to project it in the world.
 	Subtitle: Building blueprints
 	PageLibrary: Library

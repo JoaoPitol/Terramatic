@@ -23,6 +23,12 @@ namespace Terraprint.Common.Blueprints
 		public byte LiquidAmount;
 		public byte LiquidType;
 
+		// Bloco ou parede de um mod que nao esta ativo: indice (a partir de 1) em Blueprint.MissingKeys, 0 = nenhum.
+		// A celula conta como vazia (HasTile false / WallType 0), mas o tipo e os quadros continuam guardados
+		// e voltam para o arquivo quando o blueprint e salvo de novo (ex.: pelo editor).
+		public ushort MissingTile;
+		public ushort MissingWall;
+
 		// So em memoria (nao vao para o arquivo): celulas ignoradas pelas listas de bloqueio das opcoes.
 		// O fantasma, o progresso, os materiais e a construcao automatica nao exigem nada nelas.
 		public bool SkipTile;

@@ -53,8 +53,10 @@ namespace Terraprint.Common.Systems
 			SelectionSystem.Cancel();
 			Players.TerraprintPlayer.SwallowClick();
 			Lang.Info(Lang.UI("PlacingStart", bp.Name), Color.LightSkyBlue);
-			if (bp.UnknownTypes > 0)
-				Main.NewText(Lang.UI("UnknownTypes", bp.UnknownTypes), Color.Orange);
+			if (bp.UnknownTypes > 0) {
+				bp.GetMods(out _, out var missing);
+				Main.NewText(Lang.UI("UnknownTypes", bp.UnknownTypes, string.Join(", ", missing)), Color.Orange);
+			}
 		}
 
 		public static void Clear()

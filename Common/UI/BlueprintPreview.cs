@@ -26,6 +26,8 @@ namespace Terraprint.Common.UI
 			public int Width, Height;
 			/// <summary>Blocos e objetos (celulas com bloco).</summary>
 			public int Tiles;
+			/// <summary>Mods cujos blocos/paredes o blueprint usa, e os que nao estao ativos (nomes internos).</summary>
+			public List<string> Mods = new(), MissingMods = new();
 			public bool Failed;
 		}
 
@@ -92,6 +94,7 @@ namespace Terraprint.Common.UI
 					tiles++;
 			}
 			e.Tiles = tiles;
+			bp.GetMods(out e.Mods, out e.MissingMods);
 			e.Texture = Build(bp);
 		}
 

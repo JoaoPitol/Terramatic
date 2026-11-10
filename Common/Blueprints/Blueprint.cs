@@ -27,7 +27,13 @@ namespace Terraprint.Common.Blueprints
 		public BlueprintCell[] Cells { get; private set; }
 
 		/// <summary>Quantos tipos de bloco/parede do arquivo nao existem neste jogo (mod ausente).</summary>
-		public int UnknownTypes { get; private set; }
+		public int UnknownTypes => MissingKeys.Count;
+
+		/// <summary>
+		/// Nomes ("Mod/Tipo") dos blocos e paredes que vieram de mods que nao estao ativos. As celulas apontam
+		/// para esta lista (BlueprintCell.MissingTile/MissingWall), entao eles voltam para o arquivo ao salvar.
+		/// </summary>
+		public List<string> MissingKeys = new();
 
 		public Blueprint(int width, int height)
 		{
@@ -76,7 +82,7 @@ namespace Terraprint.Common.Blueprints
 
 		public Blueprint Clone()
 		{
-			var bp = new Blueprint(Width, Height) { Name = Name, Author = Author, CreatedUtc = CreatedUtc, UnknownTypes = UnknownTypes };
+			var bp = new Blueprint(Width, Height) { Name = Name, Author = Author, CreatedUtc = CreatedUtc, MissingKeys = new List<string>(MissingKeys) };
 			Array.Copy(Cells, bp.Cells, Cells.Length);
 			return bp;
 		}
@@ -88,7 +94,7 @@ namespace Terraprint.Common.Blueprints
 		{
 			int w = Math.Max(1, Width + left + right);
 			int h = Math.Max(1, Height + top + bottom);
-			var bp = new Blueprint(w, h) { Name = Name, Author = Author, CreatedUtc = CreatedUtc };
+			var bp = new Blueprint(w, h) { Name = Name, Author = Author, CreatedUtc = CreatedUtc, MissingKeys = new List<string>(MissingKeys) };
 			for (int y = 0; y < h; y++) {
 				int sy = y - top;
 				if (sy < 0 || sy >= Height)
@@ -108,7 +114,8 @@ namespace Terraprint.Common.Blueprints
 			int minX = Width, minY = Height, maxX = -1, maxY = -1;
 			for (int y = 0; y < Height; y++) {
 				for (int x = 0; x < Width; x++) {
-					if (Cells[y * Width + x].IsEmpty)
+					ref BlueprintCell c = ref Cells[y * Width + x];
+					if (c.IsEmpty && !HasMissing(c))
 						continue;
 					if (x < minX) minX = x;
 					if (x > maxX) maxX = x;
@@ -127,6 +134,46 @@ namespace Terraprint.Common.Blueprints
 			foreach (var c in Cells)
 				if (c.HasTile) n++;
 			return n;
+		}
+
+		/// <summary>True quando a celula guarda um bloco ou parede de um mod que nao esta ativo.</summary>
+		public static bool HasMissing(in BlueprintCell c) => c.MissingTile > 0 && !c.HasTile || c.MissingWall > 0 && c.WallType == 0;
+
+		/// <summary>
+		/// Mods cujos blocos ou paredes o blueprint usa (nome interno, sem o Terraria), e quais deles nao estao ativos.
+		/// </summary>
+		public void GetMods(out List<string> used, out List<string> missing)
+		{
+			var usedSet = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+			var missingSet = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+			var seenTiles = new HashSet<int>();
+			var seenWalls = new HashSet<int>();
+			foreach (var c in Cells) {
+				if (c.HasTile && c.TileType >= TileID.Count && seenTiles.Add(c.TileType) && TileLoader.GetTile(c.TileType) is ModTile mt)
+					usedSet.Add(mt.Mod.Name);
+				if (c.WallType >= WallID.Count && seenWalls.Add(c.WallType) && WallLoader.GetWall(c.WallType) is ModWall mw)
+					usedSet.Add(mw.Mod.Name);
+			}
+			foreach (string key in MissingKeys) {
+				string mod = ModOfKey(key);
+				usedSet.Add(mod);
+				missingSet.Add(mod);
+			}
+			used = new List<string>(usedSet);
+			missing = new List<string>(missingSet);
+		}
+
+		/// <summary>"CalamityMod/Tijolo" -> "CalamityMod".</summary>
+		public static string ModOfKey(string key)
+		{
+			int slash = key.IndexOf('/');
+			return slash > 0 ? key.Substring(0, slash) : key;
+		}
+
+		/// <summary>Nome do mod para mostrar (o de exibicao, se o mod estiver ativo).</summary>
+		public static string ModDisplayName(string name)
+		{
+			return ModLoader.TryGetMod(name, out Mod mod) ? mod.DisplayNameClean : name;
 		}
 
 		public int CountWalls()
@@ -184,34 +231,37 @@ namespace Terraprint.Common.Blueprints
 		public TagCompound Save()
 		{
 			// Paleta: indice local -> nome do tipo. 0 fica reservado para "nenhum".
+			// Blocos de mods ausentes entram na paleta com o nome original, igual aos outros.
 			var tileKeys = new List<string>();
 			var wallKeys = new List<string>();
-			var tileIndex = new Dictionary<int, int>();
-			var wallIndex = new Dictionary<int, int>();
+			var tileIndex = new Dictionary<string, int>();
+			var wallIndex = new Dictionary<string, int>();
+			int Index(string key, List<string> keys, Dictionary<string, int> index)
+			{
+				if (!index.TryGetValue(key, out int i)) {
+					keys.Add(key);
+					i = keys.Count;
+					index[key] = i;
+				}
+				return i;
+			}
+			string Missing(ushort i) => i > 0 && i <= MissingKeys.Count ? MissingKeys[i - 1] : null;
 
 			using var ms = new MemoryStream();
 			using (var w = new BinaryWriter(ms)) {
 				foreach (var c in Cells) {
 					int ti = 0, wi = 0;
-					if (c.HasTile) {
-						if (!tileIndex.TryGetValue(c.TileType, out ti)) {
-							tileKeys.Add(TileKey(c.TileType));
-							ti = tileKeys.Count;
-							tileIndex[c.TileType] = ti;
-						}
-					}
-					if (c.WallType != 0) {
-						if (!wallIndex.TryGetValue(c.WallType, out wi)) {
-							wallKeys.Add(WallKey(c.WallType));
-							wi = wallKeys.Count;
-							wallIndex[c.WallType] = wi;
-						}
-					}
+					string tileKey = c.HasTile ? TileKey(c.TileType) : Missing(c.MissingTile);
+					string wallKey = c.WallType != 0 ? WallKey(c.WallType) : Missing(c.MissingWall);
+					if (tileKey != null)
+						ti = Index(tileKey, tileKeys, tileIndex);
+					if (wallKey != null)
+						wi = Index(wallKey, wallKeys, wallIndex);
 
 					byte flags = 0;
 					if (c.HalfBlock) flags |= 1;
 					if (c.HasActuator) flags |= 2;
-					if (c.Inactive) flags |= 4;
+					if (c.Inactive && tileKey != null) flags |= 4;
 					w.Write((ushort)ti);
 					w.Write(c.FrameX);
 					w.Write(c.FrameY);
@@ -252,16 +302,17 @@ namespace Terraprint.Common.Blueprints
 
 			var tileKeys = tag.GetList<string>("tileKeys");
 			var wallKeys = tag.GetList<string>("wallKeys");
+			// Tipo resolvido (>= 0) ou, para mods ausentes, -(indice em MissingKeys).
 			var tileMap = new int[tileKeys.Count + 1];
 			var wallMap = new int[wallKeys.Count + 1];
-			int unknown = 0;
 			for (int i = 0; i < tileKeys.Count; i++) {
-				if (!TryResolveTile(tileKeys[i], out tileMap[i + 1])) { tileMap[i + 1] = -1; unknown++; }
+				if (!TryResolveTile(tileKeys[i], out tileMap[i + 1]))
+					tileMap[i + 1] = -bp.AddMissing(tileKeys[i]);
 			}
 			for (int i = 0; i < wallKeys.Count; i++) {
-				if (!TryResolveWall(wallKeys[i], out wallMap[i + 1])) { wallMap[i + 1] = -1; unknown++; }
+				if (!TryResolveWall(wallKeys[i], out wallMap[i + 1]))
+					wallMap[i + 1] = -bp.AddMissing(wallKeys[i]);
 			}
-			bp.UnknownTypes = unknown;
 
 			byte[] data = tag.GetByteArray("cells");
 			using var r = new BinaryReader(new MemoryStream(data));
@@ -280,15 +331,33 @@ namespace Terraprint.Common.Blueprints
 				c.HalfBlock = (flags & 1) != 0;
 				c.HasActuator = (flags & 2) != 0;
 
-				if (ti > 0 && ti < tileMap.Length && tileMap[ti] >= 0) {
-					c.HasTile = true;
-					c.TileType = (ushort)tileMap[ti];
+				if (ti > 0 && ti < tileMap.Length) {
 					c.Inactive = (flags & 4) != 0;
+					if (tileMap[ti] >= 0) {
+						c.HasTile = true;
+						c.TileType = (ushort)tileMap[ti];
+					}
+					else
+						c.MissingTile = (ushort)-tileMap[ti];
 				}
-				if (wi > 0 && wi < wallMap.Length && wallMap[wi] >= 0)
-					c.WallType = (ushort)wallMap[wi];
+				if (wi > 0 && wi < wallMap.Length) {
+					if (wallMap[wi] >= 0)
+						c.WallType = (ushort)wallMap[wi];
+					else
+						c.MissingWall = (ushort)-wallMap[wi];
+				}
 			}
 			return bp;
+		}
+
+		private int AddMissing(string key)
+		{
+			int i = MissingKeys.IndexOf(key);
+			if (i < 0) {
+				MissingKeys.Add(key);
+				i = MissingKeys.Count - 1;
+			}
+			return i + 1;
 		}
 
 		#endregion
