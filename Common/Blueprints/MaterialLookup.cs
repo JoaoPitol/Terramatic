@@ -41,6 +41,8 @@ namespace Terraprint.Common.Blueprints
 			_tileItems = null;
 			_wallItems = null;
 			_placeableWalls = new();
+			_wallDrops = null;
+			_wallDropsTried = false;
 		}
 
 		/// <summary>
@@ -57,7 +59,8 @@ namespace Terraprint.Common.Blueprints
 
 		/// <summary>
 		/// Parede que o jogador consegue colocar no lugar desta: ela mesma quando algum item a coloca, senao
-		/// a versao "segura" (WallID.Sets.BlendType do jogo, ou o mesmo nome sem "Unsafe"). Sem equivalente, ela mesma.
+		/// a versao "segura" (WallID.Sets.BlendType do jogo, ou o mesmo nome sem "Unsafe"; nas paredes de mods,
+		/// tambem o item que ela solta). Sem equivalente, ela mesma.
 		/// </summary>
 		public static int PlaceableWall(int wallType)
 		{
@@ -79,7 +82,9 @@ namespace Terraprint.Common.Blueprints
 					break;
 				}
 			}
-			if (found == wallType && WallLoader.GetWall(wallType) == null) {
+			if (found == wallType && WallLoader.GetWall(wallType) is ModWall modWall)
+				found = ModdedPlaceableWall(modWall);
+			else if (found == wallType) {
 				string name = WallID.Search.GetName(wallType);
 				string safe = System.Text.RegularExpressions.Regex.Replace(name ?? "", "Unsafe[0-9]*$", "");
 				foreach (string candidate in new[] { safe, safe + "Wall", safe.Replace("Unsafe", "") }) {
@@ -91,6 +96,47 @@ namespace Terraprint.Common.Blueprints
 			}
 			_placeableWalls[wallType] = found;
 			return found;
+		}
+
+		/// <summary>
+		/// Paredes de mods sem item (as naturais, que aparecem no mundo gerado): usa a parede que o item
+		/// que ela solta coloca (ModWall.RegisterItemDrop), ou a do mesmo mod com o nome sem "Unsafe"/"Natural".
+		/// </summary>
+		private static int ModdedPlaceableWall(ModWall wall)
+		{
+			int drop = WallDropItem(wall.Type);
+			if (drop > 0 && ContentSamples.ItemsByType.TryGetValue(drop, out Item item) && item.createWall > WallID.None && _wallItems.ContainsKey(item.createWall))
+				return item.createWall;
+
+			string name = wall.Name;
+			string bare = System.Text.RegularExpressions.Regex.Replace(name, "(Unsafe|Natural)[0-9]*", "");
+			foreach (string candidate in new[] { bare, bare + "Wall" }) {
+				if (candidate.Length > 0 && candidate != name && ModContent.TryFind(wall.Mod.Name, candidate, out ModWall safe) && _wallItems.ContainsKey(safe.Type))
+					return safe.Type;
+			}
+			return wall.Type;
+		}
+
+		private static System.Collections.Generic.IDictionary<int, int> _wallDrops;
+		private static bool _wallDropsTried;
+
+		/// <summary>
+		/// Item registrado com ModWall.RegisterItemDrop para esta parede, ou 0. O tModLoader nao expoe esse mapa,
+		/// entao ele e lido por reflexao; se a versao mudar e o campo sumir, so fica sem esse atalho.
+		/// </summary>
+		private static int WallDropItem(int wallType)
+		{
+			if (!_wallDropsTried) {
+				_wallDropsTried = true;
+				try {
+					var field = typeof(WallLoader).GetField("wallTypeToItemType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+					_wallDrops = field?.GetValue(null) as System.Collections.Generic.IDictionary<int, int>;
+				}
+				catch (System.Exception) {
+					_wallDrops = null;
+				}
+			}
+			return _wallDrops != null && _wallDrops.TryGetValue(wallType, out int item) ? item : 0;
 		}
 
 		/// <summary>Duas paredes contam como iguais se forem a mesma ou tiverem a mesma versao colocavel.</summary>
