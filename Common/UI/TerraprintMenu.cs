@@ -470,6 +470,11 @@ namespace Terraprint.Common.UI
 				v => TerraprintConfig.Set(c => c.ShowOnMinimap = c.ShowOnFullscreenMap = v)), 0f, y, right, 32f);
 			y += 36f;
 			Put(col, new UIToggleRow(Lang.UI("ShowCorrectShort"), null, () => Cfg.ShowCorrect, v => TerraprintConfig.Set(c => c.ShowCorrect = v)), 0f, y, right, 32f);
+			y += 32f + 10f;
+
+			col.Append(Header(Lang.UI("GroupMovement"), y));
+			y += 22f;
+			Put(col, new UIToggleRow(Lang.UI("NoClipShort"), Lang.UI("NoClipTip"), () => Players.TerraprintPlayer.NoClip, Players.TerraprintPlayer.SetNoClip), 0f, y, right, 32f);
 
 			// Acoes principais embaixo.
 			_buildButton = new UITextButton(() => Lang.UI(_buildButton.Held ? "AutoBuilding" : "AutoBuild"), null) {
@@ -479,9 +484,16 @@ namespace Terraprint.Common.UI
 				Tooltip = () => Lang.UI("AutoBuildTip"),
 			};
 			_buildButton.Top.Set(-2 * BtnH - Gap, 1f);
-			_buildButton.Width.Set(0f, 1f);
+			_buildButton.Width.Set(half, 0f);
 			_buildButton.Height.Set(BtnH, 0f);
 			col.Append(_buildButton);
+			// Constroi o blueprint inteiro com o que tiver no inventario, sem precisar estar perto.
+			var buildAll = new UITextButton(() => Lang.UI(AutoBuildSystem.BuildingAll ? "BuildAllStop" : "BuildAll"), AutoBuildSystem.ToggleBuildAll) {
+				IsEnabled = () => ProjectionSystem.State == ProjectionSystem.ProjectionState.Fixed || AutoBuildSystem.BuildingAll,
+				IsActive = () => AutoBuildSystem.BuildingAll,
+				Tooltip = () => Lang.UI("BuildAllTip"),
+			};
+			Put(col, buildAll, half + Gap, 0f, half, BtnH).Top.Set(-2 * BtnH - Gap, 1f);
 			var edit = new UITextButton(Lang.UI("Edit"), () => {
 				if (ProjectionSystem.SourcePath != null && File.Exists(ProjectionSystem.SourcePath))
 					OpenEditor(ProjectionSystem.SourcePath);

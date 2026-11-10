@@ -40,11 +40,94 @@ namespace Terraprint.Common.Systems
 
 		public static bool Holding => Main.GameUpdateCount <= _heldUntil;
 
+		// --- Construir tudo (um clique, sem limite de alcance) ---
+
+		/// <summary>Blocos por tick no "Construir tudo" em single player (espalha o trabalho para nao travar o jogo).</summary>
+		private const int BuildAllPerTick = 60;
+		/// <summary>Tentativas por tick no "Construir tudo".</summary>
+		private const int BuildAllAttemptsPerTick = 600;
+
+		private static bool _buildAll;
+		private static bool _buildAllRetried;
+		private static int _buildAllPlaced;
+
+		/// <summary>O "Construir tudo" esta rodando.</summary>
+		public static bool BuildingAll => _buildAll;
+
+		/// <summary>Liga ou para o "Construir tudo".</summary>
+		public static void ToggleBuildAll()
+		{
+			if (_buildAll) {
+				FinishBuildAll(stopped: true);
+				return;
+			}
+			if (ProjectionSystem.State != ProjectionSystem.ProjectionState.Fixed) {
+				Lang.Info(Lang.UI("AutoBuildNoProjection"), Color.Orange);
+				return;
+			}
+			_buildAll = true;
+			_buildAllRetried = false;
+			_buildAllPlaced = 0;
+			_failed.Clear();
+			Lang.Info(Lang.UI("BuildAllStarted"));
+		}
+
+		private static void FinishBuildAll(bool stopped)
+		{
+			_buildAll = false;
+			_failed.Clear();
+			ProgressTracker.Recalculate();
+			if (stopped)
+				Lang.Info(Lang.UI("BuildAllStopped", _buildAllPlaced), Color.Orange);
+			else if (ProgressTracker.Missing > 0 || ProgressTracker.Wrong > 0)
+				Lang.Info(Lang.UI("BuildAllPartial", _buildAllPlaced, ProgressTracker.Missing, ProgressTracker.Wrong), Color.Orange);
+			else
+				Lang.Info(Lang.UI("BuildAllDone", _buildAllPlaced), Color.LightGreen);
+		}
+
+		/// <summary>Um tick do "Construir tudo": coloca um lote em qualquer parte do blueprint.</summary>
+		private static void UpdateBuildAll()
+		{
+			Player player = Main.LocalPlayer;
+			if (ProjectionSystem.State != ProjectionSystem.ProjectionState.Fixed || player == null || !player.active || player.dead || player.noBuilding) {
+				FinishBuildAll(stopped: true);
+				return;
+			}
+
+			int max = BuildAllPerTick;
+			if (Main.netMode == NetmodeID.MultiplayerClient) {
+				_mpBudget = System.Math.Min(1f, _mpBudget + MultiplayerBlocksPerTick);
+				max = (int)_mpBudget;
+				if (max == 0)
+					return;
+			}
+			int placed = PlaceBatch(player, max, ProjectionSystem.Area, BuildAllAttemptsPerTick, out int pending);
+			if (Main.netMode == NetmodeID.MultiplayerClient)
+				_mpBudget -= placed;
+			if (placed > 0) {
+				_buildAllPlaced += placed;
+				_buildAllRetried = false;
+				SoundEngine.PlaySound(SoundID.Dig, player.Center);
+				ProgressTracker.RequestRefresh();
+			}
+			if (pending > 0)
+				return;
+			// Acabaram as posicoes que ainda nao falharam. Tenta as que falharam mais uma vez (moveis que
+			// dependiam de um bloco colocado depois, por exemplo); se nada mudar, terminou.
+			if (!_buildAllRetried && _failed.Count > 0) {
+				_failed.Clear();
+				_buildAllRetried = true;
+				return;
+			}
+			FinishBuildAll(stopped: false);
+		}
+
 		/// <summary>Chamado a cada tick enquanto o botao do menu ou a tecla estao pressionados.</summary>
 		public static void RequestHold() => _heldUntil = Main.GameUpdateCount + 1;
 
 		public override void ClearWorld()
 		{
+			_buildAll = false;
 			_heldUntil = 0;
 			_wasHeld = false;
 			_failed.Clear();
@@ -52,6 +135,11 @@ namespace Terraprint.Common.Systems
 
 		public override void PostUpdateEverything()
 		{
+			if (_buildAll) {
+				_wasHeld = false;
+				UpdateBuildAll();
+				return;
+			}
 			bool held = Holding;
 			bool justPressed = held && !_wasHeld;
 			bool justReleased = !held && _wasHeld;
@@ -83,7 +171,7 @@ namespace Terraprint.Common.Systems
 				if (max == 0)
 					return;
 			}
-			int placed = PlaceBatch(player, max);
+			int placed = PlaceBatch(player, max, Reach(player), MaxAttemptsPerTick, out _);
 			if (Main.netMode == NetmodeID.MultiplayerClient)
 				_mpBudget -= placed;
 			if (placed > 0) {
@@ -112,12 +200,18 @@ namespace Terraprint.Common.Systems
 			return new Rectangle(left, top, right - left + 1, bottom - top + 1);
 		}
 
-		private static int PlaceBatch(Player player, int max)
+		/// <summary>
+		/// Coloca ate <paramref name="max"/> blocos/paredes do blueprint dentro de <paramref name="region"/>
+		/// (o alcance do jogador, ou o blueprint inteiro no "Construir tudo"). <paramref name="pending"/> diz
+		/// quantas posicoes ainda dava para tentar neste tick.
+		/// </summary>
+		private static int PlaceBatch(Player player, int max, Rectangle region, int maxAttempts, out int pending)
 		{
+			pending = 0;
 			var bp = ProjectionSystem.Current;
 			var origin = ProjectionSystem.Origin;
 			var cfg = TerraprintConfig.Instance;
-			Rectangle area = Rectangle.Intersect(Reach(player), ProjectionSystem.Area);
+			Rectangle area = Rectangle.Intersect(region, ProjectionSystem.Area);
 			if (area.Width <= 0 || area.Height <= 0)
 				return 0;
 
@@ -145,6 +239,7 @@ namespace Terraprint.Common.Systems
 						candidates.Add(new Candidate { Index = i, Wall = true, Priority = 1, Distance = dist });
 				}
 			}
+			pending = candidates.Count;
 			if (candidates.Count == 0)
 				return 0;
 
@@ -152,7 +247,7 @@ namespace Terraprint.Common.Systems
 
 			int placed = 0, attempts = 0;
 			foreach (var cand in candidates) {
-				if (placed >= max || attempts >= MaxAttemptsPerTick)
+				if (placed >= max || attempts >= maxAttempts)
 					break;
 				attempts++;
 				int x = origin.X + cand.Index % bp.Width;
@@ -219,10 +314,14 @@ namespace Terraprint.Common.Systems
 			int w = hasObject ? data.Width : 1;
 			int h = hasObject ? data.Height : 1;
 
-			// Nao prende o jogador dentro de um bloco solido.
-			if (Main.tileSolid[c.TileType] && !Main.tileSolidTop[c.TileType]
-				&& player.Hitbox.Intersects(new Rectangle(x * 16, y * 16, w * 16, h * 16)))
-				return false;
+			// Nao prende o jogador: sem NoClip, deixa uma folga de 1 bloco dos lados e em cima dele
+			// (embaixo pode, e o chao). Esses blocos sao colocados depois, quando o jogador se afastar.
+			if (Main.tileSolid[c.TileType] && !Main.tileSolidTop[c.TileType] && !Players.TerraprintPlayer.NoClip) {
+				Rectangle hb = player.Hitbox;
+				var keepClear = new Rectangle(hb.X - 16, hb.Y - 16, hb.Width + 32, hb.Height + 16);
+				if (keepClear.Intersects(new Rectangle(x * 16, y * 16, w * 16, h * 16)))
+					return false;
+			}
 
 			bool ok = hasObject && TileObjectData.CustomPlace(c.TileType, style)
 				? PlaceObject(player, c, x, y, style, data)

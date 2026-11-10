@@ -340,6 +340,18 @@ UI: {
 	ShowMapShort: Mostrar no mapa
 	ShowCorrectShort: Mostrar os certos
 	AutoBuildTip: Segure para colocar os blocos ao seu alcance usando o inventário.
+	BuildAll: Construir tudo
+	BuildAllStop: Parar
+	BuildAllTip: Coloca o blueprint inteiro com os itens do inventário, sem precisar estar perto. Clique de novo para parar.
+	BuildAllStarted: "[Terraprint] Construindo o blueprint inteiro..."
+	BuildAllDone: "[Terraprint] Construção completa: {0} colocados."
+	BuildAllPartial: "[Terraprint] Construção terminou: {0} colocados. Ficaram {1} faltando (sem item no inventário ou sem apoio) e {2} errados (veja Materiais)."
+	BuildAllStopped: "[Terraprint] Construção parada: {0} colocados."
+	GroupMovement: Movimento
+	NoClipShort: NoClip (atravessar blocos)
+	NoClipTip: Voe atravessando blocos com WASD (pulo sobe, Shift acelera). Útil para sair de dentro da construção.
+	NoClipOn: "[Terraprint] NoClip ligado: voe com WASD, pulo sobe, Shift acelera."
+	NoClipOff: "[Terraprint] NoClip desligado."
 	NoProjectionShort: Nenhum blueprint carregado
 	StateMovingShort: Seguindo o mouse: clique para fixar
 	ProgressBar: "{0}%  ·  {1}/{2} certos  ·  faltam {3}  ·  errados {4}"

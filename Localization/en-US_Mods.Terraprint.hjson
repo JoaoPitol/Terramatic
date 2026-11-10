@@ -340,6 +340,18 @@ UI: {
 	ShowMapShort: Show on map
 	ShowCorrectShort: Show correct blocks
 	AutoBuildTip: Hold to place the blocks in reach using your inventory.
+	BuildAll: Build all
+	BuildAllStop: Stop
+	BuildAllTip: Places the whole blueprint using your inventory, no need to be nearby. Click again to stop.
+	BuildAllStarted: "[Terraprint] Building the whole blueprint..."
+	BuildAllDone: "[Terraprint] Build complete: {0} placed."
+	BuildAllPartial: "[Terraprint] Build finished: {0} placed. {1} still missing (no item in your inventory or nothing to rest on) and {2} wrong (see Materials)."
+	BuildAllStopped: "[Terraprint] Build stopped: {0} placed."
+	GroupMovement: Movement
+	NoClipShort: NoClip (pass through blocks)
+	NoClipTip: Fly through blocks with WASD (jump goes up, Shift is faster). Handy to get out of a build.
+	NoClipOn: "[Terraprint] NoClip on: fly with WASD, jump goes up, Shift is faster."
+	NoClipOff: "[Terraprint] NoClip off."
 	NoProjectionShort: No blueprint loaded
 	StateMovingShort: Following the mouse: click to place
 	ProgressBar: "{0}%  ·  {1}/{2} correct  ·  {3} missing  ·  {4} wrong"
