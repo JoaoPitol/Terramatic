@@ -6,6 +6,8 @@ Terraprint: salve suas construções como blueprints e reconstrua em qualquer lu
 - O blueprint aparece também no minimapa e no mapa grande, com o progresso
 - Lista de materiais: quanto precisa, quanto falta e quanto você tem no inventário
 - Construção automática: segure o botão (ou a tecla P) e o mod coloca os blocos ao seu alcance, gastando os itens do inventário
+- Funciona com blocos de outros mods (Calamity, Thorium...)
+- Com o Magic Storage (opcional): botão no terminal com os materiais que faltam, quanto há no storage e atalho para a receita no Crafting Terminal
 - Todas as opções podem ser ligadas e desligadas nas configurações do mod
 
 Abra o menu com a tecla K (pode trocar em Configurações > Controles).
@@ -22,6 +24,8 @@ Terraprint: save your builds as blueprints and rebuild them anywhere.
 - The blueprint also shows on the minimap and the full map, with progress
 - Materials list: how many you need, how many are left and how many you have
 - Auto-build: hold the button (or the P key) and the mod places blocks within reach, using items from your inventory
+- Works with tiles from other mods (Calamity, Thorium...)
+- With Magic Storage (optional): a button in the terminal with the missing materials, how many the storage has and a shortcut to the recipe in the Crafting Terminal
 - Every option can be turned on or off in the mod config
 
 Open the menu with K (change it in Settings > Controls).

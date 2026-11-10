@@ -9,11 +9,25 @@
 [*] Lista de materiais: quanto precisa, quanto falta e quanto você tem no inventário
 [*] Construção automática: segure o botão (ou a tecla [b]P[/b]) e o mod coloca os blocos ao seu alcance, gastando os itens do inventário
 [*] Editor de schematic dentro do jogo, com paleta de blocos, paredes e móveis
+[*] Funciona com blocos, paredes e móveis de outros mods (Calamity, Thorium...), inclusive na paleta do editor (busque pelo nome do mod)
 [*] Todas as opções podem ser ligadas e desligadas nas configurações do mod
 [/list]
 
 Abra o menu com a tecla [b]K[/b] (pode trocar em Configurações > Controles).
 Os blueprints ficam em [i]Documents/My Games/Terraria/tModLoader/Terraprint[/i].
+
+[h2]Blocos de outros mods[/h2]
+A biblioteca mostra quais mods cada blueprint usa. Se um mod estiver desativado, os blocos dele ficam fora do fantasma, mas continuam guardados no arquivo e voltam quando o mod for ativado de novo.
+
+[h2]Magic Storage (opcional)[/h2]
+Com o [b]Magic Storage[/b] ativo, o terminal do storage ganha um botão [b]Terraprint[/b] que mostra:
+[list]
+[*] o resumo do storage e o blueprint fixado no mapa, com o progresso
+[*] os materiais que faltam, com quanto há no inventário e no storage
+[*] o botão [b]Pegar o que falta[/b], que tira do storage o que ainda falta para terminar
+[*] clique num material para abrir a receita dele direto no Crafting Terminal conectado
+[/list]
+Não é obrigatório: sem o Magic Storage o Terraprint funciona normalmente.
 
 [h2]Multiplayer[/h2]
 O mod é só do cliente: funciona em qualquer servidor, mesmo sem o mod instalado nele. Em servidores, a construção automática coloca no máximo 15 blocos por segundo para não cair no anti-spam do jogo.
@@ -36,11 +50,25 @@ Este é um projeto pessoal, sem fins lucrativos, criado com a ajuda de LLMs. Se 
 [*] Materials list: how many you need, how many are left and how many you have
 [*] Auto-build: hold the button (or the [b]P[/b] key) and the mod places blocks within reach, using items from your inventory
 [*] In-game schematic editor with a palette of tiles, walls and furniture
+[*] Works with tiles, walls and furniture from other mods (Calamity, Thorium...), including the editor palette (search by mod name)
 [*] Every option can be turned on or off in the mod config
 [/list]
 
 Open the menu with [b]K[/b] (change it in Settings > Controls).
 Blueprints are stored in [i]Documents/My Games/Terraria/tModLoader/Terraprint[/i].
+
+[h2]Tiles from other mods[/h2]
+The library shows which mods each blueprint uses. If a mod is disabled, its tiles are left out of the ghost but stay saved in the file, and come back when the mod is enabled again.
+
+[h2]Magic Storage (optional)[/h2]
+With [b]Magic Storage[/b] enabled, the storage terminal gets a [b]Terraprint[/b] button that shows:
+[list]
+[*] a storage summary and the blueprint placed on the map, with progress
+[*] the missing materials, with how many are in your inventory and in the storage
+[*] a [b]Take what is missing[/b] button that pulls what you still need out of the storage
+[*] click a material to open its recipe right in the connected Crafting Terminal
+[/list]
+It is not required: without Magic Storage, Terraprint works as usual.
 
 [h2]Multiplayer[/h2]
 The mod is client-side only: it works on any server, even one without the mod. On servers, auto-build places at most 15 blocks per second to avoid the game's anti-spam kick.

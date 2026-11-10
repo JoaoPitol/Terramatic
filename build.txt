@@ -1,6 +1,6 @@
 displayName = Terraprint
 author = Joao
-version = 0.1.1
+version = 0.2.0
 homepage = https://terramatic.com.br
 hideCode = false
 hideResources = false
